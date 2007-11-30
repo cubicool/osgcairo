@@ -74,7 +74,8 @@ osg::Camera* createOrthoCamera(unsigned int width, unsigned int height) {
 int main(int argc, char** argv) {
 	osgViewer::Viewer viewer;
 
-	osg::Camera* camera = createOrthoCamera(1280.0f, 1024.0f);
+	osg::Camera* camera = createOrthoCamera(1280, 1024);
+
 	osg::Geode*  cairo  = createGroup();
 	
 	camera->addChild(cairo);
