@@ -1,0 +1,131 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSG_CAIRO_SURFACE
+#define OSG_CAIRO_SURFACE
+
+#include <osgCairo/Matrix>
+#include <osgCairo/Path>
+#include <string>
+
+namespace osgCairo {
+
+class Surface {
+protected:
+	CairoSurface* _surface;
+	CairoContext* _context;
+	
+	Surface();
+	
+public:
+	~Surface();
+
+	bool createContext(unsigned int, unsigned int, unsigned char*);
+
+	CairoSurface* getSurface ();
+	CairoContext* getContext ();
+
+	// Context stuff: http://www.cairographics.org/manual/cairo-cairo-t.html
+	//
+	// The methods that I leave out are:
+	// - cairo_create
+	// - cairo_reference
+	// - cairo_destroy
+	// - cairo_get_target
+	// - cairo_push_group
+	// - cairo_push_group_with_content
+	// - cairo_pop_group
+	// - cairo_pop_group_to_source
+	// - cairo_get_group_target
+	// - cairo_set_soruce_rgb
+	// - cairo_set_source_surface
+	// - cairo_get_source
+	// - cairo_copy_page
+	// - cairo_show_page
+	//
+	// The methods that will require custom classes are:
+	// - set_source
+	// - mask
+	// - mask_surface
+	//
+	// The methods that will require more investigation are:
+	// - set_dash
+	
+	CairoStatus   status         ();
+	const char*   statusToString ();
+	CairoFillRule getFillRule    ();
+	CairoLineCap  getLineCap     ();
+	CairoLineJoin getLineJoin    ();
+	CairoOperator getOperator    ();
+	double        getLineWidth   ();
+	double        getMiterLimit  ();
+	double        getTolerance   ();
+	bool          inFill         (double, double);
+	bool          inStroke       (double, double);
+	void          save           ();
+	void          restore        ();	
+	void          setSourceRGBA  (double, double, double, double=1.0f);
+	void          setAntialias   (CairoAntialias);
+	void          setFillRule    (CairoFillRule);
+	void          setLineCap     (CairoLineCap);
+	void          setLineJoin    (CairoLineJoin);
+	void          setLineWidth   (double);
+	void          setMiterLimit  (double);
+	void          setOperator    (CairoOperator);
+	void          setTolerance   (double);
+	void          clip           ();
+	void          clipPreserve   ();
+	void          resetClip      ();
+	void          fill           ();
+	void          fillPreserve   ();
+	void          fillExtents    (double&, double&, double&, double&);
+	void          paint          ();
+	void          paintWithAlpha (double);
+	void          stroke         ();
+	void          strokePreserve ();
+	void          strokeExtents  (double&, double&, double&, double&);
+
+	// Path stuff: http://www.cairographics.org/manual/cairo-Paths.html
+	//
+	// The methods that will require custom classes are:
+	// - glyph_path
+	
+	Path copyPath     ();
+	Path copyPathFlat ();
+	
+	void appendPath      (Path);
+	void newPath         ();
+	void newSubPath      ();
+	void closePath       ();
+	void getCurrentPoint (double&, double&);
+	void arc             (double, double, double, double, double);
+	void arcNegative     (double, double, double, double, double);
+	void curveTo         (double, double, double, double, double, double);
+	void lineTo          (double, double);
+	void moveTo          (double, double);
+	void rectangle       (double, double, double, double);
+	void textPath        (const std::string&);
+	void relCurveTo      (double, double, double, double, double, double);
+	void relLineTo       (double, double);
+	void relMoveTo       (double, double);
+
+	// Transformation stuff: http://www.cairographics.org/manual/cairo-Transformations.html
+	
+	Matrix getMatrix(); 
+	
+	void translate            (double, double);
+	void scale                (double, double);
+	void rotate               (double);
+	void transform            (const Matrix&);
+	void setMatrix            (const Matrix&);
+	void identityMatrix       ();
+	void userToDevice         (double&, double&);
+	void userToDeviceDistance (double&, double&);
+	void deviceToUser         (double&, double&);
+	void deviceToUserDistance (double&, double&);
+	
+	void writeToPNG(const std::string&);
+};
+
+} // namespace osgCairo
+
+#endif

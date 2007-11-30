@@ -1,0 +1,53 @@
+INTRODUCTION: Cairo
+-------------------------------------------------------------------------------
+
+First things first: you should know what Cairo is and why you want to use it.
+Visit this website and look around for a few minutes:
+
+	http://cairographics.org
+
+In summation, Cairo is a 2D vector graphics drawing library, which conceptually
+means you are creating images as "algorithms" or "instructions" rather than
+colored pixels. This is desirable for many reasons, the greatest of which is
+scalability. By this I mean you can take any image created by Cairo and scale it
+to any arbitrary dimensions without a single bit of loss in clarity. Clearly,
+this is the hotness.
+
+
+
+INTRODUCTION: osgCairo
+-------------------------------------------------------------------------------
+
+osgCairo is a NodeKit for OpenSceneGraph that abstracts the work of glueing a
+Cairo image and an OSG image together, allowing you to concentrate wholly on
+creating your image. It should be noted and equally comitted to memory that
+osgCairo is currently an OFFLINE OR LOADTIME DRAWING library--it is not 
+intended to be used interactively (or, rather, if it is, infrequently).
+While it is absolutely possible to redraw your Cairo image as often as you
+like, performance in OSG will suffer.
+
+
+
+USAGE
+-------------------------------------------------------------------------------
+
+First, get yourself a new SurfaceImage object:
+
+	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage("random1");
+
+Secondly, call the various Cairo methods on the image:
+
+	image->setSourceRGBA(1.0f, 1.0f, 0.0f);
+	image->moveTo(0.0f, 0.0f);
+	image->lineTo(10.0f, 10.0f);
+	image->stroke();
+
+Thirdly, once you're finished drawing--since an osgCairo::SurfaceImage is
+also an osg::Image--inform OSG that the Image has been modified and is
+dirty:
+
+	image->dirty();
+
+Have a look at examples/osgcairoviewer to see some of this in action. If you're
+looking for a less C++'ish way of playing around with Cairo and OSG, check out
+osgEgypt.

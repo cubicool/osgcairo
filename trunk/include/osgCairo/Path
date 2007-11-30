@@ -1,0 +1,30 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSG_CAIRO_PATH
+#define OSG_CAIRO_PATH
+
+#include <osg/Referenced>
+#include <osgCairo/Types>
+
+namespace osgCairo {
+
+class Surface;
+	
+class Path : public osg::Referenced {
+	friend class Surface;
+
+	CairoPath* _path;
+	
+	Path(CairoPath* path);
+	
+public:
+	//class PathData {};
+
+	~Path();
+
+	CairoPath* getPath();
+};
+	
+} // namespace osgCairo
+
+#endif
