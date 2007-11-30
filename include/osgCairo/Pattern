@@ -1,0 +1,57 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSG_CAIRO_PATTERN
+#define OSG_CAIRO_PATTERN
+
+#include <osg/Referenced>
+#include <osgCairo/Types>
+
+namespace osgCairo {
+
+class Pattern : public osg::Referenced {
+protected:
+	CairoPattern* _pattern;
+	
+	Pattern(CairoPattern* =0);
+
+public:
+	~Pattern ();
+
+	CairoPattern* getPattern();
+	
+	// The functions that will happen later are:
+	// - setMatrix
+	// - getMatrix
+
+	void addColorStopRGBA (double, double, double, double, double=1.0f);
+	void setExtend        (CairoExtend);
+	void setFilter        (CairoFilter);
+	
+	CairoStatus status    ();
+	CairoExtend getExtend ();
+	CairoFilter getFilter ();
+};
+
+class SolidPattern : public Pattern {
+public:
+	SolidPattern(double, double, double, double=1.0f);
+};
+
+class SurfacePattern : public Pattern {
+public:
+	SurfacePattern(CairoSurface*);
+};
+
+class LinearPattern : public Pattern {
+public:
+	LinearPattern(double, double, double, double);
+};
+
+class RadialPattern : public Pattern {
+public:
+	RadialPattern(double, double, double, double, double, double);
+};
+
+} // namespace osgCairo
+
+#endif

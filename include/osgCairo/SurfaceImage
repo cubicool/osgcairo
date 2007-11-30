@@ -1,0 +1,51 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSG_CAIRO_SURFACE_IMAGE
+#define OSG_CAIRO_SURFACE_IMAGE
+
+#include <osgCairo/Surface>
+#include <osg/Vec4>
+#include <osg/Image>
+
+namespace osgCairo {
+
+class SurfaceImage : public Surface, public osg::Image {
+	static unsigned int _count;
+
+	static std::string _generateName();
+
+	bool _allocated;
+
+public:
+	SurfaceImage(const std::string& = "");
+
+	bool allocateCairo(unsigned int, unsigned int, const unsigned char* = 0, bool = true);
+	
+	bool valid() const {
+		return osg::Image::valid() and _allocated;
+	}
+
+	virtual const char* className() const {
+		return "SurfaceImage";
+	}
+
+	virtual const char* libraryName() const {
+		return "osgCairo";
+	}
+
+	// This class will also provide all of the non-Cairo wrapping functions,
+	// such as rotate, scale, etc.
+	// For example, when the user wants to destroy and recreate the Texture.
+	// The reason this class exists also is so that we can create SurfacePatterns
+	// without having to touch OpenGL. :)
+	using Surface::setSourceRGBA;
+
+	inline void setSourceRGBA(const osg::Vec4& col) {
+		Surface::setSourceRGBA(col.r(), col.g(), col.b(), col.a());
+	}
+};
+
+
+}
+
+#endif

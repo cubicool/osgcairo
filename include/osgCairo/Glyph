@@ -1,0 +1,10 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSG_CAIRO_GLYPH
+#define OSG_CAIRO_GLYPH
+
+namespace osgCairo {
+
+} // namespace osgCairo
+
+#endif
