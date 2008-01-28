@@ -12,7 +12,7 @@ class Pattern : public osg::Referenced {
 protected:
 	CairoPattern* _pattern;
 	
-	Pattern(CairoPattern* =0);
+	Pattern(CairoPattern* = 0);
 
 public:
 	~Pattern ();

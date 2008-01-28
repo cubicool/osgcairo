@@ -25,6 +25,7 @@ SET(HEADER_FILES
 
 SET(CMAKE_INCLUDE_PATH /usr/local/include CACHE STRING "Put your OSG include dir here...")
 SET(CMAKE_LIBRARY_PATH /usr/local/lib CACHE STRING "Put your OSG lib dir here...")
+SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
 INCLUDE_DIRECTORIES(include ${CMAKE_INCLUDE_PATH} ${CAIRO_INCLUDE_DIRS})
 
@@ -47,3 +48,7 @@ ENDFOREACH(INCLUDEFILE)
 
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
 ADD_SUBDIRECTORY(examples/osgcairomatrix)
+
+IF(OSGCAIROWIDGET)
+	ADD_SUBDIRECTORY(examples/osgcairowidget)
+ENDIF(OSGCAIROWIDGET)

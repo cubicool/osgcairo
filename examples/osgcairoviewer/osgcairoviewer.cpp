@@ -3,6 +3,7 @@
 #include <osg/Geometry>
 #include <osg/Texture2D>
 #include <osg/Geode>
+#include <osg/BlendFunc>
 #include <osgViewer/Viewer>
 #include <osgCairo/SurfaceImage>
 
@@ -13,14 +14,16 @@ osg::Geode* createGroup() {
 	
 	if(image->allocateCairo(256, 256)) {
 		image->scale(256.0f, 256.0f);
-		image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
-		image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
-		image->fill();
+		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
+		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
+		//image->fill();
 		image->setSourceRGBA(1.0f, 0.7f, 0.3f);
 		image->setLineWidth(0.05);
 		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
 		image->stroke();
-		image->writeToPNG("output.png");
+		
+		// If we wanted to create a PNG image of our surface, we could do so here.
+		// image->writeToPNG("output.png");
 		
 		osg::Geometry* geom = osg::createTexturedQuadGeometry(
 			osg::Vec3(10.0f, 10.0f, 0.0f),
@@ -45,7 +48,10 @@ osg::Geode* createGroup() {
 
 		state->setMode(GL_BLEND, osg::StateAttribute::ON);
 		state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-	
+		state->setAttributeAndModes(
+		     new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE_MINUS_SRC_ALPHA)
+		);
+
 		geode->addDrawable(geom);
 
 		image->dirty();
@@ -75,7 +81,6 @@ int main(int argc, char** argv) {
 	osgViewer::Viewer viewer;
 
 	osg::Camera* camera = createOrthoCamera(1280, 1024);
-
 	osg::Geode*  cairo  = createGroup();
 	
 	camera->addChild(cairo);
