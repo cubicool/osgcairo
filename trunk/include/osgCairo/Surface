@@ -5,6 +5,7 @@
 
 #include <osgCairo/Matrix>
 #include <osgCairo/Path>
+#include <osgCairo/Pattern>
 #include <string>
 
 namespace osgCairo {
@@ -62,7 +63,8 @@ public:
 	bool          inFill         (double, double);
 	bool          inStroke       (double, double);
 	void          save           ();
-	void          restore        ();	
+	void          restore        ();
+	void          setSource      (Pattern*);
 	void          setSourceRGBA  (double, double, double, double=1.0f);
 	void          setAntialias   (CairoAntialias);
 	void          setFillRule    (CairoFillRule);

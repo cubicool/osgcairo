@@ -90,13 +90,13 @@ void Surface::restore() {
 	cairo_restore(_context);
 }
 
+void Surface::setSource(Pattern* pattern) {
+	cairo_set_source(_context, pattern->getPattern());
+}
+
 void Surface::setSourceRGBA(double r, double g, double b, double a) {
 	cairo_set_source_rgba(_context, r, g, b, a);
 }
-
-//void Surface::setSource(CairoPattern* pattern) {
-//	cairo_set_source(_context, pattern);
-//}
 
 void Surface::setAntialias(CairoAntialias aa) {
 	cairo_set_antialias(_context, aa);

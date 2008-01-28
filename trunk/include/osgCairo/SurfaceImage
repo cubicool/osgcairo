@@ -9,40 +9,30 @@
 
 namespace osgCairo {
 
-class SurfaceImage : public Surface, public osg::Image {
-	static unsigned int _count;
-
-	static std::string _generateName();
-
+class SurfaceImage: public Surface, public osg::Image {
 	bool _allocated;
 
 public:
-	SurfaceImage(const std::string& = "");
+	META_Object(osgCairo, SurfaceImage);
 
-	bool allocateCairo(unsigned int, unsigned int, const unsigned char* = 0, bool = true);
-	
+	SurfaceImage (const std::string& = "SurfaceImage");
+	SurfaceImage (const SurfaceImage&, const osg::CopyOp&);
+
+	bool allocateCairo(unsigned int, unsigned int, const unsigned char* = 0);
+
 	bool valid() const {
-		return osg::Image::valid() and _allocated;
+		return osg::Image::valid() && _allocated;
 	}
 
-	virtual const char* className() const {
-		return "SurfaceImage";
-	}
-
-	virtual const char* libraryName() const {
-		return "osgCairo";
-	}
-
-	// This class will also provide all of the non-Cairo wrapping functions,
-	// such as rotate, scale, etc.
-	// For example, when the user wants to destroy and recreate the Texture.
-	// The reason this class exists also is so that we can create SurfacePatterns
-	// without having to touch OpenGL. :)
+	// Provide an easier OSG'ish wrapper for setSourceRGBA.
 	using Surface::setSourceRGBA;
 
-	inline void setSourceRGBA(const osg::Vec4& col) {
-		Surface::setSourceRGBA(col.r(), col.g(), col.b(), col.a());
+	void setSourceRGBA(const osg::Vec4& col) {
+		setSourceRGBA(col.r(), col.g(), col.b(), col.a());
 	}
+
+	// A helper to create a commonly-wanted round box.
+	bool roundedRectangle(double, double, double, double, double = 10.0f);
 };
 
 

@@ -6,27 +6,134 @@ import cairo
 import gtk
 import math
 
-def convert(d):
-	try:
-		return float(d)
+# -------------------------------------------------------------------------------------------------
+
+def drawLinePath(cr, seg):
+	seg -= seg % 2
+
+	for i in range(seg):
+		p = (float(i) / seg) + cr.get_line_width()
+
+		cr.move_to(0.0, p)
+		cr.line_to(1.0, p)
+
+def createPattern(w, h, r):
+	surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, int(w), int(h))
+	context = cairo.Context(surface)
+	matrix  = cairo.Matrix()
+
+	matrix.rotate(r)
+
+	context.scale(w, h)
+	context.rectangle(0.0, 0.0, 1.0, 1.0)
+	context.set_source_rgba(0.0, 0.0, 0.0, 0.0)
+	context.fill()
+	context.set_line_width(0.01)
+	context.set_source_rgba(0.5, 0.5, 0.5, 1.0)
+
+	drawLinePath(context, 5)
+
+	pattern = cairo.SurfacePattern(surface)
+
+	pattern.set_matrix(matrix)
+
+	context.stroke()
+
+	return pattern
+
+def createShadow():
+	radial = cairo.RadialGradient(0.0, 0.0, 0.1, 0.0, 0.0, 1.0)
+
+	radial.add_color_stop_rgba(0.0, 0.0, 0.0, 0.0, 1.0)
+	radial.add_color_stop_rgba(1.0, 0.0, 0.0, 0.0, 0.1)
+
+	return radial
+
+def createLinearGradient(h, downUp=False):
+	linear = cairo.LinearGradient(0.0, 0.0, 0.0, h)
+
+	if downUp:
+		linear.add_color_stop_rgba(0.0, 0.3, 0.3, 0.3, 1.0)
+		linear.add_color_stop_rgba(1.0, 0.7, 0.7, 0.7, 1.0)
+
+	else:
+		linear.add_color_stop_rgba(0.0, 0.7, 0.7, 0.7, 1.0)
+		linear.add_color_stop_rgba(1.0, 0.3, 0.3, 0.3, 1.0)
+
+	return linear
+
+def createLinearGradientFill(h, downUp=False):
+	linear = cairo.LinearGradient(0.0, 0.0, 0.0, h)
+
+	linear.add_color_stop_rgba(0.0, 0.3, 0.3, 0.3, 0.2)
+	linear.add_color_stop_rgba(1.0, 0.7, 0.7, 0.7, 0.2)
+
+	return linear
+
+def drawRoundBox(cr, s, r):
+	pi  = math.pi
+	pi2 = math.pi / 2.0
 	
-	except ValueError, e:
-		return 0.0
+	cr.arc(s, s, r, pi, pi + pi2)
+	cr.line_to(s * 2.0, s - r)
+
+	cr.arc(s * 2.0, s, r, pi + pi2, 0.0)
+	cr.line_to((s * 3.0) - (s - r), s * 2.0)
+
+	cr.arc(s * 2.0, s * 2.0, r, 0.0, pi2)
+	cr.line_to(s, (s * 3.0) - (s - r))
+
+	cr.arc(s, s * 2.0, r, pi2, pi)
+	cr.line_to(s - r, s)
+
+def roundedrec(context, x, y, w, h, r = 10):
+	context.move_to(x+r,y)                      # Move to A
+	context.line_to(x+w-r,y)                    # Straight line to B
+	context.curve_to(x+w,y,x+w,y,x+w,y+r)       # Curve to C, Control points are both at Q
+	context.line_to(x+w,y+h-r)                  # Move to D
+	context.curve_to(x+w,y+h,x+w,y+h,x+w-r,y+h) # Curve to E
+	context.line_to(x+r,y+h)                    # Line to F
+	context.curve_to(x,y+h,x,y+h,x,y+h-r)       # Curve to G
+	context.line_to(x,y+r)                      # Line to H
+	context.curve_to(x,y,x,y,x+r,y)             # Curve to A
+
+def draw(cr, w, h, r):
+	pattern = createPattern(14.0, 14.0, r)
+
+	pattern.set_extend(cairo.EXTEND_REPEAT)
+
+	cr.set_source(pattern)
+
+	cr.scale(w, h)
+	cr.rectangle(0.0, 0.0, 1.0, 1.0)
+	cr.fill_preserve()
+
+# -------------------------------------------------------------------------------------------------
 
 class CairoScriptParser(object):
 	def __init__(self):
 		object.__init__(self)
 	
-	def Parse(self, cr, buf):
+	def Parse(self, cr, buf, width, height):
+		w = width
+		h = height
+
+		print w, h
+
+		def convert(d):
+			try:
+				return eval("float(%s)" % d, {"w": w, "h": h})
+	
+			except ValueError, e:
+				print "Error: ", e
+
+				return 0.0
+
 		for line in buf.split("\n"):
 			args = line.split()
 
 			if len(args) and hasattr(cr, args[0]):
-				try:
-					getattr(cr, args[0])(*[convert(a) for a in args[1 : ]])
-
-				except Exception, e:
-					print "Parse Error:", e
+				getattr(cr, args[0])(*[convert(a) for a in args[1 : ]])
 
 class CairoDrawingArea(gtk.DrawingArea):
 	def __init__(self, width=0, height=0):
@@ -35,27 +142,57 @@ class CairoDrawingArea(gtk.DrawingArea):
 		self.__parser = CairoScriptParser()
 		self.__buffer = """
 			set_source_rgb 0.3 0.3 0.3
-			set_line_width 0.2
-			move_to 0.0 0.0
-			line_to 1.0 1.0
-			move_to 1.0 0.0
-			line_to 0.0 1.0
+			set_line_width 1
+			move_to 10.0 10.5
+			line_to 50.5 10.5
+			line_to 50.5 50.5
+			line_to 10.5 50.5
+			line_to 10.5 10.5
 			stroke
 		"""
 
 		self.set_size_request(width, height)
+		
 		self.connect("expose-event", self.__render)
 
 	def __render(self, widget, event):
-		cr = self.window.cairo_create()
+		cr   = self.window.cairo_create()
+		w, h = self.allocation.width, self.allocation.height
 
-		cr.scale(self.allocation.width, self.allocation.height)
-		cr.set_source_rgb(0.5, 0.5, 0.5)
-		cr.rectangle(0.0, 0.0, 1.0, 1.0)
+		# TOOD: here!
+		# self.__parser.Parse(cr, self.__buffer, w + 0.5, h + 0.5)
+	
+		lw = 1.0
+		o  = 10.5
+		bw = 30.5
+		bh = 30.5
+		r1 = 15
+		r2 = 12
+
+		cr.set_source_rgba(51 / 255.0, 51 / 255.0, 102 / 255.0, 1.0)
+		cr.rectangle(0, 0, w, h)
 		cr.fill()
-		
-		self.__parser.Parse(cr, self.__buffer)
-		
+
+		cr.set_line_width(1.0)
+
+		cr.save()
+		cr.set_source(createLinearGradient(50, True))
+		roundedrec(cr, 10.5, 10.5, 30.0, 30.0, 15)
+		cr.stroke()
+		cr.restore()
+
+		cr.save()
+		cr.set_source(createLinearGradientFill(50))
+		roundedrec(cr, 13.5, 13.5, 24.0, 24.0, 12)
+		cr.fill()
+		cr.restore()
+
+		cr.save()
+		cr.set_source(createLinearGradient(50))
+		roundedrec(cr, 13.5, 13.5, 24.0, 24.0, 12)
+		cr.stroke()
+		cr.restore()
+
 		return True
 
 	def Parse(self, buf):
@@ -92,8 +229,6 @@ class CairoWindow(gtk.Window):
 		vbox.pack_start(self.__tool, False, False, 2)
 		vbox.pack_start(self.__status, False, False)
 
-		self.__text.set_size_request(512, 150)
-
 		for i, b in enumerate((gtk.STOCK_OPEN, gtk.STOCK_SAVE, gtk.STOCK_REFRESH)):
 			button = gtk.Button()
 			image  = gtk.Image()
@@ -119,8 +254,6 @@ class CairoWindow(gtk.Window):
 	def __parseCode(self, *args):
 		buf = self.__text.get_buffer()
 		txt = buf.get_text(buf.get_start_iter(), buf.get_end_iter())
-
-		print buf.get_selection_bounds()
 
 		self.__draw.Parse(txt)
 
