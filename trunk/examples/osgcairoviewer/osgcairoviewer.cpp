@@ -85,13 +85,7 @@ int main(int argc, char** argv) {
 	
 	camera->addChild(cairo);
 
-	if(camera) {
-		viewer.setSceneData(camera);
+	viewer.setSceneData(camera);
 
-		return viewer.run();
-	}
-
-	else osg::notify(osg::WARN) << "Couldn't create the orthographic camera." << std::endl;
-
-	return 0;
+	return viewer.run();
 }
