@@ -25,7 +25,7 @@ bool Surface::createContext(unsigned int width, unsigned int height, unsigned ch
 
 	_context = cairo_create(_surface);
 
-	if(not _surface or not _context or status()) return false;
+	if(!_surface || !_context || status()) return false;
 	
 	return true;
 }
