@@ -25,7 +25,7 @@ bool SurfaceImage::allocateCairo(
 ) {
 	allocateImage(width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE);
 
-	if(not osg::Image::valid()) {
+	if(!osg::Image::valid()) {
 		osg::notify(osg::WARN)
 			<< "osgCairo::SurfaceImage::allocateImage failed!"
 			<< std::endl
@@ -39,7 +39,7 @@ bool SurfaceImage::allocateCairo(
 
 	else std::memset(_data, 0, (width * height) * 4);
 
-	if(not createContext(width, height, _data)) {
+	if(!createContext(width, height, _data)) {
 		osg::notify(osg::WARN)
 			<< "osgCairo::Surface::createContext failed!"
 			<< std::endl
