@@ -1,10 +1,9 @@
 // -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
 
-#ifndef OSG_CAIRO_SURFACE_IMAGE
-#define OSG_CAIRO_SURFACE_IMAGE
+#ifndef OSGCAIRO_SURFACEIMAGE
+#define OSGCAIRO_SURFACEIMAGE
 
 #include <osgCairo/Surface>
-#include <osg/Vec4>
 #include <osg/Image>
 
 namespace osgCairo {
@@ -12,27 +11,21 @@ namespace osgCairo {
 class SurfaceImage: public Surface, public osg::Image {
 	bool _allocated;
 
+protected:
+	virtual CairoSurface* _createSurfaceImplementation();
+
 public:
 	META_Object(osgCairo, SurfaceImage);
 
-	SurfaceImage (const std::string& = "SurfaceImage");
+	SurfaceImage ();
+	SurfaceImage (unsigned int, unsigned int, const unsigned char* = 0);
 	SurfaceImage (const SurfaceImage&, const osg::CopyOp&);
 
-	bool allocateCairo(unsigned int, unsigned int, const unsigned char* = 0);
+	bool allocateImage(unsigned int, unsigned int, const unsigned char* = 0);
 
-	bool valid() const {
+	virtual bool valid() const {
 		return osg::Image::valid() && _allocated;
 	}
-
-	// Provide an easier OSG'ish wrapper for setSourceRGBA.
-	using Surface::setSourceRGBA;
-
-	void setSourceRGBA(const osg::Vec4& col) {
-		setSourceRGBA(col.r(), col.g(), col.b(), col.a());
-	}
-
-	// A helper to create a commonly-wanted round box.
-	bool roundedRectangle(double, double, double, double, double = 10.0f);
 };
 
 

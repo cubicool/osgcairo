@@ -50,4 +50,4 @@ dirty:
 
 Have a look at examples/osgcairoviewer to see some of this in action. If you're
 looking for a less C++'ish way of playing around with Cairo and OSG, check out
-osgEgypt.
+osgWidget.

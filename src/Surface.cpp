@@ -14,18 +14,14 @@ Surface::~Surface() {
 	cairo_destroy(_context);
 }
 
-bool Surface::createContext(unsigned int width, unsigned int height, unsigned char* data) {
-	_surface = cairo_image_surface_create_for_data(
-		data,
-		CAIRO_FORMAT_ARGB32,
-		width,
-		height,
-		width * 4
-	);
+bool Surface::createContext() {
+	_surface = _createSurfaceImplementation();
+	
+	if(!_surface) return false;
 
 	_context = cairo_create(_surface);
 
-	if(!_surface || !_context || status()) return false;
+	if(!_context || status()) return false;
 	
 	return true;
 }
@@ -310,6 +306,22 @@ Matrix Surface::getMatrix() {
 	cairo_get_matrix(_context, &m);
 
 	return m;
+}
+
+void Surface::roundedRectangle(double x, double y, double w, double h, double r) {
+	moveTo(x + r, y);
+
+	lineTo(x + w - r, y);
+	curveTo(x + w, y, x + w, y, x + w, y + r);
+	
+	lineTo(x + w, y + h - r);
+	curveTo(x + w, y + h, x + w, y + h, x + w - r, y + h);
+	
+	lineTo(x + r, y + h) ;
+	curveTo(x, y + h, x, y + h, x, y + h - r);
+	
+	lineTo(x, y + r);
+	curveTo(x, y, x, y, x + r, y);
 }
 
 } // namespace osgCairo

@@ -10,9 +10,9 @@
 osg::Geode* createGroup() {
 	osg::Geode*             geode   = new osg::Geode();
 	osg::Texture2D*         texture = new osg::Texture2D();
-	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage("testing");
+	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage();
 	
-	if(image->allocateCairo(256, 256)) {
+	if(image->allocateImage(256, 256) && image->createContext()) {
 		image->scale(256.0f, 256.0f);
 		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
 		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
