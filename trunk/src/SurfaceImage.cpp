@@ -7,10 +7,17 @@
 
 namespace osgCairo {
 
-SurfaceImage::SurfaceImage(const std::string& name):
+SurfaceImage::SurfaceImage():
 _allocated(false) {
-	_name     = name;
-	_fileName = name;
+}
+
+SurfaceImage::SurfaceImage(
+	unsigned int         width,
+	unsigned int         height,
+	const unsigned char* data	
+):
+_allocated(false) {
+	allocateImage(width, height, data);
 }
 
 SurfaceImage::SurfaceImage(const SurfaceImage& si, const osg::CopyOp& co):
@@ -18,12 +25,23 @@ osg::Image (si, co),
 _allocated (si._allocated) {
 }
 
-bool SurfaceImage::allocateCairo(
+CairoSurface* SurfaceImage::_createSurfaceImplementation() {
+	return cairo_image_surface_create_for_data(
+		_data,
+		CAIRO_FORMAT_ARGB32,
+		_s,
+		_t,
+		_t * 4
+	);
+}
+
+bool SurfaceImage::allocateImage(
 	unsigned int         width,
 	unsigned int         height,
 	const unsigned char* data
 ) {
-	allocateImage(width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE);
+	// Call the osg::Image allocation method.
+	osg::Image::allocateImage(width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE);
 
 	if(!osg::Image::valid()) {
 		osg::notify(osg::WARN)
@@ -39,21 +57,12 @@ bool SurfaceImage::allocateCairo(
 
 	else std::memset(_data, 0, (width * height) * 4);
 
-	if(!createContext(width, height, _data)) {
-		osg::notify(osg::WARN)
-			<< "osgCairo::Surface::createContext failed!"
-			<< std::endl
-		;
-
-		return false;
-	}
-
 	_allocated   = true;
 	_pixelFormat = GL_BGRA;
 
-	flipVertical();
 	dirty();
-	
+
+	/*
 	osg::notify() 
 		<< "- Name:        " << _name                        << std::endl
 		<< "- Size:        " << _s << " " << _t << " " << _r << std::endl
@@ -64,26 +73,7 @@ bool SurfaceImage::allocateCairo(
 		<< "- Allocation:  " << _allocationMode              << std::endl
 		<< "- Modified:    " << _modifiedCount               << std::endl
 	;
-
-	return true;
-}
-
-bool SurfaceImage::roundedRectangle(double x, double y, double w, double h, double r) {
-	if(!_allocated) return false;
-
-	moveTo(x + r, y);
-
-	lineTo(x + w - r, y);
-	curveTo(x + w, y, x + w, y, x + w, y + r);
-	
-	lineTo(x + w, y + h - r);
-	curveTo(x + w, y + h, x + w, y + h, x + w - r, y + h);
-	
-	lineTo(x + r, y + h) ;
-	curveTo(x, y + h, x, y + h, x, y + h - r);
-	
-	lineTo(x, y + r);
-	curveTo(x, y, x, y, x + r, y);
+	*/
 
 	return true;
 }

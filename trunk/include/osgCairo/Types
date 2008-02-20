@@ -1,7 +1,7 @@
 // -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
 
-#ifndef OSG_CAIRO_TYPES
-#define OSG_CAIRO_TYPES
+#ifndef OSGCAIRO_TYPES
+#define OSGCAIRO_TYPES
 
 #include <string>
 #include <cairo.h>

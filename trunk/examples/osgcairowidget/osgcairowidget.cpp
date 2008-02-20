@@ -10,7 +10,7 @@
 typedef osgWidget::point_type point_type;   
 
 osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=false) {
-	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage("button-WOOT!");
+	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage();
 
 	osgCairo::Pattern* gradient1 = new osgCairo::LinearPattern(0.0f, 0.0f, 0.0f, h);
 	osgCairo::Pattern* gradient2 = new osgCairo::LinearPattern(0.0f, 0.0f, 0.0f, h);
@@ -25,10 +25,10 @@ osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=fals
 		h / 2.0f
 	);
 
-	if(!image->allocateCairo(
+	if(!image->allocateImage(
 		static_cast<unsigned int>(w),
 		static_cast<unsigned int>(h)
-	)) return 0;
+	) || !image->createContext()) return 0;
 
 	point_type lw = floor(w * 0.02f);   
 	point_type x  = floor(w * 0.1f) + 0.5f;

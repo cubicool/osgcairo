@@ -1,8 +1,9 @@
 // -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
 
-#ifndef OSG_CAIRO_SURFACE
-#define OSG_CAIRO_SURFACE
+#ifndef OSGCAIRO_SURFACE
+#define OSGCAIRO_SURFACE
 
+#include <osg/Vec4>
 #include <osgCairo/Matrix>
 #include <osgCairo/Path>
 #include <osgCairo/Pattern>
@@ -16,11 +17,20 @@ protected:
 	CairoContext* _context;
 	
 	Surface();
-	
-public:
-	~Surface();
 
-	bool createContext(unsigned int, unsigned int, unsigned char*);
+	// ALL subclasses need to implement this method, which simply returns the final
+	// surface allocation for the call to createContext.
+	virtual CairoSurface* _createSurfaceImplementation() = 0;
+
+public:
+	virtual ~Surface();
+
+	// Subclasses must also define a "valid" method clients can use.
+	virtual bool valid() const = 0;
+
+	// This is the "finalize" method called to create the actual Cairo context so that
+	// all drawing operations are valid.
+	bool createContext();
 
 	CairoSurface* getSurface ();
 	CairoContext* getContext ();
@@ -126,6 +136,14 @@ public:
 	void deviceToUserDistance (double&, double&);
 	
 	void writeToPNG(const std::string&);
+
+	// Provide an easier OSG'ish wrapper for setSourceRGBA.
+	void setSourceRGBA(const osg::Vec4& col) {
+		setSourceRGBA(col.r(), col.g(), col.b(), col.a());
+	}
+
+	// A helper to create a commonly-wanted round box.
+	void roundedRectangle(double, double, double, double, double = 10.0f);
 };
 
 } // namespace osgCairo

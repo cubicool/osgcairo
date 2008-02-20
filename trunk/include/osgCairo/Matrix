@@ -1,7 +1,7 @@
 // -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
 
-#ifndef OSG_CAIRO_MATRIX
-#define OSG_CAIRO_MATRIX
+#ifndef OSGCAIRO_MATRIX
+#define OSGCAIRO_MATRIX
 
 #include <osg/Referenced>
 #include <osgCairo/Types>
