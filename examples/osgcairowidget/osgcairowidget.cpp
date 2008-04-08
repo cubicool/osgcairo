@@ -1,10 +1,12 @@
 #include <osg/BlendFunc>
+#include <osg/Timer>
 #include <osgDB/ReadFile>
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 #include <osgWidget/WindowManager>
 #include <osgWidget/ViewerEventHandlers>
 #include <osgWidget/Box>
+#include <osgWidget/Version>
 #include <osgCairo/SurfaceImage>
 
 typedef osgWidget::point_type point_type;   
@@ -30,7 +32,7 @@ osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=fals
 		static_cast<unsigned int>(h)
 	) || !image->createContext()) return 0;
 
-	point_type lw = floor(w * 0.02f);   
+	point_type lw = floor(w * 0.02f);
 	point_type x  = floor(w * 0.1f) + 0.5f;
 	point_type y  = floor(x * 2.0f);
 	point_type r  = floor(w * 0.3f);
@@ -99,6 +101,7 @@ public:
 	_over   (createButton(w, h, true)) {
 		setImage(_normal.get(), true);
 		setColor(1.0f, 1.0f, 1.0f, 1.0f);
+		setEventMask(osgWidget::EVENT_MASK_MOUSE_MOVE);
 		getOrCreateStateSet()->setAttributeAndModes(new osg::BlendFunc(
 			osg::BlendFunc::ONE,
 			osg::BlendFunc::ONE_MINUS_SRC_ALPHA
@@ -119,13 +122,22 @@ public:
 };
 
 int main(int argc, char** argv) {
+	if(!osgWidgetVersionMinimum(0, 1, 6)) {
+		osg::notify(osg::FATAL)
+			<< argv[0] << " needs osgWidget version 0.1.6 or higher; "
+			<< "found " << osgWidgetGetVersion() << "." << std::endl
+		;
+
+		return 0;
+	}
+
 	osgViewer::Viewer viewer;
 
 	point_type w = 256.0f;
 	point_type h = 256.0f;
 
 	osgWidget::WindowManager* wm = new osgWidget::WindowManager(
-		viewer,
+		&viewer,
 		1280.0f,
 		1024.0f,
 		0xF000000
@@ -139,11 +151,16 @@ int main(int argc, char** argv) {
 	box->getBackground()->setTexCoord(5.0f, 1.0f, osgWidget::Widget::LOWER_RIGHT);
 	box->getBackground()->setTexCoord(5.0f, 0.0f, osgWidget::Widget::UPPER_RIGHT);
 	box->getBackground()->setTexCoord(0.0f, 0.0f, osgWidget::Widget::UPPER_LEFT);
+
+	osg::Timer timer;
+
 	box->addWidget(new CairoButton(w, h));
 	box->addWidget(new CairoButton(w, h));
 	box->addWidget(new CairoButton(w, h));
 	box->addWidget(new CairoButton(w, h));
 	box->addWidget(new CairoButton(w, h));
+
+	osgWidget::warn() << "Created 5 buttons in " << timer.time_s() << " seconds." << std::endl;
 
 	wm->addChild(box);
 	wm->resizeAllWindows();
@@ -161,5 +178,7 @@ int main(int argc, char** argv) {
 
 	viewer.setSceneData(group);
 
+	osgWidget::warn() << "Run called after " << timer.time_s() << " seconds." << std::endl;
+	
 	return viewer.run();
 }
