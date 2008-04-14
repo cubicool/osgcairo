@@ -79,7 +79,7 @@ osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=fals
 	image->restore();
 
 	// image->writeToPNG("osgcairowidget.png");
-	image->flipVertical();
+	// image->flipVertical();
 	image->dirty();
 
 	delete gradient1;
@@ -122,6 +122,7 @@ public:
 };
 
 int main(int argc, char** argv) {
+	/*
 	if(!osgWidgetVersionMinimum(0, 1, 6)) {
 		osg::notify(osg::FATAL)
 			<< argv[0] << " needs osgWidget version 0.1.6 or higher; "
@@ -130,6 +131,7 @@ int main(int argc, char** argv) {
 
 		return 0;
 	}
+	*/
 
 	osgViewer::Viewer viewer;
 

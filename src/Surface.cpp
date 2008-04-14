@@ -308,20 +308,47 @@ Matrix Surface::getMatrix() {
 	return m;
 }
 
-void Surface::roundedRectangle(double x, double y, double w, double h, double r) {
-	moveTo(x + r, y);
+void Surface::roundedRectangle(double x, double y, double width, double height, double radius) {
+	moveTo(x + radius, y);
+	lineTo(x + width - radius, y);
 
-	lineTo(x + w - r, y);
-	curveTo(x + w, y, x + w, y, x + w, y + r);
-	
-	lineTo(x + w, y + h - r);
-	curveTo(x + w, y + h, x + w, y + h, x + w - r, y + h);
-	
-	lineTo(x + r, y + h) ;
-	curveTo(x, y + h, x, y + h, x, y + h - r);
-	
-	lineTo(x, y + r);
-	curveTo(x, y, x, y, x + r, y);
+	arc(
+		x + width - radius,
+		y + radius,
+		radius,
+		-90.0f * osg::PI / 180.0f,
+		0.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x + width, y + height - radius);
+
+	arc(
+		x + width - radius,
+		y + height - radius,
+		radius,
+		0.0f * osg::PI / 180.0f,
+		90.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x + radius, y + height);
+
+	arc(
+		x + radius,
+		y + height - radius,
+		radius,
+		90.0f * osg::PI / 180.0f,
+		180.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x, y + radius);
+
+	arc(
+		x + radius,
+		y + radius,
+		radius,
+		180.0f * osg::PI / 180.0f,
+		270.0f * osg::PI / 180.0f
+	);
 }
 
 } // namespace osgCairo

@@ -62,20 +62,21 @@ bool SurfaceImage::allocateImage(
 
 	dirty();
 
-	/*
-	osg::notify() 
-		<< "- Name:        " << _name                        << std::endl
-		<< "- Size:        " << _s << " " << _t << " " << _r << std::endl
-		<< "- TexFormat:   " << _internalTextureFormat       << std::endl
-		<< "- PixelFormat: " << _pixelFormat                 << std::endl
-		<< "- DataType:    " << _dataType                    << std::endl
-		<< "- Packing:     " << _packing                     << std::endl
-		<< "- Allocation:  " << _allocationMode              << std::endl
-		<< "- Modified:    " << _modifiedCount               << std::endl
-	;
-	*/
-
 	return true;
 }
 
-} 
+void SurfaceImage::roundedCorners() {	
+	Pattern* p = new SolidPattern(0.0f, 0.0f, 0.0f, 1.0f);
+
+	if(!p) return;
+
+	scale(_s, _t);
+	setOperator(CAIRO_OPERATOR_DEST_IN);
+	setSource(p);
+	roundedRectangle(0.01f, 0.01f, 0.98f, 0.98f, 0.075f);
+	fill();
+
+	delete p;
+}
+
+} // namespace osgCairo
