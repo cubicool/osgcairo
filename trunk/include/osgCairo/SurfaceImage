@@ -26,6 +26,8 @@ public:
 	virtual bool valid() const {
 		return osg::Image::valid() && _allocated;
 	}
+
+	void roundedCorners();
 };
 
 
