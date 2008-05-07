@@ -108,13 +108,13 @@ public:
 		));
 	}
 
-	virtual bool mouseEnter(double, double, const osgWidget::WindowManager*) {
+	virtual bool mouseEnter(double, double, osgWidget::WindowManager*) {
 		setImage(_over.get());
 
 		return true;
 	};
 
-	virtual bool mouseLeave(double, double, const osgWidget::WindowManager*) {
+	virtual bool mouseLeave(double, double, osgWidget::WindowManager*) {
 		setImage(_normal.get());
 
 		return true;
