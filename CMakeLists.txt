@@ -52,3 +52,13 @@ ADD_SUBDIRECTORY(examples/osgcairomatrix)
 IF(OSGCAIROWIDGET)
 	ADD_SUBDIRECTORY(examples/osgcairowidget)
 ENDIF(OSGCAIROWIDGET)
+
+CONFIGURE_FILE(
+	"${CMAKE_CURRENT_SOURCE_DIR}/etc/uninstall.cmake"
+	"${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
+	IMMEDIATE @ONLY
+)
+
+ADD_CUSTOM_TARGET(uninstall
+	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
+)
