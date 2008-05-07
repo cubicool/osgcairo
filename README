@@ -33,7 +33,19 @@ USAGE
 
 First, get yourself a new SurfaceImage object:
 
-	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage("random1");
+	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage();
+
+	if(image->allocateImage(128, 128) && image->createContext()) {}
+
+	...OR...
+
+	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage(
+		128,
+		128,
+		pointerToRGBAdata
+	);
+
+	if(image->createContext()) {}
 
 Secondly, call the various Cairo methods on the image:
 
