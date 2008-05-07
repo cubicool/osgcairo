@@ -8,7 +8,7 @@
 #include <osgDB/ReadFile>
 #include <osgCairo/SurfaceImage>
 
-osg::Geometry* createGroupCommon(osgCairo::SurfaceImage* image) {
+osg::Geometry* createGroupCommon(osg::Image* image) {
 	static osg::Vec3 pos(50.0f, 50.0f, -0.8f);
 
 	osg::Texture2D* texture = new osg::Texture2D();
@@ -41,8 +41,7 @@ osg::Geometry* createGroupCommon(osgCairo::SurfaceImage* image) {
 
 	image->dirty();
 
-	// pos += osg::Vec3(image->s() + 50.0f, 0.0f, 0.1f);
-	pos += osg::Vec3(10.0f, 10.0f, -0.1f);
+	pos += osg::Vec3(image->s() + 50.0f, 0.0f, 0.1f);
 
 	return geom;
 }
@@ -63,6 +62,7 @@ osg::Geode* createGroup3() {
 		image->roundedCorners();
 	
 		geode->addDrawable(createGroupCommon(image));
+		geode->addDrawable(createGroupCommon(limage));
 	}
 
 	return geode;

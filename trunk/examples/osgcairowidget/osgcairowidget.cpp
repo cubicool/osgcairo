@@ -32,10 +32,10 @@ osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=fals
 		static_cast<unsigned int>(h)
 	) || !image->createContext()) return 0;
 
-	point_type lw = floor(w * 0.02f);
+	point_type lw = floor(w * 0.01f);
 	point_type x  = floor(w * 0.1f) + 0.5f;
 	point_type y  = floor(x * 2.0f);
-	point_type r  = floor(w * 0.3f);
+	point_type r  = floor(w * 0.12f);
 	point_type xx = floor(x + (lw * 1.5f)) + 0.5f;
 	point_type yy = floor(xx * 2.0f);   
 	point_type rr = r - (r * 0.2f);
