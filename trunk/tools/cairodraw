@@ -8,14 +8,16 @@ import sys
 import math
 
 DEFAULT_BUFFER = """\
-set_source_rgb 0.3 0.3 0.3
-set_line_width 10
-move_to 0 0
-line_to 512 512
-stroke
-move_to 0 512
-line_to 512 0
-stroke_preserve
+# This is a Python script to quickly test Cairo stuff!
+
+c.set_source_rgb(0.3, 0.3, 0.3)
+c.set_line_width(10)
+c.move_to(0, 0)
+c.line_to(512, 512)
+c.stroke()
+c.move_to(0, 512)
+c.line_to(512, 0)
+c.stroke_preserve()
 """
 
 CAIRODRAW_LIBRARY_ROUTINES        = {}
@@ -48,12 +50,6 @@ def CairoDrawLibraryRoutine(function):
 	return CairoDrawLibraryRoutineDecorator
 
 # -------------------------------------------------------------------------------------------------
-
-@CairoDrawLibraryRoutine
-def message(cr, message):
-	"""Prints whatever argument is passed to it."""
-
-	print message
 
 @CairoDrawLibraryRoutine
 def drawLinePath(cr, x, y, xx, yy, seg):
@@ -180,44 +176,10 @@ def draw(cr, w, h, r):
 
 # -------------------------------------------------------------------------------------------------
 
-class CairoScriptParser(object):
-	def __init__(self):
-		object.__init__(self)
-	
-	def Parse(self, cr, buf, width, height):
-		global CAIRODRAW_LIBRARY_ROUTINES
-
-		def convert(d):
-			try:
-				return eval("%s" % d, CAIRODRAW_LIBRARY_GLOBALS)
-	
-			except NameError, e:
-				print "Error: ", e
-
-				return None
-
-		for line in buf.split("\n"):
-			args = line.split()
-
-			if not len(args): continue
-			
-			arglist = [convert(a) for a in args[1 : ]]
-
-			try:
-				if hasattr(cr, args[0]):
-					getattr(cr, args[0])(*arglist)
-
-				elif args[0] in CAIRODRAW_LIBRARY_ROUTINES:
-					globals()[args[0]](cr, *arglist)
-
-			except Exception, e:
-				print "ERROR:", e
-
 class CairoDrawingArea(gtk.DrawingArea):
 	def __init__(self, width=0, height=0, win=None):
 		gtk.DrawingArea.__init__(self)
 
-		self.__parser = CairoScriptParser()
 		self.__buffer = DEFAULT_BUFFER
 		self.__win    = win
 
@@ -232,14 +194,21 @@ class CairoDrawingArea(gtk.DrawingArea):
 		if self.__win:
 			self.__win.SetStatus(w, h)
 
-		CairoDrawLibrarySetGlobal("w", w)
-		CairoDrawLibrarySetGlobal("h", h)
-		CairoDrawLibrarySetGlobal("width", w)
-		CairoDrawLibrarySetGlobal("height", h)
-
-		self.__parser.Parse(cr, self.__buffer, w, h)
+		self.__eval(self.__buffer, cr, w, h)
 
 		return True
+
+	def __eval(self, buf, cr, w, h):
+		CairoDrawLibrarySetGlobal("c", cr)
+		CairoDrawLibrarySetGlobal("w", w)
+		CairoDrawLibrarySetGlobal("h", h)
+
+		glbls = {}
+
+		glbls.update(CAIRODRAW_LIBRARY_ROUTINES)
+		glbls.update(CAIRODRAW_LIBRARY_GLOBALS)
+
+		eval(compile(buf, "<cairoscript>", "exec"), glbls)
 
 	def Parse(self, buf):
 		self.__buffer = buf
@@ -252,7 +221,7 @@ class CairoDrawingArea(gtk.DrawingArea):
 		surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
 		context = cairo.Context(surface)
 
-		self.__parser.Parse(context, self.__buffer, w, h)
+		self.__eval(self.__buffer, context, w, h)
 
 		surface.write_to_png(path)
 

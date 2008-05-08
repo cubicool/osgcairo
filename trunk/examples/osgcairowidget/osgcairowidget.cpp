@@ -167,12 +167,13 @@ int main(int argc, char** argv) {
 	wm->addChild(box);
 	wm->resizeAllWindows();
 
-	viewer.addEventHandler(new osgWidget::MouseHandler(wm));
-	viewer.addEventHandler(new osgViewer::StatsHandler());
-	viewer.addEventHandler(new osgViewer::WindowSizeHandler());
-
 	osg::Group*  group  = new osg::Group();
 	osg::Camera* camera = wm->createParentOrthoCamera();
+
+	viewer.addEventHandler(new osgWidget::MouseHandler(wm));
+	viewer.addEventHandler(new osgWidget::ResizeHandler(wm, camera));
+	viewer.addEventHandler(new osgViewer::StatsHandler());
+	viewer.addEventHandler(new osgViewer::WindowSizeHandler());
 
 	camera->addChild(wm);
 
