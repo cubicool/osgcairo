@@ -21,6 +21,7 @@ c.stroke_preserve()
 """
 
 CAIRODRAW_LIBRARY_ROUTINES        = {}
+CAIRODRAW_LIBRARY_ROUTINE_DATA    = {}
 CAIRODRAW_LIBRARY_GLOBALS         = {}
 CAIRODRAW_LIBRARY_GLOBAL_CALLBACK = lambda *a, **k: None
 
@@ -33,8 +34,11 @@ def CairoDrawLibrarySetGlobal(g, val):
 
 def CairoDrawLibraryRoutine(function):
 	global CAIRODRAW_LIBRARY_ROUTINES
+	global CAIRODRAW_LIBRARY_ROUTINE_DATA
 
-	CAIRODRAW_LIBRARY_ROUTINES[function.func_name] = (
+	CAIRODRAW_LIBRARY_ROUTINES[function.func_name] = function
+
+	CAIRODRAW_LIBRARY_ROUTINE_DATA[function.func_name] = (
 		" ".join(function.func_code.co_varnames[:function.func_code.co_argcount]),
 		function.func_doc.lstrip().rstrip().replace("\t", "")
 	)
@@ -397,7 +401,7 @@ class CairoWindow(gtk.Window):
 
 		self.__updateGlobals()
 
-		for lrn, lrd in CAIRODRAW_LIBRARY_ROUTINES.iteritems():
+		for lrn, lrd in CAIRODRAW_LIBRARY_ROUTINE_DATA.iteritems():
 			self.__help.Pack(LibraryRoutine(lrn, *lrd))
 		
 			# This is a clever trick that lets us remove the last
