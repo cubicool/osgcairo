@@ -5,6 +5,7 @@ import gtk
 import cairo
 import pango
 import sys
+import os
 import math
 
 DEFAULT_BUFFER = """\
@@ -138,13 +139,28 @@ def createPattern(cr, w, h, r):
 
 	return pattern
 
-def createShadow():
-	radial = cairo.RadialGradient(0.0, 0.0, 0.1, 0.0, 0.0, 1.0)
+@CairoDrawLibraryRoutine
+def createShadow(x, y, r1, r2):
+	"""Creates a RadianGradient"""
+
+	radial = cairo.RadialGradient(x, y, r1, x, y, r2)
 
 	radial.add_color_stop_rgba(0.0, 0.0, 0.0, 0.0, 1.0)
-	radial.add_color_stop_rgba(1.0, 0.0, 0.0, 0.0, 0.1)
+	radial.add_color_stop_rgba(1.0, 0.0, 0.0, 0.0, 0.0)
 
 	return radial
+
+@CairoDrawLibraryRoutine
+def drawRadialGradientCircle(cr, x, y, r1, r2, colStart, colEnd):
+	"""Creates a RadianGradient"""
+
+	radial = cairo.RadialGradient(x, y, r1, x, y, r2)
+
+	radial.add_color_stop_rgba(*((1.0,) + colStart))
+	radial.add_color_stop_rgba(*((0.0,) + colEnd))
+
+	cr.set_source(radial)
+	cr.arc(x, y, r2, 0, 2 * math.pi)
 
 def createLinearGradient(h, downUp=False):
 	linear = cairo.LinearGradient(0.0, 0.0, 0.0, h)
@@ -181,10 +197,10 @@ def draw(cr, w, h, r):
 # -------------------------------------------------------------------------------------------------
 
 class CairoDrawingArea(gtk.DrawingArea):
-	def __init__(self, width=0, height=0, win=None):
+	def __init__(self, width=0, height=0, win=None, buf=DEFAULT_BUFFER):
 		gtk.DrawingArea.__init__(self)
 
-		self.__buffer = DEFAULT_BUFFER
+		self.__buffer = buf
 		self.__win    = win
 
 		self.set_size_request(width, height)
@@ -376,11 +392,13 @@ class LibraryRoutine(gtk.Alignment):
 		self.__help.set_markup("<span size='smaller'>%s</span>" % help)
 
 class CairoWindow(gtk.Window):
-	def __init__(self, w, h):
+	def __init__(self, w, h, script=None):
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
-		self.__draw   = CairoDrawingArea(w, h, self)
-		self.__text   = TextView(DEFAULT_BUFFER)
+		b = script and file(script).read() or DEFAULT_BUFFER
+
+		self.__draw   = CairoDrawingArea(w, h, self, b)
+		self.__text   = TextView(b)
 		self.__help   = ColorBox()
 		self.__glbls  = LibraryRoutine("GLOBALS")
 		self.__err    = TextView()
@@ -511,6 +529,8 @@ class CairoWindow(gtk.Window):
 		if fc.run():
 			self.__text.SetText(file(fc.get_filename()).read())
 
+			self.__parseCode()
+
 		fc.destroy()
 
 	def __saveScript(self, *args):
@@ -522,7 +542,12 @@ class CairoWindow(gtk.Window):
 		)
 
 		if fc.run():
-			print >> file(fc.get_filename() + ".cairo", "w"), self.__text.GetText()
+			f = fc.get_filename()
+
+			if not ".cairo" in f:
+				f += ".cairo"
+
+			print >> file(f, "w"), self.__text.GetText()
 
 		fc.destroy()
 
@@ -550,7 +575,12 @@ class CairoWindow(gtk.Window):
 		self.__status.push(0, "Dimensions: %i x %i" % (w, h))
 
 if __name__ == "__main__":
-	cw = CairoWindow(512, 512)
+	f = None
+
+	if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
+		f = sys.argv[1]
+
+	cw = CairoWindow(512, 512, f)
 	
 	cw.connect("destroy", gtk.main_quit)
 	cw.show_all()
