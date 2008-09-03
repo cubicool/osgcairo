@@ -8,6 +8,10 @@ Matrix::Matrix(double xx, double yx, double xy, double yy, double x0, double y0)
 	cairo_matrix_init(this, xx, yx, xy, yy, x0, y0);
 }
 
+Matrix::Matrix(const CairoMatrix& cm):
+CairoMatrix(cm) {
+}
+
 Matrix::~Matrix() {
 }
 

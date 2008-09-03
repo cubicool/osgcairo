@@ -9,7 +9,8 @@
 namespace osgCairo {
 
 class SurfaceImage: public Surface, public osg::Image {
-	bool _allocated;
+	bool        _allocated;
+	CairoFormat _format;
 
 protected:
 	virtual CairoSurface* _createSurfaceImplementation();
@@ -17,17 +18,29 @@ protected:
 public:
 	META_Object(osgCairo, SurfaceImage);
 
-	SurfaceImage ();
-	SurfaceImage (unsigned int, unsigned int, const unsigned char* = 0);
-	SurfaceImage (const SurfaceImage&, const osg::CopyOp&);
+	SurfaceImage(CairoFormat = CAIRO_FORMAT_ARGB32);
 
-	bool allocateImage(unsigned int, unsigned int, const unsigned char* = 0);
+	SurfaceImage(
+		unsigned int,
+		unsigned int,
+		const unsigned char* = 0,
+		CairoFormat          = CAIRO_FORMAT_ARGB32
+	);
+	
+	SurfaceImage(const SurfaceImage&, const osg::CopyOp&);
+
+	bool allocateSurface(unsigned int, unsigned int, const unsigned char* = 0);
 
 	virtual bool valid() const {
 		return osg::Image::valid() && _allocated;
 	}
 
-	void roundedCorners();
+	CairoFormat getFormat() const {
+		return _format;
+	}
+
+	void roundedCorners      ();
+	void setOriginBottomLeft ();
 };
 
 

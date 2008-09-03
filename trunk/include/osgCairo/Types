@@ -18,18 +18,21 @@ typedef cairo_matrix_t         CairoMatrix;
 
 // These are types that I will use directly w/out creating wrappers. For the most
 // part, they are all just C enum's anyway.
-typedef cairo_surface_t      CairoSurface;
-typedef cairo_t              CairoContext;
-typedef cairo_status_t       CairoStatus;
-typedef cairo_pattern_type_t CairoPatternType;
-typedef cairo_content_t      CairoContent;
-typedef cairo_antialias_t    CairoAntialias;
-typedef cairo_fill_rule_t    CairoFillRule;
-typedef cairo_line_cap_t     CairoLineCap;
-typedef cairo_line_join_t    CairoLineJoin;
-typedef cairo_operator_t     CairoOperator;
-typedef cairo_extend_t       CairoExtend;
-typedef cairo_filter_t       CairoFilter;
+typedef cairo_surface_t        CairoSurface;
+typedef cairo_t                CairoContext;
+typedef cairo_status_t         CairoStatus;
+typedef cairo_pattern_type_t   CairoPatternType;
+typedef cairo_content_t        CairoContent;
+typedef cairo_antialias_t      CairoAntialias;
+typedef cairo_fill_rule_t      CairoFillRule;
+typedef cairo_line_cap_t       CairoLineCap;
+typedef cairo_line_join_t      CairoLineJoin;
+typedef cairo_operator_t       CairoOperator;
+typedef cairo_extend_t         CairoExtend;
+typedef cairo_filter_t         CairoFilter;
+typedef cairo_format_t         CairoFormat;
+typedef cairo_hint_style_t     CairoHintStyle;
+typedef cairo_subpixel_order_t CairoSubpixelOrder;
 
 // I thought I might just use std::map's here; is that a better idea than these
 // boring, silly functions?

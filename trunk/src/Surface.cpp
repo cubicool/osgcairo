@@ -280,6 +280,10 @@ void Surface::setMatrix(const Matrix& mat) {
 	cairo_set_matrix(_context, &mat);
 }
 
+void Surface::setFontMatrix(const Matrix& mat) {
+	cairo_set_font_matrix(_context, &mat);
+}
+
 void Surface::identityMatrix() {
 	cairo_identity_matrix(_context);
 }

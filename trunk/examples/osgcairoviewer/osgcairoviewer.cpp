@@ -46,6 +46,24 @@ osg::Geometry* createGroupCommon(osg::Image* image) {
 	return geom;
 }
 
+osg::Geode* createGroup4() {
+	osg::Geode*             geode   = new osg::Geode();
+	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage(CAIRO_FORMAT_A8);
+	
+	if(image->allocateSurface(64, 64) && image->createContext()) {
+		image->setOriginBottomLeft();
+		image->setLineWidth(2.0f);
+		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 1.0);
+		image->moveTo(0.0f, 0.0f);
+		image->lineTo(64.0f, 64.0f);
+		image->stroke();
+		
+		geode->addDrawable(createGroupCommon(image));
+	}
+
+	return geode;
+}
+
 osg::Geode* createGroup3() {
 	osg::Geode* geode   = new osg::Geode();
 	osg::Image* limage  = osgDB::readImageFile("../examples/osgcairoviewer/img.png");
@@ -70,10 +88,9 @@ osg::Geode* createGroup3() {
 
 osg::Geode* createGroup2() {
 	osg::Geode*             geode   = new osg::Geode();
-	osg::Texture2D*         texture = new osg::Texture2D();
 	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage();
 	
-	if(image->allocateImage(64, 64) && image->createContext()) {
+	if(image->allocateSurface(64, 64) && image->createContext()) {
 		/*
 		// Theme 1!
 		image->setSourceRGBA(0.8f, 0.8f, 0.8f);
@@ -100,10 +117,9 @@ osg::Geode* createGroup2() {
 
 osg::Geode* createGroup1() {
 	osg::Geode*             geode   = new osg::Geode();
-	osg::Texture2D*         texture = new osg::Texture2D();
 	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage();
 	
-	if(image->allocateImage(256, 256) && image->createContext()) {
+	if(image->allocateSurface(256, 256) && image->createContext()) {
 		image->scale(256.0f, 256.0f);
 		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
 		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
@@ -146,11 +162,13 @@ int main(int argc, char** argv) {
 	osg::Geode*  cairo1 = createGroup1();
 	osg::Geode*  cairo2 = createGroup2();
 	osg::Geode*  cairo3 = createGroup3();
+	osg::Geode*  cairo4 = createGroup4();
 
-	if(camera && cairo1 && cairo2 && cairo3) {
+	if(camera && cairo1 && cairo2 && cairo3 && cairo4) {
 		camera->addChild(cairo1);
 		camera->addChild(cairo2);
 		camera->addChild(cairo3);
+		camera->addChild(cairo4);
 
 		viewer.setSceneData(camera);
 
