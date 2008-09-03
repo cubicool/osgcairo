@@ -1,6 +1,8 @@
 import cairo
 import math
 
+c.set_antialias(cairo.ANTIALIAS_SUBPIXEL)
+
 c.rectangle(0, 0, 512, 512)
 c.set_source_rgb(0.7, 0.7, 0.7)
 c.fill()

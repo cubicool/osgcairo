@@ -3,6 +3,7 @@
 #ifndef OSGCAIRO_MATRIX
 #define OSGCAIRO_MATRIX
 
+#include <ostream>
 #include <osg/Referenced>
 #include <osgCairo/Types>
 
@@ -11,6 +12,7 @@ namespace osgCairo {
 class Matrix : public CairoMatrix, public osg::Referenced {
 public:
 	Matrix  (double=0.0f, double=0.0f, double=0.0f, double=0.0f, double=0.0f, double=0.0f);
+	Matrix  (const CairoMatrix&);
 	~Matrix ();
 
 	Matrix operator= (const Matrix&);
@@ -30,7 +32,17 @@ public:
 	static Matrix scale     (double, double);
 	static Matrix rotate    (double);
 };
-	
+
+inline std::ostream& operator<<(std::ostream& output, const Matrix& m) {
+	output
+		<< m.xx << " " << m.yx << std::endl
+		<< m.xy << " " << m.yy << std::endl
+		<< m.x0 << " " << m.y0 << std::endl
+	;
+
+	return output;
+}
+
 } // namespace osgCairo
 
 #endif

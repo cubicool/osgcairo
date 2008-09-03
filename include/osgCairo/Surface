@@ -129,6 +129,7 @@ public:
 	void rotate               (double);
 	void transform            (const Matrix&);
 	void setMatrix            (const Matrix&);
+	void setFontMatrix        (const Matrix&);
 	void identityMatrix       ();
 	void userToDevice         (double&, double&);
 	void userToDeviceDistance (double&, double&);

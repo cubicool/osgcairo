@@ -7,41 +7,58 @@
 
 namespace osgCairo {
 
-SurfaceImage::SurfaceImage():
-_allocated(false) {
+SurfaceImage::SurfaceImage(CairoFormat format):
+_allocated (false),
+_format    (format) {
 }
 
 SurfaceImage::SurfaceImage(
 	unsigned int         width,
 	unsigned int         height,
-	const unsigned char* data	
+	const unsigned char* data,
+	CairoFormat          format
 ):
-_allocated(false) {
-	allocateImage(width, height, data);
+_allocated (false),
+_format    (format) {
+	allocateSurface(width, height, data);
 }
 
 SurfaceImage::SurfaceImage(const SurfaceImage& si, const osg::CopyOp& co):
 osg::Image (si, co),
-_allocated (si._allocated) {
+_allocated (si._allocated),
+_format    (si._format) {
 }
 
 CairoSurface* SurfaceImage::_createSurfaceImplementation() {
 	return cairo_image_surface_create_for_data(
 		_data,
-		CAIRO_FORMAT_ARGB32,
+		_format,
 		_s,
 		_t,
-		_t * 4
+		cairo_format_stride_for_width(_format, _s)
 	);
 }
 
-bool SurfaceImage::allocateImage(
+bool SurfaceImage::allocateSurface(
 	unsigned int         width,
 	unsigned int         height,
 	const unsigned char* data
 ) {
+	GLenum pf = 0;
+
+	if(_format == CAIRO_FORMAT_A8) {
+		pf           = GL_ALPHA;
+		_pixelFormat = GL_ALPHA;
+	}
+
+	else {
+		pf           = GL_RGBA;
+		_format      = CAIRO_FORMAT_ARGB32;
+		_pixelFormat = GL_BGRA;
+	}
+
 	// Call the osg::Image allocation method.
-	osg::Image::allocateImage(width, height, 1, GL_RGBA, GL_UNSIGNED_BYTE);
+	osg::Image::allocateImage(width, height, 1, pf, GL_UNSIGNED_BYTE);
 
 	if(!osg::Image::valid()) {
 		osg::notify(osg::WARN)
@@ -52,13 +69,18 @@ bool SurfaceImage::allocateImage(
 		return false;
 	}
 
+	unsigned int i = 0;
+
 	// This will have to do for now. :)
-	if(data) std::memcpy(_data, data, (width * height) * 4);
+	if(_format == CAIRO_FORMAT_A8) i = 1;
 
-	else std::memset(_data, 0, (width * height) * 4);
+	else i = 4;
+	
+	if(data) std::memcpy(_data, data, (width * height) * i);
 
-	_allocated   = true;
-	_pixelFormat = GL_BGRA;
+	else std::memset(_data, 0, (width * height) * i);
+
+	_allocated = true;
 
 	dirty();
 
@@ -77,6 +99,10 @@ void SurfaceImage::roundedCorners() {
 	fill();
 
 	delete p;
+}
+
+void SurfaceImage::setOriginBottomLeft() {
+	setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
 } // namespace osgCairo
