@@ -41,6 +41,8 @@ public:
 
 	void roundedCorners      ();
 	void setOriginBottomLeft ();
+
+	unsigned int getImageSizeInBytes() const;
 };
 
 
