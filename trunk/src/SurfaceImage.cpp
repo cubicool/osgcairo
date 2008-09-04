@@ -105,4 +105,8 @@ void SurfaceImage::setOriginBottomLeft() {
 	setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
+unsigned int SurfaceImage::getImageSizeInBytes() const {
+	return computeRowWidthInBytes(_s, _pixelFormat, _dataType, _packing) * _t * _r;
+}
+
 } // namespace osgCairo
