@@ -1,3 +1,4 @@
+#include <iostream>
 #include <osg/Notify>
 #include <osg/Math>
 #include <osg/Geometry>
@@ -22,8 +23,15 @@ osg::Geometry* createGroupCommon(osg::Image* image) {
 		1.0f
 	);
 
+	// image->setPixelFormat(GL_BGRA);
+
 	texture->setImage(image);
 	texture->setDataVariance(osg::Object::DYNAMIC);
+
+	std::cout
+		<< "internalFormat: " << std::hex << texture->getInternalFormat() << std::endl
+		<< "sourceFormat: "   << texture->getSourceFormat() << std::endl
+	;
 
 	osg::StateSet* state = geom->getOrCreateStateSet();
 
@@ -124,7 +132,7 @@ osg::Geode* createGroup1() {
 		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
 		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
 		//image->fill();
-		image->setSourceRGBA(1.0f, 0.7f, 0.3f);
+		image->setSourceRGBA(0.0f, 0.0f, 1.0f);
 		image->setLineWidth(0.05f);
 		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
 		image->stroke();

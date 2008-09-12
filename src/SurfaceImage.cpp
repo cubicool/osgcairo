@@ -44,21 +44,16 @@ bool SurfaceImage::allocateSurface(
 	unsigned int         height,
 	const unsigned char* data
 ) {
-	GLenum pf = 0;
+	GLenum pf1 = GL_RGBA;
+	GLenum pf2 = GL_UNSIGNED_INT_8_8_8_8_REV;
 
 	if(_format == CAIRO_FORMAT_A8) {
-		pf           = GL_ALPHA;
-		_pixelFormat = GL_ALPHA;
-	}
-
-	else {
-		pf           = GL_RGBA;
-		_format      = CAIRO_FORMAT_ARGB32;
-		_pixelFormat = GL_BGRA;
+		pf1 = GL_ALPHA;
+		pf2 = GL_UNSIGNED_BYTE;
 	}
 
 	// Call the osg::Image allocation method.
-	osg::Image::allocateImage(width, height, 1, pf, GL_UNSIGNED_BYTE);
+	osg::Image::allocateImage(width, height, 1, pf1, pf2);
 
 	if(!osg::Image::valid()) {
 		osg::notify(osg::WARN)
@@ -80,7 +75,11 @@ bool SurfaceImage::allocateSurface(
 
 	else std::memset(_data, 0, (width * height) * i);
 
-	_allocated = true;
+	_allocated   = true;
+
+	if(_format == CAIRO_FORMAT_A8) _pixelFormat = GL_ALPHA;
+
+	else _pixelFormat = GL_BGRA;
 
 	dirty();
 
