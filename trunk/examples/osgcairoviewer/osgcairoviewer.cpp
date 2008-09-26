@@ -132,7 +132,7 @@ osg::Geode* createGroup1() {
 		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
 		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
 		//image->fill();
-		image->setSourceRGBA(0.0f, 0.0f, 1.0f);
+		image->setSourceRGBA(0.0f, 1.0f, 0.0f);
 		image->setLineWidth(0.05f);
 		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
 		image->stroke();

@@ -18,6 +18,7 @@ SET(HEADER_FILES
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Matrix
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Path
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Pattern
+	${osgCairo_SOURCE_DIR}/include/osgCairo/ScaledFont
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Surface
 	${osgCairo_SOURCE_DIR}/include/osgCairo/SurfaceImage
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Types

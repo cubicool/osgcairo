@@ -3,7 +3,25 @@
 #ifndef OSGCAIRO_GLYPH
 #define OSGCAIRO_GLYPH
 
+#include <list>
+#include <osgCairo/Types>
+
 namespace osgCairo {
+
+class Glyph: public CairoGlyph {
+public:
+	Glyph(unsigned int _index = 0, double _x = 0.0f, double _y = 0.0f) {
+		setGlyph(_index, _x, _y);
+	}
+
+	void setGlyph(unsigned int _index, double _x, double _y) {
+		index = _index;
+		x     = _x;
+		y     = _y;
+	}
+};
+
+typedef std::list<Glyph> GlyphList;
 
 } // namespace osgCairo
 
