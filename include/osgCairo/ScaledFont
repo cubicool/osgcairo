@@ -1,0 +1,25 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSGCAIRO_SCALED_FONT
+#define OSGCAIRO_SCALED_FONT
+
+#include <osgCairo/Types>
+
+namespace osgCairo {
+
+class ScaledFont {
+	CairoScaledFont* _scaledFont;
+
+public:
+	ScaledFont(CairoScaledFont* csf = 0):
+	_scaledFont(csf) {
+	}
+
+	CairoScaledFont* getScaledFont() {
+		return _scaledFont;
+	}
+};
+
+} // namespace osgCairo
+
+#endif

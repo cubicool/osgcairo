@@ -7,6 +7,8 @@
 #include <osgCairo/Matrix>
 #include <osgCairo/Path>
 #include <osgCairo/Pattern>
+#include <osgCairo/Glyph>
+#include <osgCairo/ScaledFont>
 #include <string>
 
 namespace osgCairo {
@@ -84,6 +86,7 @@ public:
 	void          setMiterLimit  (double);
 	void          setOperator    (CairoOperator);
 	void          setTolerance   (double);
+	void          setScaledFont  (ScaledFont*);
 	void          clip           ();
 	void          clipPreserve   ();
 	void          resetClip      ();
@@ -99,7 +102,10 @@ public:
 	// Path stuff: http://www.cairographics.org/manual/cairo-Paths.html
 	//
 	// The methods that will require custom classes are:
-	// - glyph_path
+	void showGlyphs (const GlyphList&);
+	void showGlyphs (const Glyph&);
+	void glyphPath  (const GlyphList&);
+	void glyphPath  (const Glyph&);
 	
 	Path copyPath     ();
 	Path copyPathFlat ();

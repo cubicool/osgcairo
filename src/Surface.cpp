@@ -130,6 +130,10 @@ void Surface::setTolerance(double tolerance) {
 	cairo_set_tolerance(_context, tolerance);
 }
 
+void Surface::setScaledFont(ScaledFont* scaledFont) {
+	cairo_set_scaled_font(_context, scaledFont->getScaledFont());
+}
+
 void Surface::clip() {
 	cairo_clip(_context);
 }
@@ -180,6 +184,22 @@ void Surface::strokePreserve() {
 
 void Surface::strokeExtents(double& x1, double& y1, double& x2, double& y2) {
 	cairo_stroke_extents(_context, &x1, &y1, &x2, &y2);
+}
+
+void Surface::showGlyphs(const GlyphList& gl) {
+	cairo_show_glyphs(_context, &gl.front(), gl.size());
+}
+
+void Surface::showGlyphs(const Glyph& glyph) {
+	cairo_show_glyphs(_context, &glyph, 1);
+}
+
+void Surface::glyphPath(const GlyphList& gl) {
+	cairo_glyph_path(_context, &gl.front(), gl.size());
+}
+
+void Surface::glyphPath(const Glyph& glyph) {
+	cairo_glyph_path(_context, &glyph, 1);
 }
 
 void Surface::writeToPNG(const std::string& filename) {

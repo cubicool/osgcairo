@@ -15,6 +15,7 @@ typedef cairo_path_data_t      CairoPathData;
 typedef cairo_path_data_type_t CairoPathDataType;
 typedef cairo_glyph_t          CairoGlyph;
 typedef cairo_matrix_t         CairoMatrix;
+typedef cairo_scaled_font_t    CairoScaledFont;
 
 // These are types that I will use directly w/out creating wrappers. For the most
 // part, they are all just C enum's anyway.
