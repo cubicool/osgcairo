@@ -148,9 +148,6 @@ public:
 	void setSourceRGBA(const osg::Vec4& col) {
 		setSourceRGBA(col.r(), col.g(), col.b(), col.a());
 	}
-
-	// A helper to create a commonly-wanted round box.
-	void roundedRectangle(double, double, double, double, double = 10.0f);
 };
 
 } // namespace osgCairo

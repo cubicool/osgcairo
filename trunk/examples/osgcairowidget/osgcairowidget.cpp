@@ -1,3 +1,5 @@
+#include <iostream>
+#include <osg/io_utils>
 #include <osg/BlendFunc>
 #include <osg/Timer>
 #include <osgDB/ReadFile>
@@ -27,7 +29,7 @@ osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=fals
 		h / 2.0f
 	);
 
-	if(!image->allocateImage(
+	if(!image->allocateSurface(
 		static_cast<unsigned int>(w),
 		static_cast<unsigned int>(h)
 	) || !image->createContext()) return 0;
@@ -108,31 +110,26 @@ public:
 		));
 	}
 
-	virtual bool mouseEnter(double, double, osgWidget::WindowManager*) {
-		setImage(_over.get());
+	virtual bool mouseEnter(double x, double y, osgWidget::WindowManager*) {
+		const osgWidget::Color& col = getImageColorAtXY(x, y);
+
+		std::cout << col << std::endl;
+
+		if(col.a() >= 0.1f) setImage(_over.get());
 
 		return true;
 	};
 
-	virtual bool mouseLeave(double, double, osgWidget::WindowManager*) {
-		setImage(_normal.get());
+	virtual bool mouseLeave(double x, double y, osgWidget::WindowManager*) {
+		const osgWidget::Color& col = getImageColorAtXY(x, y);
+
+		if(col.a() >= 0.1f) setImage(_normal.get());
 
 		return true;
 	};
 };
 
 int main(int argc, char** argv) {
-	/*
-	if(!osgWidgetVersionMinimum(0, 1, 6)) {
-		osg::notify(osg::FATAL)
-			<< argv[0] << " needs osgWidget version 0.1.6 or higher; "
-			<< "found " << osgWidgetGetVersion() << "." << std::endl
-		;
-
-		return 0;
-	}
-	*/
-
 	osgViewer::Viewer viewer;
 
 	point_type w = 256.0f;

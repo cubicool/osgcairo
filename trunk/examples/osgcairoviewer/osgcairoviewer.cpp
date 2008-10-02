@@ -23,15 +23,8 @@ osg::Geometry* createGroupCommon(osg::Image* image) {
 		1.0f
 	);
 
-	// image->setPixelFormat(GL_BGRA);
-
 	texture->setImage(image);
 	texture->setDataVariance(osg::Object::DYNAMIC);
-
-	std::cout
-		<< "internalFormat: " << std::hex << texture->getInternalFormat() << std::endl
-		<< "sourceFormat: "   << texture->getSourceFormat() << std::endl
-	;
 
 	osg::StateSet* state = geom->getOrCreateStateSet();
 
@@ -43,9 +36,12 @@ osg::Geometry* createGroupCommon(osg::Image* image) {
 
 	state->setMode(GL_BLEND, osg::StateAttribute::ON);
 	state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+	/*
 	state->setAttributeAndModes(
 		new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE_MINUS_SRC_ALPHA)
 	);
+	*/
 
 	image->dirty();
 
@@ -59,13 +55,14 @@ osg::Geode* createGroup4() {
 	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage(CAIRO_FORMAT_A8);
 	
 	if(image->allocateSurface(64, 64) && image->createContext()) {
-		image->setOriginBottomLeft();
+		//image->setOriginBottomLeft();
 		image->setLineWidth(2.0f);
 		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 1.0);
-		image->moveTo(0.0f, 0.0f);
-		image->lineTo(64.0f, 64.0f);
+		image->moveTo(10.0f, 10.0f);
+		image->lineTo(44.0f, 44.0f);
 		image->stroke();
-		
+		image->gaussianBlur(10);
+
 		geode->addDrawable(createGroupCommon(image));
 	}
 
@@ -86,7 +83,8 @@ osg::Geode* createGroup3() {
 	
 	if(image->createContext()) {
 		image->roundedCorners();
-	
+		image->gaussianBlur(5);
+
 		geode->addDrawable(createGroupCommon(image));
 		geode->addDrawable(createGroupCommon(limage));
 	}
@@ -116,7 +114,7 @@ osg::Geode* createGroup2() {
 		image->fillPreserve();
 		//image->setSourceRGBA(0.2f, 0.2f, 0.2f, 1.0f);
 		//image->strokePreserve();
-		
+			
 		geode->addDrawable(createGroupCommon(image));
 	}
 
@@ -136,7 +134,8 @@ osg::Geode* createGroup1() {
 		image->setLineWidth(0.05f);
 		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
 		image->stroke();
-		
+		image->gaussianBlur(10);
+
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
 		
