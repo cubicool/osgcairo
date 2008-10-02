@@ -39,8 +39,10 @@ public:
 		return _format;
 	}
 
+	void roundedRectangle    (double, double, double, double, double = 10.0f);
 	void roundedCorners      ();
 	void setOriginBottomLeft ();
+	void gaussianBlur        (unsigned int = 10);
 
 	unsigned int getImageSizeInBytes() const;
 };

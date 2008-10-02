@@ -1,6 +1,15 @@
 PROJECT(osgCairo)
 
+SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
+
+# On GCC, we need to set these compiler flags.
+IF(NOT WIN32)
+	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused")
+ENDIF(NOT WIN32)
+
 INCLUDE(FindPkgConfig)
+
+FIND_PACKAGE(OpenSceneGraph)
 
 PKG_CHECK_MODULES(CAIRO REQUIRED cairo)
 
@@ -24,13 +33,11 @@ SET(HEADER_FILES
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Types
 )
 
-SET(CMAKE_INCLUDE_PATH /usr/local/include CACHE STRING "Put your OSG include dir here...")
-SET(CMAKE_LIBRARY_PATH /usr/local/lib CACHE STRING "Put your OSG lib dir here...")
 SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
-INCLUDE_DIRECTORIES(include ${CMAKE_INCLUDE_PATH} ${CAIRO_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(include ${OPENSCENEGRAPH_INCLUDE_DIR} ${CAIRO_INCLUDE_DIRS})
 
-LINK_DIRECTORIES(${CMAKE_LIBRARY_PATH} ${CAIRO_LIBRARY_DIRS})
+LINK_DIRECTORIES(${OPENSCENEGRAPH_LIB_DIR} ${CAIRO_LIBRARY_DIRS})
 
 LINK_LIBRARIES(osg osgUtil osgViewer cairo)
 
@@ -63,3 +70,19 @@ CONFIGURE_FILE(
 ADD_CUSTOM_TARGET(uninstall
 	"${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/uninstall.cmake"
 )
+
+# Packaging information.
+SET(CPACK_GENERATOR TGZ)
+SET(CPACK_SOURCE_GENERATOR TGZ)
+SET(CPACK_SOURCE_IGNORE_FILES
+	"~$"
+	".*.svn"
+	".*build/"
+	".*debug/"
+	".*release/"
+)
+
+SET(OSGCAIRO_VERSION "0.1.0")
+SET(CPACK_SOURCE_PACKAGE_FILE_NAME "osgCairo-${OSGCAIRO_VERSION}")
+
+INCLUDE(CPack)

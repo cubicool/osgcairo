@@ -75,7 +75,7 @@ bool SurfaceImage::allocateSurface(
 
 	else std::memset(_data, 0, (width * height) * i);
 
-	_allocated   = true;
+	_allocated = true;
 
 	if(_format == CAIRO_FORMAT_A8) _pixelFormat = GL_ALPHA;
 
@@ -86,18 +86,63 @@ bool SurfaceImage::allocateSurface(
 	return true;
 }
 
-void SurfaceImage::roundedCorners() {	
-	Pattern* p = new SolidPattern(0.0f, 0.0f, 0.0f, 1.0f);
+void SurfaceImage::roundedRectangle(
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius
+) {
+	moveTo(x + radius, y);
+	lineTo(x + width - radius, y);
 
-	if(!p) return;
+	arc(
+		x + width - radius,
+		y + radius,
+		radius,
+		-90.0f * osg::PI / 180.0f,
+		0.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x + width, y + height - radius);
+
+	arc(
+		x + width - radius,
+		y + height - radius,
+		radius,
+		0.0f * osg::PI / 180.0f,
+		90.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x + radius, y + height);
+
+	arc(
+		x + radius,
+		y + height - radius,
+		radius,
+		90.0f * osg::PI / 180.0f,
+		180.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x, y + radius);
+
+	arc(
+		x + radius,
+		y + radius,
+		radius,
+		180.0f * osg::PI / 180.0f,
+		270.0f * osg::PI / 180.0f
+	);
+}
+
+void SurfaceImage::roundedCorners() {	
+	SolidPattern p(0.0f, 0.0f, 0.0f, 1.0f);
 
 	scale(_s, _t);
 	setOperator(CAIRO_OPERATOR_DEST_IN);
-	setSource(p);
+	setSource(&p);
 	roundedRectangle(0.01f, 0.01f, 0.98f, 0.98f, 0.075f);
 	fill();
-
-	delete p;
 }
 
 void SurfaceImage::setOriginBottomLeft() {
@@ -106,6 +151,215 @@ void SurfaceImage::setOriginBottomLeft() {
 
 unsigned int SurfaceImage::getImageSizeInBytes() const {
 	return computeRowWidthInBytes(_s, _pixelFormat, _dataType, _packing) * _t * _r;
+}
+
+double* createKernel(
+	int radius,
+	double deviation
+) {
+	double* kernel = 0;
+	double  sum    = 0.0f;
+	double  value  = 0.0f;
+	int     i;
+	int     size   = 2 * radius + 1;
+	double  radiusf;
+
+	if(radius <= 0) return 0;
+
+	kernel = new double[size + 1];
+	
+	if(!kernel) return 0;
+
+	radiusf = fabs(radius) + 1.0f;
+
+	if(deviation == 0.0f) 
+		deviation = sqrt (-(radiusf * radiusf) / (2.0f * log (1.0f / 255.0f)))
+	;
+
+	kernel[0] = size;
+	value     = (double)-radius;
+	
+	for (i = 0; i < size; i++) {
+		kernel[1 + i] = 
+			1.0f / (2.506628275f * deviation) *
+			expf (-((value * value) /
+			(2.0f * deviation * deviation)))
+		;
+
+		sum   += kernel[1 + i];
+		value += 1.0f;
+	}
+
+	for(i = 0; i < size; i++) kernel[1 + i] /= sum;
+
+	return kernel;
+}
+
+void SurfaceImage::gaussianBlur(unsigned int radius) {
+	if(!_surface) return;
+
+	unsigned int channels = 0;
+
+	if(_format == CAIRO_FORMAT_ARGB32) channels = 4;
+	
+	else if(_format == CAIRO_FORMAT_RGB24) channels = 3;
+	
+	else if(_format == CAIRO_FORMAT_A8) channels = 1;
+
+	else return;
+
+	unsigned int stride = _s * channels;
+
+	// create buffers to hold the blur-passes
+	double* horzBlur = new double[_t * stride];
+	double* vertBlur = new double[_t * stride];
+	double* kernel   = createKernel(radius, 0.0f);
+
+	if(!kernel) return;
+
+	// horizontal pass
+	for(int iY = 0; iY < _t; iY++) {
+		for(int iX = 0; iX < _s; iX++) {
+			double red   = 0.0f;
+			double green = 0.0f;
+			double blue  = 0.0f;
+			double alpha = 0.0f;
+
+			int offset = ((int) kernel[0]) / -2;
+			
+			for(int i = 0; i < (int) kernel[0]; i++) {
+				int x = iX + offset;
+
+				// TODO: THIS
+				if (x >= 0 && x < _s) {
+					int baseOffset = iY * stride + x * channels;
+
+					if(channels == 1) alpha += (
+						kernel[1 + i] *
+						(double)_data[baseOffset]
+					);
+
+					else {
+						if (channels == 4)
+							alpha += (kernel[1+i] *
+							(double)_data[baseOffset + 3]);
+
+						red += (kernel[1+i] *
+							(double)_data[baseOffset + 2]);
+
+						green += (kernel[1+i] *
+							(double)_data[baseOffset + 1]);
+
+						blue += (kernel[1+i] *
+							(double)_data[baseOffset + 0]);
+					}
+				}
+
+				offset++;
+			}
+
+			int baseOffset = iY * stride + iX * channels;
+
+			if(channels == 1) horzBlur[baseOffset] = alpha;
+
+			else {
+				if(channels == 4) horzBlur[baseOffset + 3] = alpha;
+
+				horzBlur[baseOffset + 2] = red;
+				horzBlur[baseOffset + 1] = green;
+				horzBlur[baseOffset + 0] = blue;
+			}
+		}
+	}
+
+	// vertical pass
+	for(int iY = 0; iY < _t; iY++) {
+		for(int iX = 0; iX < _s; iX++) {
+			double red   = 0.0f;
+			double green = 0.0f;
+			double blue  = 0.0f;
+			double alpha = 0.0f;
+
+			int offset = ((int) kernel[0]) / -2;
+			
+			for(int i = 0; i < (int) kernel[0]; i++) {
+				int y = iY + offset;
+
+				if (y >= 0 && y < _t) {
+					int baseOffset = y * stride + iX * channels;
+
+					if(channels ==1) alpha += (
+						kernel[1 + i] *
+						horzBlur[baseOffset]
+					);
+
+					else {
+
+						if (channels == 4)
+							alpha += (kernel[1+i] *
+							horzBlur[baseOffset + 3]);
+
+						red   += (kernel[1+i]  *
+							horzBlur[baseOffset + 2]);
+
+						green += (kernel[1+i]  *
+							horzBlur[baseOffset + 1]);
+
+						blue  += (kernel[1+i]  *
+							horzBlur[baseOffset + 0]);
+					}
+				}
+
+				offset++;
+			}
+
+			int baseOffset = iY * stride + iX * channels;
+
+			if(channels == 1) vertBlur[baseOffset] = alpha;
+
+			else {
+				if(channels == 4) vertBlur[baseOffset + 3] = alpha;
+
+				vertBlur[baseOffset + 2] = red;
+				vertBlur[baseOffset + 1] = green;
+				vertBlur[baseOffset + 0] = blue;
+			}
+		}
+	}
+
+	// We're done with the blurring.
+	delete[] kernel;
+
+	for (int iY = 0; iY < _t; iY++) {
+		for (int iX = 0; iX < _s; iX++) {
+			int offset = iY * stride + iX * channels;
+
+			if(channels == 1) _data[offset] = (unsigned char)vertBlur[offset];
+
+			else {
+				if (channels == 4) _data[offset + 3] = (unsigned char)vertBlur[offset + 3];
+
+				_data[offset + 2] = (unsigned char)vertBlur[offset + 2];
+				_data[offset + 1] = (unsigned char)vertBlur[offset + 1];
+				_data[offset + 0] = (unsigned char)vertBlur[offset + 0];
+			}
+		}
+	}
+
+	/*
+	cairo_surface_t* hb = cairo_image_surface_create_for_data((unsigned char*)horzBlur, _format, _s, _t, 
+		cairo_format_stride_for_width(_format, _s)
+	);
+	cairo_surface_t* vb = cairo_image_surface_create_for_data((unsigned char*)vertBlur, _format, _s, _t,
+		cairo_format_stride_for_width(_format, _s)
+	);
+
+	cairo_surface_write_to_png(hb, "hb.png");
+	cairo_surface_write_to_png(vb, "vb.png");
+	*/
+
+	delete[] horzBlur;
+	delete[] vertBlur;
 }
 
 } // namespace osgCairo
