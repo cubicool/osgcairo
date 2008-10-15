@@ -1,0 +1,39 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSGCAIRO_READFILE
+#define OSGCAIRO_READFILE
+
+#include <osgCairo/Image>
+
+namespace osgCairo {
+
+typedef std::vector<osg::ref_ptr<Image> > ImageVector;
+
+struct PDFOptions {
+	PDFOptions():
+	keepAspectRatio (true),
+	keepPageSize    (false),
+	width           (512),
+	height          (512),
+	maxPages        (-1),
+	backgroundColor (1.0f, 1.0f, 1.0f, 1.0f) {
+	}
+
+	bool keepAspectRatio;
+	bool keepPageSize;
+
+	unsigned int width;
+	unsigned int height;
+
+	int maxPages;
+
+	osg::Vec4 backgroundColor;
+};
+
+// Reads every page of the PDF into a vector of osgCairo::Image objects, rendered
+// at the given resolution.
+bool readFilePDF(const std::string&, ImageVector&, const PDFOptions& = PDFOptions());
+
+} // namespace osgCairo
+
+#endif

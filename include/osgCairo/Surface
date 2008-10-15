@@ -3,13 +3,13 @@
 #ifndef OSGCAIRO_SURFACE
 #define OSGCAIRO_SURFACE
 
+#include <string>
 #include <osg/Vec4>
 #include <osgCairo/Matrix>
 #include <osgCairo/Path>
 #include <osgCairo/Pattern>
 #include <osgCairo/Glyph>
 #include <osgCairo/ScaledFont>
-#include <string>
 
 namespace osgCairo {
 
