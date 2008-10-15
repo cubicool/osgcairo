@@ -14,36 +14,48 @@ INCLUDE(FindPkgConfig)
 FIND_PACKAGE(OpenSceneGraph)
 
 PKG_CHECK_MODULES(CAIRO REQUIRED cairo)
+PKG_CHECK_MODULES(POPPLER poppler-glib)
 
 SET(SRC_FILES
+	src/Image.cpp
 	src/Matrix.cpp
 	src/Path.cpp
 	src/Pattern.cpp
+	src/ReadFile.cpp
 	src/Surface.cpp
-	src/SurfaceImage.cpp
 	src/Types.cpp
 )
 
 SET(HEADER_FILES
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Glyph
+	${osgCairo_SOURCE_DIR}/include/osgCairo/Image
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Matrix
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Path
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Pattern
+	${osgCairo_SOURCE_DIR}/include/osgCairo/ReadFile
 	${osgCairo_SOURCE_DIR}/include/osgCairo/ScaledFont
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Surface
-	${osgCairo_SOURCE_DIR}/include/osgCairo/SurfaceImage
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Types
 )
 
 SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
-INCLUDE_DIRECTORIES(include ${OPENSCENEGRAPH_INCLUDE_DIR} ${CAIRO_INCLUDE_DIRS})
+INCLUDE_DIRECTORIES(
+	include
+	${OPENSCENEGRAPH_INCLUDE_DIR}
+	${CAIRO_INCLUDE_DIRS}
+	${POPPLER_INCLUDE_DIRS}
+)
 
-LINK_DIRECTORIES(${OPENSCENEGRAPH_LIB_DIR} ${CAIRO_LIBRARY_DIRS})
-
-LINK_LIBRARIES(osg osgUtil osgViewer cairo)
+LINK_DIRECTORIES(
+	${OPENSCENEGRAPH_LIB_DIR}
+	${CAIRO_LIBRARY_DIRS}
+	${POPPLER_LIBRARY_DIRS}
+)
 
 ADD_LIBRARY(osgCairo SHARED ${SRC_FILES} ${HEADER_FILES})
+
+TARGET_LINK_LIBRARIES(osgCairo osg osgUtil osgViewer cairo)
 
 INSTALL(TARGETS osgCairo DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
 
@@ -62,6 +74,12 @@ ADD_SUBDIRECTORY(examples/osgcairomatrix)
 IF(OSGCAIROWIDGET)
 	ADD_SUBDIRECTORY(examples/osgcairowidget)
 ENDIF(OSGCAIROWIDGET)
+
+IF(POPPLER_FOUND)
+	TARGET_LINK_LIBRARIES(osgCairo poppler poppler-glib)
+	ADD_DEFINITIONS(-DOSGCAIRO_POPPLER)
+	ADD_SUBDIRECTORY(examples/osgcairopdf)
+ENDIF(POPPLER_FOUND)
 
 CONFIGURE_FILE(
 	"${CMAKE_CURRENT_SOURCE_DIR}/etc/uninstall.cmake"

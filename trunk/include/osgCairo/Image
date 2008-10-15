@@ -1,14 +1,14 @@
 // -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
 
-#ifndef OSGCAIRO_SURFACEIMAGE
-#define OSGCAIRO_SURFACEIMAGE
+#ifndef OSGCAIRO_IMAGE
+#define OSGCAIRO_IMAGE
 
 #include <osgCairo/Surface>
 #include <osg/Image>
 
 namespace osgCairo {
 
-class SurfaceImage: public Surface, public osg::Image {
+class Image: public Surface, public osg::Image {
 	bool        _allocated;
 	CairoFormat _format;
 
@@ -16,18 +16,18 @@ protected:
 	virtual CairoSurface* _createSurfaceImplementation();
 
 public:
-	META_Object(osgCairo, SurfaceImage);
+	META_Object(osgCairo, Image);
 
-	SurfaceImage(CairoFormat = CAIRO_FORMAT_ARGB32);
+	Image(CairoFormat = CAIRO_FORMAT_ARGB32);
 
-	SurfaceImage(
+	Image(
 		unsigned int,
 		unsigned int,
-		const unsigned char* = 0,
-		CairoFormat          = CAIRO_FORMAT_ARGB32
+		CairoFormat          = CAIRO_FORMAT_ARGB32,
+		const unsigned char* = 0
 	);
 	
-	SurfaceImage(const SurfaceImage&, const osg::CopyOp&);
+	Image(const Image&, const osg::CopyOp&);
 
 	bool allocateSurface(unsigned int, unsigned int, const unsigned char* = 0);
 

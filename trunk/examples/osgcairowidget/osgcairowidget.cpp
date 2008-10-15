@@ -9,12 +9,12 @@
 #include <osgWidget/ViewerEventHandlers>
 #include <osgWidget/Box>
 #include <osgWidget/Version>
-#include <osgCairo/SurfaceImage>
+#include <osgCairo/Image>
 
 typedef osgWidget::point_type point_type;   
 
-osgCairo::SurfaceImage* createButton(point_type w, point_type h, bool gloss=false) {
-	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage();
+osgCairo::Image* createButton(point_type w, point_type h, bool gloss=false) {
+	osgCairo::Image* image = new osgCairo::Image();
 
 	osgCairo::Pattern* gradient1 = new osgCairo::LinearPattern(0.0f, 0.0f, 0.0f, h);
 	osgCairo::Pattern* gradient2 = new osgCairo::LinearPattern(0.0f, 0.0f, 0.0f, h);

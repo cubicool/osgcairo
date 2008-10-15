@@ -3,33 +3,33 @@
 #include <cstring>
 #include <sstream>
 #include <osg/Notify>
-#include <osgCairo/SurfaceImage>
+#include <osgCairo/Image>
 
 namespace osgCairo {
 
-SurfaceImage::SurfaceImage(CairoFormat format):
+Image::Image(CairoFormat format):
 _allocated (false),
 _format    (format) {
 }
 
-SurfaceImage::SurfaceImage(
+Image::Image(
 	unsigned int         width,
 	unsigned int         height,
-	const unsigned char* data,
-	CairoFormat          format
+	CairoFormat          format,
+	const unsigned char* data
 ):
 _allocated (false),
 _format    (format) {
 	allocateSurface(width, height, data);
 }
 
-SurfaceImage::SurfaceImage(const SurfaceImage& si, const osg::CopyOp& co):
+Image::Image(const Image& si, const osg::CopyOp& co):
 osg::Image (si, co),
 _allocated (si._allocated),
 _format    (si._format) {
 }
 
-CairoSurface* SurfaceImage::_createSurfaceImplementation() {
+CairoSurface* Image::_createSurfaceImplementation() {
 	return cairo_image_surface_create_for_data(
 		_data,
 		_format,
@@ -39,7 +39,7 @@ CairoSurface* SurfaceImage::_createSurfaceImplementation() {
 	);
 }
 
-bool SurfaceImage::allocateSurface(
+bool Image::allocateSurface(
 	unsigned int         width,
 	unsigned int         height,
 	const unsigned char* data
@@ -57,7 +57,7 @@ bool SurfaceImage::allocateSurface(
 
 	if(!osg::Image::valid()) {
 		osg::notify(osg::WARN)
-			<< "osgCairo::SurfaceImage::allocateImage failed!"
+			<< "osgCairo::Image::allocateImage failed!"
 			<< std::endl
 		;
 
@@ -86,7 +86,7 @@ bool SurfaceImage::allocateSurface(
 	return true;
 }
 
-void SurfaceImage::roundedRectangle(
+void Image::roundedRectangle(
 	double x,
 	double y,
 	double width,
@@ -135,7 +135,7 @@ void SurfaceImage::roundedRectangle(
 	);
 }
 
-void SurfaceImage::roundedCorners() {	
+void Image::roundedCorners() {	
 	SolidPattern p(0.0f, 0.0f, 0.0f, 1.0f);
 
 	scale(_s, _t);
@@ -145,11 +145,11 @@ void SurfaceImage::roundedCorners() {
 	fill();
 }
 
-void SurfaceImage::setOriginBottomLeft() {
+void Image::setOriginBottomLeft() {
 	setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
-unsigned int SurfaceImage::getImageSizeInBytes() const {
+unsigned int Image::getImageSizeInBytes() const {
 	return computeRowWidthInBytes(_s, _pixelFormat, _dataType, _packing) * _t * _r;
 }
 
@@ -195,7 +195,7 @@ double* createKernel(
 	return kernel;
 }
 
-void SurfaceImage::gaussianBlur(unsigned int radius) {
+void Image::gaussianBlur(unsigned int radius) {
 	if(!_surface) return;
 
 	unsigned int channels = 0;

@@ -7,7 +7,7 @@
 #include <osg/BlendFunc>
 #include <osgViewer/Viewer>
 #include <osgDB/ReadFile>
-#include <osgCairo/SurfaceImage>
+#include <osgCairo/Image>
 
 osg::Geometry* createGroupCommon(osg::Image* image) {
 	static osg::Vec3 pos(50.0f, 50.0f, -0.8f);
@@ -51,8 +51,8 @@ osg::Geometry* createGroupCommon(osg::Image* image) {
 }
 
 osg::Geode* createGroup4() {
-	osg::Geode*             geode   = new osg::Geode();
-	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage(CAIRO_FORMAT_A8);
+	osg::Geode*      geode = new osg::Geode();
+	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_A8);
 	
 	if(image->allocateSurface(64, 64) && image->createContext()) {
 		//image->setOriginBottomLeft();
@@ -75,9 +75,10 @@ osg::Geode* createGroup3() {
 
 	if(!limage || limage->getPixelFormat() != GL_RGBA) return geode;
 
-	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage(
+	osgCairo::Image* image = new osgCairo::Image(
 		limage->s(),
 		limage->t(),
+		CAIRO_FORMAT_ARGB32,
 		limage->data()
 	);
 	
@@ -93,8 +94,8 @@ osg::Geode* createGroup3() {
 }
 
 osg::Geode* createGroup2() {
-	osg::Geode*             geode   = new osg::Geode();
-	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage();
+	osg::Geode*      geode = new osg::Geode();
+	osgCairo::Image* image = new osgCairo::Image();
 	
 	if(image->allocateSurface(64, 64) && image->createContext()) {
 		/*
@@ -122,8 +123,8 @@ osg::Geode* createGroup2() {
 }
 
 osg::Geode* createGroup1() {
-	osg::Geode*             geode   = new osg::Geode();
-	osgCairo::SurfaceImage* image   = new osgCairo::SurfaceImage();
+	osg::Geode*      geode = new osg::Geode();
+	osgCairo::Image* image = new osgCairo::Image();
 	
 	if(image->allocateSurface(256, 256) && image->createContext()) {
 		image->scale(256.0f, 256.0f);
