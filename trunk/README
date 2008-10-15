@@ -31,17 +31,18 @@ like, performance in OSG will suffer.
 USAGE
 -------------------------------------------------------------------------------
 
-First, get yourself a new SurfaceImage object:
+First, get yourself a new Image object:
 
-	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage();
+	osgCairo::Image* image = new osgCairo::Image();
 
 	if(image->allocateImage(128, 128) && image->createContext()) {}
 
 	...OR...
 
-	osgCairo::SurfaceImage* image = new osgCairo::SurfaceImage(
+	osgCairo::Image* image = new osgCairo::Image(
 		128,
 		128,
+		CAIRO_FORMAT_ARGB32,
 		pointerToRGBAdata
 	);
 
@@ -54,7 +55,7 @@ Secondly, call the various Cairo methods on the image:
 	image->lineTo(10.0f, 10.0f);
 	image->stroke();
 
-Thirdly, once you're finished drawing--since an osgCairo::SurfaceImage is
+Thirdly, once you're finished drawing--since an osgCairo::Image is
 also an osg::Image--inform OSG that the Image has been modified and is
 dirty:
 
