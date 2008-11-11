@@ -9,7 +9,7 @@
 
 namespace osgCairo {
 
-class Matrix : public CairoMatrix, public osg::Referenced {
+class OSGCAIRO_EXPORT Matrix : public CairoMatrix, public osg::Referenced {
 public:
 	Matrix  (double=0.0f, double=0.0f, double=0.0f, double=0.0f, double=0.0f, double=0.0f);
 	Matrix  (const CairoMatrix&);

@@ -8,7 +8,7 @@
 
 namespace osgCairo {
 
-class Glyph: public CairoGlyph {
+class OSGCAIRO_EXPORT Glyph: public CairoGlyph {
 public:
 	Glyph(unsigned int _index = 0, double _x = 0.0f, double _y = 0.0f) {
 		setGlyph(_index, _x, _y);

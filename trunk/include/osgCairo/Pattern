@@ -8,7 +8,7 @@
 
 namespace osgCairo {
 
-class Pattern : public osg::Referenced {
+class OSGCAIRO_EXPORT Pattern : public osg::Referenced {
 protected:
 	CairoPattern* _pattern;
 	
@@ -32,22 +32,22 @@ public:
 	CairoFilter getFilter ();
 };
 
-class SolidPattern : public Pattern {
+class OSGCAIRO_EXPORT SolidPattern : public Pattern {
 public:
 	SolidPattern(double, double, double, double=1.0f);
 };
 
-class SurfacePattern : public Pattern {
+class OSGCAIRO_EXPORT SurfacePattern : public Pattern {
 public:
 	SurfacePattern(CairoSurface*);
 };
 
-class LinearPattern : public Pattern {
+class OSGCAIRO_EXPORT LinearPattern : public Pattern {
 public:
 	LinearPattern(double, double, double, double);
 };
 
-class RadialPattern : public Pattern {
+class OSGCAIRO_EXPORT RadialPattern : public Pattern {
 public:
 	RadialPattern(double, double, double, double, double, double);
 };

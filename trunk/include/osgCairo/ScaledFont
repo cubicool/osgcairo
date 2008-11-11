@@ -7,7 +7,7 @@
 
 namespace osgCairo {
 
-class ScaledFont {
+class OSGCAIRO_EXPORT ScaledFont {
 	CairoScaledFont* _scaledFont;
 
 public:

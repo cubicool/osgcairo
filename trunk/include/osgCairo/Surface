@@ -13,7 +13,7 @@
 
 namespace osgCairo {
 
-class Surface {
+class OSGCAIRO_EXPORT Surface {
 protected:
 	CairoSurface* _surface;
 	CairoContext* _context;
