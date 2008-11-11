@@ -9,7 +9,7 @@ namespace osgCairo {
 
 typedef std::vector<osg::ref_ptr<Image> > ImageVector;
 
-struct PDFOptions {
+struct OSGCAIRO_EXPORT PDFOptions {
 	PDFOptions():
 	keepAspectRatio (true),
 	keepPageSize    (false),
@@ -32,7 +32,7 @@ struct PDFOptions {
 
 // Reads every page of the PDF into a vector of osgCairo::Image objects, rendered
 // at the given resolution.
-bool readFilePDF(const std::string&, ImageVector&, const PDFOptions& = PDFOptions());
+bool OSGCAIRO_EXPORT readFilePDF(const std::string&, ImageVector&, const PDFOptions& = PDFOptions());
 
 } // namespace osgCairo
 

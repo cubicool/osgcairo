@@ -8,7 +8,7 @@
 
 namespace osgCairo {
 
-class Image: public Surface, public osg::Image {
+class OSGCAIRO_EXPORT Image: public Surface, public osg::Image {
 	bool        _allocated;
 	CairoFormat _format;
 

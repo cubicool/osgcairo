@@ -10,7 +10,7 @@ namespace osgCairo {
 
 class Surface;
 	
-class Path : public osg::Referenced {
+class OSGCAIRO_EXPORT Path : public osg::Referenced {
 	friend class Surface;
 
 	CairoPath* _path;

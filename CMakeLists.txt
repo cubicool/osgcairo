@@ -4,6 +4,12 @@ CMAKE_MINIMUM_REQUIRED(VERSION 2.6)
 
 SET(CMAKE_MODULE_PATH "${PROJECT_SOURCE_DIR}/etc/")
 
+# Use a debug postfix to distinguish build products. Mostly important on
+# Windows, because linking a debug library into a release executable (or
+# vice-versa, or just mixing C++ runtime versions) on Windows will lead
+# to crashes if the libraries use the C++ runtime.
+SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a postfix, usually d on windows")
+
 # On GCC, we need to set these compiler flags.
 IF(NOT WIN32)
 	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused")
@@ -27,6 +33,7 @@ SET(SRC_FILES
 )
 
 SET(HEADER_FILES
+	${osgCairo_SOURCE_DIR}/include/osgCairo/Export
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Glyph
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Image
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Matrix
@@ -55,9 +62,28 @@ LINK_DIRECTORIES(
 
 ADD_LIBRARY(osgCairo SHARED ${SRC_FILES} ${HEADER_FILES})
 
-TARGET_LINK_LIBRARIES(osgCairo osg osgUtil osgViewer cairo)
+# Add debug postfix to OSG libraries so we link to the right ones in debug.
+# Cairo is a C-only library so the same one (release) can be linked to both
+# debug and release without problems.
+TARGET_LINK_LIBRARIES(osgCairo
+                      debug     OpenThreads${CMAKE_DEBUG_POSTFIX}
+                      optimized OpenThreads
+                      debug     osg${CMAKE_DEBUG_POSTFIX}
+                      optimized osg
+                      debug     osgUtil${CMAKE_DEBUG_POSTFIX}
+                      optimized osgUtil
+                      debug     osgDB${CMAKE_DEBUG_POSTFIX}
+                      optimized osgDB
+                      debug     osgViewer${CMAKE_DEBUG_POSTFIX}
+                      optimized osgViewer
+                      general   cairo)
 
-INSTALL(TARGETS osgCairo DESTINATION ${CMAKE_INSTALL_PREFIX}/lib)
+# The archive/runtime part is so that the lib/dll pair goes into lib and bin
+# respectively on Windows.
+INSTALL(TARGETS osgCairo
+        ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+        LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+        RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 
 FOREACH(INCLUDEFILE ${HEADER_FILES})
 	FILE(RELATIVE_PATH REL_INCLUDEFILE ${osgCairo_SOURCE_DIR}/include/osgCairo ${INCLUDEFILE})

@@ -170,7 +170,7 @@ double* createKernel(
 	
 	if(!kernel) return 0;
 
-	radiusf = fabs(radius) + 1.0f;
+	radiusf = fabs(double(radius)) + 1.0f;
 
 	if(deviation == 0.0f) 
 		deviation = sqrt (-(radiusf * radiusf) / (2.0f * log (1.0f / 255.0f)))
