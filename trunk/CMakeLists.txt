@@ -66,24 +66,26 @@ ADD_LIBRARY(osgCairo SHARED ${SRC_FILES} ${HEADER_FILES})
 # Cairo is a C-only library so the same one (release) can be linked to both
 # debug and release without problems.
 TARGET_LINK_LIBRARIES(osgCairo
-                      debug     OpenThreads${CMAKE_DEBUG_POSTFIX}
-                      optimized OpenThreads
-                      debug     osg${CMAKE_DEBUG_POSTFIX}
-                      optimized osg
-                      debug     osgUtil${CMAKE_DEBUG_POSTFIX}
-                      optimized osgUtil
-                      debug     osgDB${CMAKE_DEBUG_POSTFIX}
-                      optimized osgDB
-                      debug     osgViewer${CMAKE_DEBUG_POSTFIX}
-                      optimized osgViewer
-                      general   cairo)
+	debug     OpenThreads${CMAKE_DEBUG_POSTFIX}
+	optimized OpenThreads
+	debug     osg${CMAKE_DEBUG_POSTFIX}
+	optimized osg
+	debug     osgUtil${CMAKE_DEBUG_POSTFIX}
+	optimized osgUtil
+	debug     osgDB${CMAKE_DEBUG_POSTFIX}
+	optimized osgDB
+	debug     osgViewer${CMAKE_DEBUG_POSTFIX}
+	optimized osgViewer
+	general   cairo
+)
 
 # The archive/runtime part is so that the lib/dll pair goes into lib and bin
 # respectively on Windows.
 INSTALL(TARGETS osgCairo
-        ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-        LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
-        RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
+	ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+	LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib
+	RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin
+)
 
 FOREACH(INCLUDEFILE ${HEADER_FILES})
 	FILE(RELATIVE_PATH REL_INCLUDEFILE ${osgCairo_SOURCE_DIR}/include/osgCairo ${INCLUDEFILE})
