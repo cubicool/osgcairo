@@ -580,7 +580,7 @@ if __name__ == "__main__":
 	if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
 		f = sys.argv[1]
 
-	cw = CairoWindow(8 * 8, 8, f)
+	cw = CairoWindow(32 * 8, 32, f)
 	
 	cw.connect("destroy", gtk.main_quit)
 	cw.show_all()
