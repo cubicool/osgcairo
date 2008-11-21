@@ -76,7 +76,8 @@ TARGET_LINK_LIBRARIES(osgCairo
 	optimized osgDB
 	debug     osgViewer${CMAKE_DEBUG_POSTFIX}
 	optimized osgViewer
-	general   cairo
+	debug     cairo
+	optimized cairo
 )
 
 # The archive/runtime part is so that the lib/dll pair goes into lib and bin
