@@ -12,5 +12,5 @@ LINK_LIBRARIES(osgCairo
 
 ADD_EXECUTABLE(osgcairowidget osgcairowidget.cpp)
 
-INSTALL(TARGETS osgcairowidget DESTINATION ${CMAKE_INSTALL_PREFIX}/share/openscenegraph/bin)
+INSTALL(TARGETS osgcairowidget DESTINATION ${CMAKE_INSTALL_PREFIX}/share/OpenSceneGraph/bin)
 SET_TARGET_PROPERTIES(osgcairowidget PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
