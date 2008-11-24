@@ -58,7 +58,11 @@ bool readFilePDF(const std::string& uri, ImageVector& pages, const PDFOptions& o
 
 		Image* image = 0;
 	
-		if(opts.keepPageSize) image = new Image(w, h, CAIRO_FORMAT_ARGB32);
+		if(opts.keepPageSize) image = new Image(
+			static_cast<unsigned int>(w),
+			static_cast<unsigned int>(h),
+			CAIRO_FORMAT_ARGB32
+		);
 		
 		else image = new Image(width, height, CAIRO_FORMAT_ARGB32);
 
