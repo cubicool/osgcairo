@@ -83,8 +83,13 @@ osg::Geode* createGroup3() {
 	);
 	
 	if(image->createContext()) {
+		image->setSourceRGBA(0.0f, 1.0f, 0.0f, 0.5f);
+		image->setLineWidth(40.0f);
+		image->arc(image->s() / 2.0f, image->t() / 2.0f, 60.0f, 0.0f, osg::PI + (osg::PI / 2.0f));
+		image->stroke();
+
+		// Why must this be done last?
 		image->roundedCorners();
-		image->gaussianBlur(5);
 
 		geode->addDrawable(createGroupCommon(image));
 		geode->addDrawable(createGroupCommon(limage));
@@ -131,11 +136,11 @@ osg::Geode* createGroup1() {
 		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
 		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
 		//image->fill();
-		image->setSourceRGBA(0.0f, 1.0f, 0.0f);
+		image->setSourceRGBA(1.0f, 1.0f, 1.0f);
 		image->setLineWidth(0.05f);
 		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
 		image->stroke();
-		image->gaussianBlur(10);
+		image->gaussianBlur(5);
 
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
