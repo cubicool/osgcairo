@@ -23,6 +23,7 @@ PKG_CHECK_MODULES(CAIRO REQUIRED cairo)
 PKG_CHECK_MODULES(POPPLER poppler-glib)
 
 SET(SRC_FILES
+	src/Canvas.cpp
 	src/Image.cpp
 	src/Matrix.cpp
 	src/Path.cpp
@@ -33,6 +34,7 @@ SET(SRC_FILES
 )
 
 SET(HEADER_FILES
+	${osgCairo_SOURCE_DIR}/include/osgCairo/Canvas
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Export
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Glyph
 	${osgCairo_SOURCE_DIR}/include/osgCairo/Image

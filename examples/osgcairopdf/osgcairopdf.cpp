@@ -81,9 +81,5 @@ int main(int argc, char** argv) {
 		return viewer.run();
 	}
 
-	else {
-		osg::notify(osg::FATAL) << "couldn't load the example PDF." << std::endl;
-
-		return 1;
-	}
+	else return 1;
 }

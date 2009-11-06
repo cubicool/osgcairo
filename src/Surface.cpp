@@ -332,4 +332,66 @@ Matrix Surface::getMatrix() {
 	return m;
 }
 
+void Surface::roundedRectangle(
+	double x,
+	double y,
+	double width,
+	double height,
+	double radius
+) {
+	moveTo(x + radius, y);
+	lineTo(x + width - radius, y);
+
+	arc(
+		x + width - radius,
+		y + radius,
+		radius,
+		-90.0f * osg::PI / 180.0f,
+		0.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x + width, y + height - radius);
+
+	arc(
+		x + width - radius,
+		y + height - radius,
+		radius,
+		0.0f * osg::PI / 180.0f,
+		90.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x + radius, y + height);
+
+	arc(
+		x + radius,
+		y + height - radius,
+		radius,
+		90.0f * osg::PI / 180.0f,
+		180.0f * osg::PI / 180.0f
+	);
+
+	lineTo(x, y + radius);
+
+	arc(
+		x + radius,
+		y + radius,
+		radius,
+		180.0f * osg::PI / 180.0f,
+		270.0f * osg::PI / 180.0f
+	);
+}
+
+void Surface::roundedCorners(double width, double height) {
+	SolidPattern p(0.0f, 0.0f, 0.0f, 1.0f);
+
+	save();
+	scale(width, height);
+	setOperator(CAIRO_OPERATOR_DEST_IN);
+	setSource(&p);
+	roundedRectangle(0.01f, 0.01f, 0.98f, 0.98f, 0.075f);
+	fill();
+	restore();
+}
+
 } // namespace osgCairo
+

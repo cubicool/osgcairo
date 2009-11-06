@@ -53,13 +53,12 @@ osg::Geode* createGroup4() {
 	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_A8);
 	
 	if(image->allocateSurface(64, 64) && image->createContext()) {
-		//image->setOriginBottomLeft();
+		image->setOriginBottomLeft();
 		image->setLineWidth(2.0f);
 		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 1.0);
 		image->moveTo(10.0f, 10.0f);
 		image->lineTo(44.0f, 44.0f);
 		image->stroke();
-		image->gaussianBlur(10);
 
 		geode->addDrawable(createGroupCommon(image, false));
 	}
@@ -70,6 +69,11 @@ osg::Geode* createGroup4() {
 osg::Geode* createGroup3() {
 	osg::Geode* geode = new osg::Geode();
 	osg::Image* image = osgDB::readImageFile("../examples/osgcairoviewer/img.png");
+
+	if(!image) return geode;
+
+	int width  = image->s();
+	int height = image->t();
 
 	geode->addDrawable(createGroupCommon(image));
 
@@ -85,19 +89,19 @@ osg::Geode* createGroup3() {
 	}
 
 	osgCairo::Image* cairoImage = new osgCairo::Image(
-		image->s(),
-		image->t(),
+		width,
+		height,
 		CAIRO_FORMAT_ARGB32,
 		newData
 	);
 	
 	if(cairoImage->createContext()) {
-		cairoImage->roundedCorners();
+		cairoImage->roundedCorners(width, height);
 		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
 		cairoImage->setLineWidth(40.0f);
 		cairoImage->arc(
-			cairoImage->s() / 2.0f,
-			cairoImage->t() / 2.0f,
+			width / 2.0f,
+			height / 2.0f,
 			60.0f,
 			0.0f,
 			osg::PI + (osg::PI / 2.0f)
@@ -115,7 +119,6 @@ osg::Geode* createGroup2() {
 	osgCairo::Image* image = new osgCairo::Image();
 	
 	if(image->allocateSurface(64, 64) && image->createContext()) {
-		/*
 		// Theme 1!
 		image->setSourceRGBA(0.8f, 0.8f, 0.8f);
 		image->setLineWidth(1.0f);
@@ -123,8 +126,8 @@ osg::Geode* createGroup2() {
 		image->strokePreserve();
 		image->setSourceRGBA(0.7f, 0.5f, 0.2f, 0.2f);
 		image->fillPreserve();
-		*/
 
+		/*
 		// Theme 2!
 		image->setLineWidth(2.0f);
 		image->roundedRectangle(2.0f, 2.0f, 59.0f, 59.0f, 12.0f);
@@ -132,6 +135,7 @@ osg::Geode* createGroup2() {
 		image->fillPreserve();
 		//image->setSourceRGBA(0.2f, 0.2f, 0.2f, 1.0f);
 		//image->strokePreserve();
+		*/
 			
 		geode->addDrawable(createGroupCommon(image));
 	}
@@ -152,7 +156,6 @@ osg::Geode* createGroup1() {
 		image->setLineWidth(0.05f);
 		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
 		image->stroke();
-		image->gaussianBlur(5);
 
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
