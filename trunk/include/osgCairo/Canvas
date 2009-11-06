@@ -1,0 +1,48 @@
+// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+
+#ifndef OSGCAIRO_CANVAS
+#define OSGCAIRO_CANVAS
+
+#include <osg/Group>
+#include <osgCairo/Image>
+
+namespace osgCairo {
+
+class OSGCAIRO_EXPORT Canvas: public osg::Object {
+	CairoFormat _format;
+
+	unsigned int _width;
+	unsigned int _height;
+	unsigned int _textureWidth;
+	unsigned int _textureHeight;
+
+public:
+	META_Object(osgCairo, Canvas);
+
+	Canvas(CairoFormat = CAIRO_FORMAT_ARGB32);
+
+	Canvas(
+		unsigned int,
+		unsigned int,
+		unsigned int,
+		unsigned int,
+		CairoFormat          = CAIRO_FORMAT_ARGB32,
+		const unsigned char* = 0
+	);
+	
+	Canvas(const Canvas&, const osg::CopyOp&);
+
+	bool allocateSurface(
+		unsigned int,
+		unsigned int,
+		unsigned int,
+		unsigned int,
+		const unsigned char* = 0
+	);
+
+	bool valid();
+};
+
+}
+
+#endif

@@ -9,10 +9,10 @@
 namespace osgCairo {
 
 class OSGCAIRO_EXPORT Image: public Surface, public osg::Image {
+protected:
 	bool        _allocated;
 	CairoFormat _format;
 
-protected:
 	virtual CairoSurface* _createSurfaceImplementation();
 
 public:
@@ -29,7 +29,7 @@ public:
 	
 	Image(const Image&, const osg::CopyOp&);
 
-	bool allocateSurface(unsigned int, unsigned int, const unsigned char* = 0);
+	virtual bool allocateSurface(unsigned int, unsigned int, const unsigned char* = 0);
 
 	virtual bool valid() const {
 		return osg::Image::valid() && _allocated;
@@ -39,10 +39,7 @@ public:
 		return _format;
 	}
 
-	void roundedRectangle    (double, double, double, double, double = 10.0f);
-	void roundedCorners      ();
-	void setOriginBottomLeft ();
-	void gaussianBlur        (unsigned int = 10);
+	void setOriginBottomLeft();
 
 	unsigned int getImageSizeInBytes() const;
 };
