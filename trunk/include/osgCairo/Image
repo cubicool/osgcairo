@@ -47,6 +47,7 @@ public:
 	unsigned int getImageSizeInBytes() const;
 };
 
+unsigned char* convertImageDataToCairoFormat(osg::Image*, CairoFormat);
 
 }
 

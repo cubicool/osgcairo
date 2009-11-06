@@ -70,30 +70,46 @@ osg::Geode* createGroup4() {
 }
 
 osg::Geode* createGroup3() {
-	osg::Geode* geode   = new osg::Geode();
-	osg::Image* limage  = osgDB::readImageFile("../examples/osgcairoviewer/img.png");
+	osg::Geode* geode = new osg::Geode();
+	osg::Image* image = osgDB::readImageFile("../examples/osgcairoviewer/img.png");
 
-	if(!limage || limage->getPixelFormat() != GL_RGBA) return geode;
+	geode->addDrawable(createGroupCommon(image));
 
-	osgCairo::Image* image = new osgCairo::Image(
-		limage->s(),
-		limage->t(),
+	unsigned char* newData = osgCairo::convertImageDataToCairoFormat(
+		image,
+		CAIRO_FORMAT_ARGB32
+	);
+
+	if(!newData) {
+		osg::notify(osg::NOTICE) << "Couldn't convert img.png to ARGB32." << std::endl;
+
+		return geode;
+	}
+
+	osgCairo::Image* cairoImage = new osgCairo::Image(
+		image->s(),
+		image->t(),
 		CAIRO_FORMAT_ARGB32,
-		limage->data()
+		newData
 	);
 	
-	if(image->createContext()) {
-		image->setSourceRGBA(0.0f, 1.0f, 0.0f, 0.5f);
-		image->setLineWidth(40.0f);
-		image->arc(image->s() / 2.0f, image->t() / 2.0f, 60.0f, 0.0f, osg::PI + (osg::PI / 2.0f));
-		image->stroke();
+	if(cairoImage->createContext()) {
+		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+		cairoImage->setLineWidth(40.0f);
+		cairoImage->arc(
+			cairoImage->s() / 2.0f,
+			cairoImage->t() / 2.0f,
+			60.0f,
+			0.0f,
+			osg::PI + (osg::PI / 2.0f)
+		);
+		cairoImage->stroke();
 
 		// Why must this be done last?
-		image->roundedCorners();
-
-		geode->addDrawable(createGroupCommon(image));
-		geode->addDrawable(createGroupCommon(limage));
+		cairoImage->roundedCorners();
 	}
+
+	geode->addDrawable(createGroupCommon(cairoImage));
 
 	return geode;
 }
