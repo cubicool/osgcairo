@@ -135,14 +135,16 @@ void Image::roundedRectangle(
 	);
 }
 
-void Image::roundedCorners() {	
+void Image::roundedCorners() {
 	SolidPattern p(0.0f, 0.0f, 0.0f, 1.0f);
 
+	save();
 	scale(_s, _t);
 	setOperator(CAIRO_OPERATOR_DEST_IN);
 	setSource(&p);
 	roundedRectangle(0.01f, 0.01f, 0.98f, 0.98f, 0.075f);
 	fill();
+	restore();
 }
 
 void Image::setOriginBottomLeft() {
@@ -360,6 +362,37 @@ void Image::gaussianBlur(unsigned int radius) {
 
 	delete[] horzBlur;
 	delete[] vertBlur;
+}
+
+// Thank you to Riccardo Corsi <riccardo.corsi@vrmmp.it> for pointing out the necessity
+// of this routine. :)
+unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cairoFormat) {
+	unsigned char* data   = image->data();
+	GLenum         format = image->getPixelFormat();
+
+	if(cairoFormat == CAIRO_FORMAT_ARGB32) {
+		if(format != GL_RGB && format != GL_RGBA) return 0;
+
+		unsigned int   numPixel = image->s() * image->t();
+		unsigned char* newData  = new unsigned char[numPixel * 4];
+		unsigned int   offset   = 4;
+
+		if(format == GL_RGB) offset = 3;
+
+		for(unsigned int i = 0; i < numPixel; ++i) {
+			newData[i * 4]     = data[i * offset + 2];
+			newData[i * 4 + 1] = data[i * offset + 1];
+			newData[i * 4 + 2] = data[i * offset];
+
+			if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
+
+			else newData[i * 4 + 3] = 255;
+		}
+
+		return newData;
+	}
+
+	return 0;
 }
 
 } // namespace osgCairo
