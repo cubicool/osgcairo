@@ -9,7 +9,7 @@
 #include <osgDB/ReadFile>
 #include <osgCairo/Image>
 
-osg::Geometry* createGroupCommon(osg::Image* image) {
+osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
 	static osg::Vec3 pos(50.0f, 50.0f, -0.8f);
 
 	osg::Texture2D* texture = new osg::Texture2D();
@@ -37,11 +37,9 @@ osg::Geometry* createGroupCommon(osg::Image* image) {
 	state->setMode(GL_BLEND, osg::StateAttribute::ON);
 	state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
-	/*
-	state->setAttributeAndModes(
+	if(setBlendMode) state->setAttributeAndModes(
 		new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE_MINUS_SRC_ALPHA)
 	);
-	*/
 
 	image->dirty();
 
@@ -63,7 +61,7 @@ osg::Geode* createGroup4() {
 		image->stroke();
 		image->gaussianBlur(10);
 
-		geode->addDrawable(createGroupCommon(image));
+		geode->addDrawable(createGroupCommon(image, false));
 	}
 
 	return geode;
