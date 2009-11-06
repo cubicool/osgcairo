@@ -94,6 +94,7 @@ osg::Geode* createGroup3() {
 	);
 	
 	if(cairoImage->createContext()) {
+		cairoImage->roundedCorners();
 		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
 		cairoImage->setLineWidth(40.0f);
 		cairoImage->arc(
@@ -104,9 +105,6 @@ osg::Geode* createGroup3() {
 			osg::PI + (osg::PI / 2.0f)
 		);
 		cairoImage->stroke();
-
-		// Why must this be done last?
-		cairoImage->roundedCorners();
 	}
 
 	geode->addDrawable(createGroupCommon(cairoImage));
