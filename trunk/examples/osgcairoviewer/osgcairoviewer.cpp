@@ -7,7 +7,9 @@
 #include <osg/BlendFunc>
 #include <osgViewer/Viewer>
 #include <osgDB/ReadFile>
+#include <osgDB/WriteFile>
 #include <osgCairo/Image>
+#include <osgCairo/ReadFile>
 
 osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
 	static osg::Vec3 pos(50.0f, 50.0f, -0.8f);
@@ -48,7 +50,7 @@ osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
 	return geom;
 }
 
-osg::Geode* createGroup4() {
+osg::Geode* createGroup5() {
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_A8);
 	
@@ -66,35 +68,23 @@ osg::Geode* createGroup4() {
 	return geode;
 }
 
-osg::Geode* createGroup3() {
+osg::Geode* createGroup4() {
+	std::string path("../examples/osgcairoviewer/img.png");
+
 	osg::Geode* geode = new osg::Geode();
-	osg::Image* image = osgDB::readImageFile("../examples/osgcairoviewer/img.png");
+	osg::Image* image = osgDB::readImageFile(path);
 
 	if(!image) return geode;
+
+	geode->addDrawable(createGroupCommon(image));
+
+	osgCairo::Image* cairoImage = osgCairo::readImageFile(path);
+
+	if(!cairoImage) return geode;
 
 	int width  = image->s();
 	int height = image->t();
 
-	geode->addDrawable(createGroupCommon(image));
-
-	unsigned char* newData = osgCairo::convertImageDataToCairoFormat(
-		image,
-		CAIRO_FORMAT_ARGB32
-	);
-
-	if(!newData) {
-		osg::notify(osg::NOTICE) << "Couldn't convert img.png to ARGB32." << std::endl;
-
-		return geode;
-	}
-
-	osgCairo::Image* cairoImage = new osgCairo::Image(
-		width,
-		height,
-		CAIRO_FORMAT_ARGB32,
-		newData
-	);
-	
 	if(cairoImage->createContext()) {
 		cairoImage->roundedCorners(width, height);
 		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
@@ -111,6 +101,43 @@ osg::Geode* createGroup3() {
 
 	geode->addDrawable(createGroupCommon(cairoImage));
 
+	/*
+	// Write the image the osgCairo way.
+	cairoImage->writeToPNG("img_cairo.png");
+
+	// Write the imagae the osgDB way.
+	cairoImage->setFileName("./img_osgDB.png");
+
+	osgDB::writeImageFile(*cairoImage, "img_osgDB.png");
+	*/
+
+	return geode;
+}
+
+osg::Geode* createGroup3() {
+	osg::Geode* geode = new osg::Geode();
+	osg::Image* image = osgDB::readImageFile("../examples/osgcairoviewer/img.cairo");
+
+	if(!image) return geode;
+
+	/*
+	if(cairoImage->createContext()) {
+		cairoImage->roundedCorners(width, height);
+		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+		cairoImage->setLineWidth(40.0f);
+		cairoImage->arc(
+			width / 2.0f,
+			height / 2.0f,
+			60.0f,
+			0.0f,
+			osg::PI + (osg::PI / 2.0f)
+		);
+		cairoImage->stroke();
+	}
+	*/
+
+	geode->addDrawable(createGroupCommon(image));
+
 	return geode;
 }
 
@@ -119,24 +146,13 @@ osg::Geode* createGroup2() {
 	osgCairo::Image* image = new osgCairo::Image();
 	
 	if(image->allocateSurface(64, 64) && image->createContext()) {
-		// Theme 1!
 		image->setSourceRGBA(0.8f, 0.8f, 0.8f);
 		image->setLineWidth(1.0f);
 		image->roundedRectangle(2.5f, 2.5f, 59.0f, 59.0f, 10.0f);
 		image->strokePreserve();
-		image->setSourceRGBA(0.7f, 0.5f, 0.2f, 0.2f);
+		image->setSourceRGBA(0.7f, 0.1f, 0.1f, 0.2f);
 		image->fillPreserve();
 
-		/*
-		// Theme 2!
-		image->setLineWidth(2.0f);
-		image->roundedRectangle(2.0f, 2.0f, 59.0f, 59.0f, 12.0f);
-		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 1.0);
-		image->fillPreserve();
-		//image->setSourceRGBA(0.2f, 0.2f, 0.2f, 1.0f);
-		//image->strokePreserve();
-		*/
-			
 		geode->addDrawable(createGroupCommon(image));
 	}
 
@@ -191,12 +207,14 @@ int main(int argc, char** argv) {
 	osg::Geode*  cairo2 = createGroup2();
 	osg::Geode*  cairo3 = createGroup3();
 	osg::Geode*  cairo4 = createGroup4();
+	osg::Geode*  cairo5 = createGroup5();
 
-	if(camera && cairo1 && cairo2 && cairo3 && cairo4) {
+	if(camera && cairo1 && cairo2 && cairo3 && cairo4 && cairo5) {
 		camera->addChild(cairo1);
 		camera->addChild(cairo2);
 		camera->addChild(cairo3);
 		camera->addChild(cairo4);
+		camera->addChild(cairo5);
 
 		viewer.setSceneData(camera);
 

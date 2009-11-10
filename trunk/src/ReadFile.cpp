@@ -107,13 +107,35 @@ bool readFilePDF(const std::string& uri, ImageVector& pages, const PDFOptions& o
 	osg::notify(osg::WARN)
 		<< "Poppler support not compiled into osgCairo; cannot load PDF "
 		<< "files. Please see:" << std::endl << std::endl
-		<< "	http://poppler.freedesktop.org" << std::endl << std::endl
+		<< "\thttp://poppler.freedesktop.org" << std::endl << std::endl
 		<< "...for more information."
 		<< std::endl
 	;
 
 	return false;
 #endif
+}
+
+Image* readImageFile(const std::string& path, osgDB::Options* options) {
+	osg::Image* image = osgDB::readImageFile(path, options);
+
+	if(!image) return 0;
+
+	GLenum      format      = image->getPixelFormat();
+	CairoFormat cairoFormat = CAIRO_FORMAT_ARGB32;
+
+	if(format != GL_RGB && format != GL_RGBA && format != GL_ALPHA) return 0;
+
+	if(format == GL_ALPHA) cairoFormat = CAIRO_FORMAT_A8;
+
+	else if(format == GL_RGB) cairoFormat = CAIRO_FORMAT_RGB24;
+
+	unsigned char* newData    = convertImageDataToCairoFormat(image, cairoFormat);
+	Image*         cairoImage = new Image(image->s(), image->t(), cairoFormat, newData);
+
+	delete newData;
+
+	return cairoImage;
 }
 
 } // namespace osgCairo

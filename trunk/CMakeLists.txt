@@ -101,6 +101,7 @@ ENDFOREACH(INCLUDEFILE)
 
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
 ADD_SUBDIRECTORY(examples/osgcairomatrix)
+ADD_SUBDIRECTORY(src/osgPlugins)
 
 IF(OSGCAIROWIDGET)
 	ADD_SUBDIRECTORY(examples/osgcairowidget)

@@ -3,8 +3,8 @@
 #ifndef OSGCAIRO_IMAGE
 #define OSGCAIRO_IMAGE
 
-#include <osgCairo/Surface>
 #include <osg/Image>
+#include <osgCairo/Surface>
 
 namespace osgCairo {
 
