@@ -52,16 +52,9 @@ bool Image::allocateSurface(
 	}
 
 	// Call the osg::Image allocation method.
-	osg::Image::allocateImage(width, height, 1, pf1, pf2);
+	allocateImage(width, height, 1, pf1, pf2);
 
-	if(!osg::Image::valid()) {
-		osg::notify(osg::WARN)
-			<< "osgCairo::Image::allocateImage failed!"
-			<< std::endl
-		;
-
-		return false;
-	}
+	if(!osg::Image::valid()) return false;
 
 	unsigned int i = 0;
 
@@ -95,6 +88,8 @@ unsigned int Image::getImageSizeInBytes() const {
 
 // Thank you to Riccardo Corsi <riccardo.corsi@vrmmp.it> for pointing out the necessity
 // of this routine. :)
+// TODO: If this routine gets called a lot, it may make sense to change the data
+// IN PLACE instead of doing a new allocation every time.
 unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cairoFormat) {
 	unsigned char* data   = image->data();
 	GLenum         format = image->getPixelFormat();

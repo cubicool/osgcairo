@@ -3,6 +3,7 @@
 #ifndef OSGCAIRO_READFILE
 #define OSGCAIRO_READFILE
 
+#include <osgDB/ReadFile>
 #include <osgCairo/Image>
 
 namespace osgCairo {
@@ -32,7 +33,17 @@ struct OSGCAIRO_EXPORT PDFOptions {
 
 // Reads every page of the PDF into a vector of osgCairo::Image objects, rendered
 // at the given resolution.
-bool OSGCAIRO_EXPORT readFilePDF(const std::string&, ImageVector&, const PDFOptions& = PDFOptions());
+bool OSGCAIRO_EXPORT readFilePDF(
+	const std::string&,
+	ImageVector&,
+	const PDFOptions& = PDFOptions()
+);
+
+Image* OSGCAIRO_EXPORT readImageFile(const std::string&, osgDB::Options*);
+
+inline Image* readImageFile(const std::string& filename) {
+	return readImageFile(filename, osgDB::Registry::instance()->getOptions());
+}
 
 } // namespace osgCairo
 
