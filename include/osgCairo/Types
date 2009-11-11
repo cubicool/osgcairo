@@ -36,17 +36,7 @@ typedef cairo_format_t         CairoFormat;
 typedef cairo_hint_style_t     CairoHintStyle;
 typedef cairo_subpixel_order_t CairoSubpixelOrder;
 
-// I thought I might just use std::map's here; is that a better idea than these
-// boring, silly functions?
-CairoPatternType stringToPatternType (const std::string&);
-CairoContent     stringToContent     (const std::string&);
-CairoAntialias   stringToAntialias   (const std::string&);
-CairoFillRule    stringToFillRule    (const std::string&);
-CairoLineCap     stringToLineCap     (const std::string&);
-CairoLineJoin    stringToLineJoin    (const std::string&);
-CairoOperator    stringToOperator    (const std::string&);
-CairoExtend      stringToExtend      (const std::string&);
-CairoFilter      stringToFilter      (const std::string&);
+std::string cairoFormatAsString(CairoFormat);
 
 } // namespace osgCairo
 

@@ -51,126 +51,55 @@ osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
 	return geom;
 }
 
-osg::Geode* createGroup5() {
+osg::Geode* createExample_loadImages() {
 	osg::Geode*      geode = new osg::Geode();
-	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_A8);
-	
-	if(image->allocateSurface(64, 64) && image->createContext()) {
-		image->setOriginBottomLeft();
-		image->setLineWidth(2.0f);
-		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 1.0);
-		image->moveTo(10.0f, 10.0f);
-		image->lineTo(44.0f, 44.0f);
-		image->stroke();
-
-		geode->addDrawable(createGroupCommon(image, false));
-	}
-
-	return geode;
-}
-
-osg::Geode* createGroup4() {
-	osg::Image* image = osgDB::readImageFile("img.png");
-	osg::Geode* geode = new osg::Geode();
+	osgCairo::Image* image = osgCairo::readImageFile("img.png");
 
 	if(!image) return geode;
-
-	geode->addDrawable(createGroupCommon(image));
-
-	osgCairo::Image* cairoImage = osgCairo::readImageFile("img.png");
-
-	if(!cairoImage) return geode;
 
 	int width  = image->s();
 	int height = image->t();
 
-	if(cairoImage->createContext()) {
-		cairoImage->roundedCorners(width, height);
-		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
-		cairoImage->setLineWidth(40.0f);
-		cairoImage->arc(
+	if(image->createContext()) {
+		image->roundedCorners(width, height);
+		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
+		image->setLineWidth(40.0f);
+		image->arc(
 			width / 2.0f,
 			height / 2.0f,
 			60.0f,
 			0.0f,
 			osg::PI + (osg::PI / 2.0f)
 		);
-		cairoImage->stroke();
+		image->stroke();
 	}
-
-	geode->addDrawable(createGroupCommon(cairoImage));
-
-	/*
-	// Write the image the osgCairo way.
-	cairoImage->writeToPNG("img_cairo.png");
-
-	// Write the imagae the osgDB way.
-	cairoImage->setFileName("./img_osgDB.png");
-
-	osgDB::writeImageFile(*cairoImage, "img_osgDB.png");
-	*/
-
-	return geode;
-}
-
-osg::Geode* createGroup3() {
-	osg::Image* image = osgDB::readImageFile("img.cairo");
-	osg::Geode* geode = new osg::Geode();
-
-	if(!image) return geode;
-
-	/*
-	if(cairoImage->createContext()) {
-		cairoImage->roundedCorners(width, height);
-		cairoImage->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
-		cairoImage->setLineWidth(40.0f);
-		cairoImage->arc(
-			width / 2.0f,
-			height / 2.0f,
-			60.0f,
-			0.0f,
-			osg::PI + (osg::PI / 2.0f)
-		);
-		cairoImage->stroke();
-	}
-	*/
 
 	geode->addDrawable(createGroupCommon(image));
 
 	return geode;
 }
 
-osg::Geode* createGroup2() {
+osg::Geode* createExample_simpleDrawing() {
 	osg::Geode*      geode = new osg::Geode();
-	osgCairo::Image* image = new osgCairo::Image();
-	
-	if(image->allocateSurface(64, 64) && image->createContext()) {
-		image->setSourceRGBA(0.8f, 0.8f, 0.8f);
-		image->setLineWidth(1.0f);
-		image->roundedRectangle(2.5f, 2.5f, 59.0f, 59.0f, 10.0f);
-		image->strokePreserve();
-		image->setSourceRGBA(0.7f, 0.1f, 0.1f, 0.2f);
-		image->fillPreserve();
-
-		geode->addDrawable(createGroupCommon(image));
-	}
-
-	return geode;
-}
-
-osg::Geode* createGroup1() {
-	osg::Geode*      geode = new osg::Geode();
-	osgCairo::Image* image = new osgCairo::Image();
+	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_RGB24);
 	
 	if(image->allocateSurface(256, 256) && image->createContext()) {
 		image->scale(256.0f, 256.0f);
-		//image->setSourceRGBA(0.2f, 0.2f, 0.4f, 1.0f);
-		//image->rectangle(0.0f, 0.0f, 1.0f, 1.0f);
-		//image->fill();
-		image->setSourceRGBA(1.0f, 1.0f, 1.0f);
-		image->setLineWidth(0.05f);
-		image->arc(0.5f, 0.5f, 0.3f, 0.0f, osg::PI * 2);
-		image->stroke();
+	
+		const osg::Vec4 colors[] = {
+			osg::Vec4(0.0f, 0.0f, 0.0f, 0.6f),
+			osg::Vec4(1.0f, 0.0f, 0.0f, 0.7f),
+			osg::Vec4(0.0f, 1.0f, 0.0f, 0.8f),
+			osg::Vec4(0.0f, 0.0f, 1.0f, 0.9f),
+			osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+		};
+
+		for(unsigned int i = 1; i <= 5; i++) {
+			image->setSourceRGBA(colors[i - 1]);
+			image->setLineWidth(0.05f);
+			image->arc(0.5f, 0.5f, i / 12.0f, 0.0f, osg::PI * 2);
+			image->stroke();
+		}
 
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
@@ -207,28 +136,18 @@ int main(int argc, char** argv) {
 
 	osgViewer::Viewer viewer;
 
-	unsigned int width  = 1440;
+	unsigned int width  = 960;
 	unsigned int height = 320;
 
 	osg::Camera* camera = createOrthoCamera(width, height);
-	osg::Geode*  cairo1 = createGroup1();
-	osg::Geode*  cairo2 = createGroup2();
-	osg::Geode*  cairo3 = createGroup3();
-	osg::Geode*  cairo4 = createGroup4();
-	osg::Geode*  cairo5 = createGroup5();
+	osg::Geode*  geode1 = createExample_simpleDrawing();
+	osg::Geode*  geode2 = createExample_loadImages();
 
-	if(camera && cairo1 && cairo2 && cairo3 && cairo4 && cairo5) {
-		camera->addChild(cairo1);
-		camera->addChild(cairo2);
-		camera->addChild(cairo3);
-		camera->addChild(cairo4);
-		camera->addChild(cairo5);
+	camera->addChild(geode1);
+	camera->addChild(geode2);
 
-		viewer.setUpViewInWindow(50, 50, width, height);
-		viewer.setSceneData(camera);
+	viewer.setUpViewInWindow(50, 50, width, height);
+	viewer.setSceneData(camera);
 
-		return viewer.run();
-	}
-
-	return 1;
+	return viewer.run();
 }
