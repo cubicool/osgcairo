@@ -117,7 +117,7 @@ bool readFilePDF(const std::string& uri, ImageVector& pages, const PDFOptions& o
 }
 
 Image* readImageFile(const std::string& path, osgDB::Options* options) {
-	osg::Image* image = osgDB::readImageFile(path); //, options);
+	osg::Image* image = osgDB::readImageFile(path, options);
 
 	if(!image) return 0;
 
@@ -130,8 +130,18 @@ Image* readImageFile(const std::string& path, osgDB::Options* options) {
 
 	else if(format == GL_RGB) cairoFormat = CAIRO_FORMAT_RGB24;
 
-	unsigned char* newData    = convertImageDataToCairoFormat(image, cairoFormat);
-	Image*         cairoImage = new Image(image->s(), image->t(), cairoFormat, newData);
+	unsigned char* newData = convertImageDataToCairoFormat(image, cairoFormat);
+
+	if(!newData) {
+		osg::notify(osg::WARN)
+			<< "Failed to convert " << path << " to an appropriate Cairo format ("
+			<< cairoFormatAsString(cairoFormat) << ")." << std::endl
+		;
+
+		return 0;
+	}
+
+	Image* cairoImage = new Image(image->s(), image->t(), cairoFormat, newData);
 
 	delete newData;
 
