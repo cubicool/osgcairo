@@ -39,7 +39,7 @@ bool OSGCAIRO_EXPORT readFilePDF(
 	const PDFOptions& = PDFOptions()
 );
 
-Image* OSGCAIRO_EXPORT readImageFile(const std::string&, osgDB::Options*);
+OSGCAIRO_EXPORT Image* readImageFile(const std::string&, osgDB::Options*);
 
 inline Image* readImageFile(const std::string& filename) {
 	return readImageFile(filename, osgDB::Registry::instance()->getOptions());

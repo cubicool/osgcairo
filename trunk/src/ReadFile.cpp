@@ -117,7 +117,7 @@ bool readFilePDF(const std::string& uri, ImageVector& pages, const PDFOptions& o
 }
 
 Image* readImageFile(const std::string& path, osgDB::Options* options) {
-	osg::Image* image = osgDB::readImageFile(path, options);
+	osg::Image* image = osgDB::readImageFile(path); //, options);
 
 	if(!image) return 0;
 
