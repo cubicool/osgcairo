@@ -33,19 +33,22 @@ SET(SRC_FILES
 	src/Types.cpp
 )
 
+SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
 SET(HEADER_FILES
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Canvas
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Export
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Glyph
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Image
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Matrix
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Path
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Pattern
-	${osgCairo_SOURCE_DIR}/include/osgCairo/ReadFile
-	${osgCairo_SOURCE_DIR}/include/osgCairo/ScaledFont
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Surface
-	${osgCairo_SOURCE_DIR}/include/osgCairo/Types
+	${HEADER_PATH}/Canvas
+	${HEADER_PATH}/Export
+	${HEADER_PATH}/Glyph
+	${HEADER_PATH}/Image
+	${HEADER_PATH}/Matrix
+	${HEADER_PATH}/Path
+	${HEADER_PATH}/Pattern
+	${HEADER_PATH}/ReadFile
+	${HEADER_PATH}/ScaledFont
+	${HEADER_PATH}/Surface
+	${HEADER_PATH}/Types
 )
+
+SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
 
 SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
@@ -62,7 +65,7 @@ LINK_DIRECTORIES(
 	${POPPLER_LIBRARY_DIRS}
 )
 
-ADD_LIBRARY(osgCairo SHARED ${SRC_FILES} ${HEADER_FILES})
+ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
 
 # Add debug postfix to OSG libraries so we link to the right ones in debug.
 # Cairo is a C-only library so the same one (release) can be linked to both
