@@ -6,13 +6,14 @@
 #include <osg/Geode>
 #include <osg/BlendFunc>
 #include <osgViewer/Viewer>
+#include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
 #include <osgCairo/Image>
 #include <osgCairo/ReadFile>
 
 osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
-	static osg::Vec3 pos(50.0f, 50.0f, -0.8f);
+	static osg::Vec3 pos(10.0f, 10.0f, -0.8f);
 
 	osg::Texture2D* texture = new osg::Texture2D();
 	osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
@@ -69,16 +70,14 @@ osg::Geode* createGroup5() {
 }
 
 osg::Geode* createGroup4() {
-	std::string path("../examples/osgcairoviewer/img.png");
-
+	osg::Image* image = osgDB::readImageFile("img.png");
 	osg::Geode* geode = new osg::Geode();
-	osg::Image* image = osgDB::readImageFile(path);
 
 	if(!image) return geode;
 
 	geode->addDrawable(createGroupCommon(image));
 
-	osgCairo::Image* cairoImage = osgCairo::readImageFile(path);
+	osgCairo::Image* cairoImage = osgCairo::readImageFile("img.png");
 
 	if(!cairoImage) return geode;
 
@@ -115,8 +114,8 @@ osg::Geode* createGroup4() {
 }
 
 osg::Geode* createGroup3() {
+	osg::Image* image = osgDB::readImageFile("img.cairo");
 	osg::Geode* geode = new osg::Geode();
-	osg::Image* image = osgDB::readImageFile("../examples/osgcairoviewer/img.cairo");
 
 	if(!image) return geode;
 
@@ -200,9 +199,18 @@ osg::Camera* createOrthoCamera(unsigned int width, unsigned int height) {
 }
 
 int main(int argc, char** argv) {
+	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
+	
+	paths.push_back("../examples/osgcairoviewer/");
+	paths.push_back("examples/osgcairoviewer/");
+	paths.push_back("./");
+
 	osgViewer::Viewer viewer;
 
-	osg::Camera* camera = createOrthoCamera(1280, 1024);
+	unsigned int width  = 1440;
+	unsigned int height = 320;
+
+	osg::Camera* camera = createOrthoCamera(width, height);
 	osg::Geode*  cairo1 = createGroup1();
 	osg::Geode*  cairo2 = createGroup2();
 	osg::Geode*  cairo3 = createGroup3();
@@ -216,6 +224,7 @@ int main(int argc, char** argv) {
 		camera->addChild(cairo4);
 		camera->addChild(cairo5);
 
+		viewer.setUpViewInWindow(50, 50, width, height);
 		viewer.setSceneData(camera);
 
 		return viewer.run();
