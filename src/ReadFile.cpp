@@ -128,7 +128,22 @@ Image* readImageFile(const std::string& path, osgDB::Options* options) {
 
 	if(format == GL_ALPHA) cairoFormat = CAIRO_FORMAT_A8;
 
-	else if(format == GL_RGB) cairoFormat = CAIRO_FORMAT_RGB24;
+	else if(format == GL_RGB) {
+		// Check the options string to see if the want to add an alpha channel
+		// to RGB images; this can be really useful sometimes.
+		std::string ops = options->getOptionString();
+
+		if(ops.find("addAlphaToRGB") != std::string::npos) {
+			osg::notify()
+				<< "Adding alpha channel to GL_RGB image at the "
+				<< "request of the user." << std::endl
+			;
+
+			cairoFormat = CAIRO_FORMAT_ARGB32;
+		}
+
+		else cairoFormat = CAIRO_FORMAT_RGB24;
+	}
 
 	unsigned char* newData = convertImageDataToCairoFormat(image, cairoFormat);
 
