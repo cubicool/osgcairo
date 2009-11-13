@@ -43,6 +43,7 @@ bool Image::allocateSurface(
 	unsigned int         height,
 	const unsigned char* data
 ) {
+	// The default is for CAIRO_FORMAT_ARGB32.
 	GLenum pf1 = GL_RGBA;
 	GLenum pf2 = GL_UNSIGNED_INT_8_8_8_8_REV;
 
@@ -50,6 +51,8 @@ bool Image::allocateSurface(
 		pf1 = GL_ALPHA;
 		pf2 = GL_UNSIGNED_BYTE;
 	}
+
+	else if(_format == CAIRO_FORMAT_RGB24) pf1 = GL_RGB;
 
 	// Call the osg::Image allocation method.
 	allocateImage(width, height, 1, pf1, pf2);
@@ -94,7 +97,7 @@ unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cair
 	unsigned char* data   = image->data();
 	GLenum         format = image->getPixelFormat();
 
-	if(cairoFormat == CAIRO_FORMAT_ARGB32) {
+	if(cairoFormat == CAIRO_FORMAT_ARGB32 || cairoFormat == CAIRO_FORMAT_RGB24) {
 		if(format != GL_RGB && format != GL_RGBA) return 0;
 
 		unsigned int   numPixel = image->s() * image->t();
@@ -108,14 +111,19 @@ unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cair
 			newData[i * 4 + 1] = data[i * offset + 1];
 			newData[i * 4 + 2] = data[i * offset];
 
-			if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
+			if(cairoFormat == CAIRO_FORMAT_ARGB32) {
+				if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
 
-			else newData[i * 4 + 3] = 255;
+				else newData[i * 4 + 3] = 255;
+			}
+
+			else newData[i * 4 + 3] = 0;
 		}
 
 		return newData;
 	}
 
+	/*
 	else if(cairoFormat == CAIRO_FORMAT_RGB24) {
 		if(format != GL_RGB && format != GL_RGBA) return 0;
 
@@ -130,17 +138,15 @@ unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cair
 			newData[i * 4 + 1] = data[i * offset + 1];
 			newData[i * 4 + 2] = data[i * offset];
 
-			/*
-			if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
+			// if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
+			// else newData[i * 4 + 3] = 255;
 
-			else newData[i * 4 + 3] = 255;
-			*/
-
-			newData[i * 4 + 3] = 255;
+			newData[i * 4 + 3] = 0;
 		}
 
 		return newData;
 	}
+	*/
 
 	return 0;
 }
