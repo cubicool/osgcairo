@@ -145,7 +145,7 @@ Image* readImageFile(const std::string& path, osgDB::Options* options) {
 		else cairoFormat = CAIRO_FORMAT_RGB24;
 	}
 
-	unsigned char* newData = convertImageDataToCairoFormat(image, cairoFormat);
+	unsigned char* newData = createNewImageDataAsCairoFormat(image, cairoFormat);
 
 	if(!newData) {
 		osg::notify(osg::WARN)

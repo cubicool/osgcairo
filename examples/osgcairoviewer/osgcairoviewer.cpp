@@ -51,50 +51,6 @@ osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
 	return geom;
 }
 
-osg::Geode* createExample_loadSVG() {
-	osg::ref_ptr<osgDB::Options> opts = new osgDB::Options("256x256 ");
-
-	osg::Geode* geode = new osg::Geode();
-	osg::Image* image = osgDB::readImageFile("img.svg", opts.get());
-
-	if(!image) return geode;
-
-	osgCairo::CairoSurface* surface = static_cast<osgCairo::CairoSurface*>(
-		opts->getPluginData("surface")
-	);
-
-	if(!surface) osg::notify(osg::NOTICE)
-		<< "You did not choose to save the CairoSurface object when you loaded "
-		<< "the SVG file. It is also possible your version of the SVG loader "
-		<< "doesn't support this feature." << std::endl
-	;
-
-	else free(surface);
-
-	/*
-	int width  = image->s();
-	int height = image->t();
-
-	if(image->createContext()) {
-		image->roundedCorners(width, height);
-		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
-		image->setLineWidth(40.0f);
-		image->arc(
-			width / 2.0f,
-			height / 2.0f,
-			60.0f,
-			0.0f,
-			osg::PI + (osg::PI / 2.0f)
-		);
-		image->stroke();
-	}
-	*/
-
-	geode->addDrawable(createGroupCommon(image));
-
-	return geode;
-}
-
 osg::Geode* createExample_loadImages() {
 	// We demonstrate using the standard osgDB::Options object here to tell
 	// osgCairo to add an alpha channel to our GL_RGB PNG image. If you wanted
@@ -169,14 +125,81 @@ osg::Camera* createOrthoCamera(unsigned int width, unsigned int height) {
 		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
 	);
 	
-	camera->setProjectionMatrix(osg::Matrix::ortho2D(0, width, 0, height));
-	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+	camera->setProjectionMatrixAsOrtho2D(0, width, 0, height);
 	camera->setViewMatrix(osg::Matrix::identity());
+	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
 	camera->setRenderOrder(osg::Camera::POST_RENDER);
-	
+
 	return camera;
 }
+
+osg::Camera* createPerspectiveCamera(unsigned int width, unsigned int height) {
+	osg::Camera* camera = new osg::Camera();
+
+	camera->getOrCreateStateSet()->setMode(
+		GL_LIGHTING,
+		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
+	);
+
+	/*
+	camera->setProjectionMatrixAsPerspective(
+		30.0f,
+		static_cast<float>(width) / static_cast<float>(height),
+		1.0f,
+		10000.0f
+	);
+	*/
+	
+	camera->setViewMatrixAsLookAt(
+		osg::Vec3(0.0f, 0.0f, 0.0f),
+		osg::Vec3(0.0f, 0.0f, 0.0f),
+		osg::Vec3(0.0f, 1.0f, 0.0f)
+	);
+	
+	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+	camera->setRenderOrder(osg::Camera::POST_RENDER);
+
+	return camera;
+}
+
+class UpdateViewMatrix: public osg::NodeCallback {
+	double    _last;
+	osg::Vec3 _pos;
+
+public:
+	UpdateViewMatrix():
+	_last (0.0f),
+	_pos  (10.0f, 10.0f, 10.0f) {
+	}
+
+	virtual void operator()(osg::Node* node, osg::NodeVisitor* visitor) {
+		osg::Camera* camera = dynamic_cast<osg::Camera*>(node);
+
+		if(!camera) {
+			traverse(node, visitor);
+
+			return;
+		}
+
+		const osg::FrameStamp* fs = visitor->getFrameStamp();
+
+		if((fs->getSimulationTime() - _last) >= 1.0f) {
+			_last = fs->getSimulationTime();
+
+			camera->setViewMatrixAsLookAt(
+				_pos,
+				osg::Vec3(0.0f, 0.0f, 0.0f),
+				osg::Vec3(0.0f, 1.0f, 0.0f)
+			);
+
+			_pos += osg::Vec3(10.0f, 10.0f, 10.0f);
+		}
+
+		traverse(node, visitor);
+	}
+};
 
 int main(int argc, char** argv) {
 	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
@@ -185,6 +208,7 @@ int main(int argc, char** argv) {
 	paths.push_back("examples/osgcairoviewer/");
 	paths.push_back("./");
 
+	/*
 	osgDB::Input input;
 
 	std::istringstream options("x 100 y 200");
@@ -197,27 +221,24 @@ int main(int argc, char** argv) {
 	input.read("y", y);
 
 	osg::notify(osg::NOTICE) << "x: " << x << " y: " << y << " save: " << input.read("saveSurface") << std::endl;
+	*/
 
-	/*
 	osgViewer::Viewer viewer;
 
 	unsigned int width  = 256 * 3 + 40;
 	unsigned int height = 276;
 
-	osg::Camera* camera = createOrthoCamera(width, height);
+	osg::Camera* camera = createPerspectiveCamera(width, height);
 	osg::Geode*  geode1 = createExample_simpleDrawing();
 	osg::Geode*  geode2 = createExample_loadImages();
-	osg::Geode*  geode3 = createExample_loadSVG();
 
 	camera->addChild(geode1);
 	camera->addChild(geode2);
-	camera->addChild(geode3);
+	camera->addChild(osgDB::readNodeFile("cow.osg"));
+	camera->addUpdateCallback(new UpdateViewMatrix());
 
 	viewer.setUpViewInWindow(50, 50, width, height);
 	viewer.setSceneData(camera);
 
 	return viewer.run();
-	*/
-
-	return 0;
 }
