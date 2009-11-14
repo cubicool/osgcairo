@@ -93,7 +93,7 @@ unsigned int Image::getImageSizeInBytes() const {
 // of this routine. :)
 // TODO: If this routine gets called a lot, it may make sense to change the data
 // IN PLACE instead of doing a new allocation every time.
-unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cairoFormat) {
+unsigned char* createNewImageDataAsCairoFormat(osg::Image* image, CairoFormat cairoFormat) {
 	unsigned char* data   = image->data();
 	GLenum         format = image->getPixelFormat();
 
@@ -122,31 +122,6 @@ unsigned char* convertImageDataToCairoFormat(osg::Image* image, CairoFormat cair
 
 		return newData;
 	}
-
-	/*
-	else if(cairoFormat == CAIRO_FORMAT_RGB24) {
-		if(format != GL_RGB && format != GL_RGBA) return 0;
-
-		unsigned int   numPixel = image->s() * image->t();
-		unsigned char* newData  = new unsigned char[numPixel * 4];
-		unsigned int   offset   = 4;
-
-		if(format == GL_RGB) offset = 3;
-
-		for(unsigned int i = 0; i < numPixel; ++i) {
-			newData[i * 4]     = data[i * offset + 2];
-			newData[i * 4 + 1] = data[i * offset + 1];
-			newData[i * 4 + 2] = data[i * offset];
-
-			// if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
-			// else newData[i * 4 + 3] = 255;
-
-			newData[i * 4 + 3] = 0;
-		}
-
-		return newData;
-	}
-	*/
 
 	return 0;
 }
