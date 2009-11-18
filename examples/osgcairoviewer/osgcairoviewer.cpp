@@ -5,6 +5,7 @@
 #include <osg/Texture2D>
 #include <osg/Geode>
 #include <osg/BlendFunc>
+#include <osg/io_utils>
 #include <osgViewer/Viewer>
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
@@ -142,20 +143,20 @@ osg::Camera* createPerspectiveCamera(unsigned int width, unsigned int height) {
 		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
 	);
 
-	/*
 	camera->setProjectionMatrixAsPerspective(
 		30.0f,
 		static_cast<float>(width) / static_cast<float>(height),
-		1.0f,
-		10000.0f
+		-1.0f,
+		1000.0f
 	);
-	*/
-	
+
+	/*
 	camera->setViewMatrixAsLookAt(
-		osg::Vec3(0.0f, 0.0f, 0.0f),
-		osg::Vec3(0.0f, 0.0f, 0.0f),
+		osg::Vec3(0.0f, 0.0f, -266.0f),
+		osg::Vec3(266.0f, 0.0f, 0.0f),
 		osg::Vec3(0.0f, 1.0f, 0.0f)
 	);
+	*/
 	
 	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
@@ -164,6 +165,7 @@ osg::Camera* createPerspectiveCamera(unsigned int width, unsigned int height) {
 	return camera;
 }
 
+/*
 class UpdateViewMatrix: public osg::NodeCallback {
 	double    _last;
 	osg::Vec3 _pos;
@@ -188,6 +190,7 @@ public:
 		if((fs->getSimulationTime() - _last) >= 1.0f) {
 			_last = fs->getSimulationTime();
 
+
 			camera->setViewMatrixAsLookAt(
 				_pos,
 				osg::Vec3(0.0f, 0.0f, 0.0f),
@@ -200,6 +203,15 @@ public:
 		traverse(node, visitor);
 	}
 };
+
+class BoundVisitor: public osg::NodeVisitor {
+	virtual void apply(osg::Node& node) {
+		
+
+		traverse(node);
+	}
+};
+*/
 
 int main(int argc, char** argv) {
 	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
@@ -229,13 +241,31 @@ int main(int argc, char** argv) {
 	unsigned int height = 276;
 
 	osg::Camera* camera = createPerspectiveCamera(width, height);
+	osg::Group*  group  = new osg::Group();
 	osg::Geode*  geode1 = createExample_simpleDrawing();
 	osg::Geode*  geode2 = createExample_loadImages();
 
-	camera->addChild(geode1);
-	camera->addChild(geode2);
-	camera->addChild(osgDB::readNodeFile("cow.osg"));
-	camera->addUpdateCallback(new UpdateViewMatrix());
+	group->addChild(geode1);
+	group->addChild(geode2);
+	
+	for(unsigned int i = 0; i < 5; i++) group->addChild(createExample_simpleDrawing());
+
+	camera->addChild(group);
+	// camera->addUpdateCallback(new UpdateViewMatrix());
+
+	// ----------------------------------------------------------------------------------------
+	const osg::BoundingSphere& bs = group->getBound();
+
+	osg::Vec3 eye = osg::Vec3(bs.center().x(), bs.center().y(), bs.radius());
+
+	osg::notify(osg::NOTICE)
+		<< "radius: " << bs.radius() << std::endl
+		<< "center: " << bs.center() << std::endl
+		<< "eye: " << eye << std::endl
+	;
+
+	camera->setViewMatrixAsLookAt(eye, bs.center(), osg::Vec3(0.0f, 1.0f, 0.0f));
+	// ----------------------------------------------------------------------------------------
 
 	viewer.setUpViewInWindow(50, 50, width, height);
 	viewer.setSceneData(camera);
