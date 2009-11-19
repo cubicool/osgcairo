@@ -79,6 +79,8 @@ TARGET_LINK_LIBRARIES(osgCairo
 	optimized osgUtil
 	debug     osgDB${CMAKE_DEBUG_POSTFIX}
 	optimized osgDB
+	debug     osgGA${CMAKE_DEBUG_POSTFIX}
+	optimized osgGA
 	debug     osgViewer${CMAKE_DEBUG_POSTFIX}
 	optimized osgViewer
 	debug     cairo
