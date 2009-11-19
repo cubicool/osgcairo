@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #ifndef OSGCAIRO_PATTERN
 #define OSGCAIRO_PATTERN
@@ -52,6 +52,6 @@ public:
 	RadialPattern(double, double, double, double, double, double);
 };
 
-} // namespace osgCairo
+}
 
 #endif

@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #ifndef OSGCAIRO_PATH
 #define OSGCAIRO_PATH
@@ -25,6 +25,6 @@ public:
 	CairoPath* getPath();
 };
 	
-} // namespace osgCairo
+}
 
 #endif

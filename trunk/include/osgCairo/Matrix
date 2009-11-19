@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #ifndef OSGCAIRO_MATRIX
 #define OSGCAIRO_MATRIX
@@ -43,6 +43,6 @@ inline std::ostream& operator<<(std::ostream& output, const Matrix& m) {
 	return output;
 }
 
-} // namespace osgCairo
+}
 
 #endif

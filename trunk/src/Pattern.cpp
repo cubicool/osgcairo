@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #include <osgCairo/Pattern>
 
@@ -56,4 +56,4 @@ RadialPattern::RadialPattern(double x0, double y0, double r0, double x1, double 
 Pattern(cairo_pattern_create_radial(x0, y0, r0, x1, y1, r1)) {
 }
 
-} // namespace osgCairo
+}

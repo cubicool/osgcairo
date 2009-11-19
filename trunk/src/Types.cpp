@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #include <osgCairo/Types>
 
@@ -14,4 +14,4 @@ std::string cairoFormatAsString(CairoFormat format) {
 	else return "CAIRO_FORMAT_A1";
 }
 
-} // namespace osgCairo
+}
