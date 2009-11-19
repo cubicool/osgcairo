@@ -85,44 +85,33 @@ void Image::setOriginBottomLeft() {
 	setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
-double* createKernel(
-	int radius,
-	double deviation
-) {
-	double* kernel = 0;
-	double  sum    = 0.0f;
-	double  value  = 0.0f;
-	int     i;
-	int     size   = 2 * radius + 1;
-	double  radiusf;
-
-	if(radius <= 0) return 0;
-
-	kernel = new double[size + 1];
+double* createKernel(double radius, double deviation) {
+	int     size   = 2 * static_cast<int>(radius) + 1;
+	double* kernel = new double[size + 1];
 	
 	if(!kernel) return 0;
 
-	radiusf = fabs(double(radius)) + 1.0f;
+	double radiusf = fabs(radius) + 1.0f;
 
-	if(deviation == 0.0f) 
-		deviation = sqrt (-(radiusf * radiusf) / (2.0f * log (1.0f / 255.0f)))
-	;
+	if(deviation == 0.0f) deviation = sqrt(-(radiusf ** 2) / (2.0f * log(1.0f / 255.0f)));
 
 	kernel[0] = size;
-	value     = (double)-radius;
-	
-	for (i = 0; i < size; i++) {
+
+	double value = -radius;
+	double sum   = 0.0f;	
+
+	for(int i = 0; i < size; i++) {
 		kernel[1 + i] = 
 			1.0f / (2.506628275f * deviation) *
-			expf (-((value * value) /
-			(2.0f * deviation * deviation)))
+			expf(-((value * value) /
+			(2.0f * (deviation ** 2))))
 		;
 
 		sum   += kernel[1 + i];
 		value += 1.0f;
 	}
 
-	for(i = 0; i < size; i++) kernel[1 + i] /= sum;
+	for(int i = 0; i < size; i++) kernel[1 + i] /= sum;
 
 	return kernel;
 }
@@ -157,36 +146,60 @@ void Image::gaussianBlur(unsigned int radius) {
 			double blue  = 0.0f;
 			double alpha = 0.0f;
 
-			int offset = ((int) kernel[0]) / -2;
+			int offset = static_cast<int>(kernel[0]) / -2;
 			
-			for(int i = 0; i < (int) kernel[0]; i++) {
+			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
 				int x = iX + offset;
 
+				/*
 				// TODO: THIS
-				if (x >= 0 && x < _s) {
+				if(x >= 0 && x < _s) {
 					int baseOffset = iY * stride + x * channels;
 
 					if(channels == 1) alpha += (
 						kernel[1 + i] *
-						(double)_data[baseOffset]
+						static_cast<double>(_data[baseOffset])
 					);
 
 					else {
-						if (channels == 4)
-							alpha += (kernel[1+i] *
-							(double)_data[baseOffset + 3]);
+						if(channels == 4)
+							alpha += (kernel[1 + i] *
+							static_cast<double>(_data[baseOffset + 3]))
+						;
 
-						red += (kernel[1+i] *
-							(double)_data[baseOffset + 2]);
+						red += (kernel[1 + i] *
+							static_cast<double>(_data[baseOffset + 2]))
+						;
 
-						green += (kernel[1+i] *
-							(double)_data[baseOffset + 1]);
+						green += (kernel[1 + i] *
+							static_cast<double>(_data[baseOffset + 1]))
+						;
 
-						blue += (kernel[1+i] *
-							(double)_data[baseOffset + 0]);
+						blue += (kernel[1 + i] *
+							static_cast<double>(_data[baseOffset + 0]))
+						;
 					}
 				}
+				*/
 
+				if(x <= 0 || x > _s) continue;
+
+				double* dataPtr = static_cast<double>(_data[
+					iY * stride + x * channels
+				]);
+
+				double kernip1 = kernel[i + 1];
+
+				if(channels == 1) alpha += kernip1 * (*dataPtr);
+
+				else {
+					if(channels == 4) alpha += kernip1 * (*(dataPtr + 3));
+
+					red   += kernip1 * (*(dataPtr + 2));
+					green += kernip1 * (*(dataPtr + 1));
+					blue  += kernip1 * (*dataPtr);
+				}
+				
 				offset++;
 			}
 
@@ -212,22 +225,22 @@ void Image::gaussianBlur(unsigned int radius) {
 			double blue  = 0.0f;
 			double alpha = 0.0f;
 
-			int offset = ((int) kernel[0]) / -2;
+			int offset = static_cast<int>(kernel[0]) / -2;
 			
-			for(int i = 0; i < (int) kernel[0]; i++) {
+			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
 				int y = iY + offset;
 
-				if (y >= 0 && y < _t) {
+				if(y >= 0 && y < _t) {
 					int baseOffset = y * stride + iX * channels;
 
-					if(channels ==1) alpha += (
+					if(channels == 1) alpha += (
 						kernel[1 + i] *
 						horzBlur[baseOffset]
 					);
 
 					else {
 
-						if (channels == 4)
+						if(channels == 4)
 							alpha += (kernel[1+i] *
 							horzBlur[baseOffset + 3]);
 
@@ -262,14 +275,14 @@ void Image::gaussianBlur(unsigned int radius) {
 	// We're done with the blurring.
 	delete[] kernel;
 
-	for (int iY = 0; iY < _t; iY++) {
-		for (int iX = 0; iX < _s; iX++) {
+	for(int iY = 0; iY < _t; iY++) {
+		for(int iX = 0; iX < _s; iX++) {
 			int offset = iY * stride + iX * channels;
 
 			if(channels == 1) _data[offset] = (unsigned char)vertBlur[offset];
 
 			else {
-				if (channels == 4) _data[offset + 3] = (unsigned char)vertBlur[offset + 3];
+				if(channels == 4) _data[offset + 3] = (unsigned char)vertBlur[offset + 3];
 
 				_data[offset + 2] = (unsigned char)vertBlur[offset + 2];
 				_data[offset + 1] = (unsigned char)vertBlur[offset + 1];
@@ -277,18 +290,6 @@ void Image::gaussianBlur(unsigned int radius) {
 			}
 		}
 	}
-
-	/*
-	cairo_surface_t* hb = cairo_image_surface_create_for_data((unsigned char*)horzBlur, _format, _s, _t, 
-		cairo_format_stride_for_width(_format, _s)
-	);
-	cairo_surface_t* vb = cairo_image_surface_create_for_data((unsigned char*)vertBlur, _format, _s, _t,
-		cairo_format_stride_for_width(_format, _s)
-	);
-
-	cairo_surface_write_to_png(hb, "hb.png");
-	cairo_surface_write_to_png(vb, "vb.png");
-	*/
 
 	delete[] horzBlur;
 	delete[] vertBlur;
