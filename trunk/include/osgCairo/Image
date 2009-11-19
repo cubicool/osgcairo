@@ -39,7 +39,8 @@ public:
 		return _format;
 	}
 
-	void setOriginBottomLeft();
+	void setOriginBottomLeft ();
+	void gaussianBlur        (unsigned int = 10);
 
 	unsigned int getImageSizeInBytes() const;
 };

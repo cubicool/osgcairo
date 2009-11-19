@@ -2,11 +2,12 @@
 #include <osg/Notify>
 #include <osg/Math>
 #include <osg/Geometry>
+#include <osg/MatrixTransform>
 #include <osg/Texture2D>
 #include <osg/Geode>
 #include <osg/BlendFunc>
-#include <osg/io_utils>
-#include <osgViewer/Viewer>
+#include <osgGA/TrackballManipulator>
+#include <osgViewer/CompositeViewer>
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
@@ -95,11 +96,11 @@ osg::Geode* createExample_simpleDrawing() {
 		image->scale(256.0f, 256.0f);
 	
 		const osg::Vec4 colors[] = {
-			osg::Vec4(0.0f, 0.0f, 0.0f, 0.6f),
-			osg::Vec4(1.0f, 0.0f, 0.0f, 0.7f),
-			osg::Vec4(0.0f, 1.0f, 0.0f, 0.8f),
-			osg::Vec4(0.0f, 0.0f, 1.0f, 0.9f),
-			osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f),
+			osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f),
+			osg::Vec4(1.0f, 0.0f, 0.0f, 0.8f),
+			osg::Vec4(0.0f, 1.0f, 0.0f, 0.6f),
+			osg::Vec4(0.0f, 0.0f, 1.0f, 0.4f),
+			osg::Vec4(1.0f, 1.0f, 1.0f, 0.2f),
 		};
 
 		for(unsigned int i = 1; i <= 5; i++) {
@@ -118,45 +119,13 @@ osg::Geode* createExample_simpleDrawing() {
 	return geode;
 }
 
-osg::Camera* createOrthoCamera(unsigned int width, unsigned int height) {
+osg::Camera* createCamera(unsigned int width, unsigned int height) {
 	osg::Camera* camera = new osg::Camera();
 
 	camera->getOrCreateStateSet()->setMode(
 		GL_LIGHTING,
 		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
 	);
-	
-	camera->setProjectionMatrixAsOrtho2D(0, width, 0, height);
-	camera->setViewMatrix(osg::Matrix::identity());
-	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
-	camera->setRenderOrder(osg::Camera::POST_RENDER);
-
-	return camera;
-}
-
-osg::Camera* createPerspectiveCamera(unsigned int width, unsigned int height) {
-	osg::Camera* camera = new osg::Camera();
-
-	camera->getOrCreateStateSet()->setMode(
-		GL_LIGHTING,
-		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
-	);
-
-	camera->setProjectionMatrixAsPerspective(
-		30.0f,
-		static_cast<float>(width) / static_cast<float>(height),
-		-1.0f,
-		1000.0f
-	);
-
-	/*
-	camera->setViewMatrixAsLookAt(
-		osg::Vec3(0.0f, 0.0f, -266.0f),
-		osg::Vec3(266.0f, 0.0f, 0.0f),
-		osg::Vec3(0.0f, 1.0f, 0.0f)
-	);
-	*/
 	
 	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
@@ -165,53 +134,45 @@ osg::Camera* createPerspectiveCamera(unsigned int width, unsigned int height) {
 	return camera;
 }
 
-/*
-class UpdateViewMatrix: public osg::NodeCallback {
-	double    _last;
-	osg::Vec3 _pos;
+class UpdateMatrixTransform: public osg::NodeCallback {
+	double _last;
+	double _direction;
 
 public:
-	UpdateViewMatrix():
-	_last (0.0f),
-	_pos  (10.0f, 10.0f, 10.0f) {
+	UpdateMatrixTransform():
+	_last      (0.0f),
+	_direction (1.0f) {
 	}
 
 	virtual void operator()(osg::Node* node, osg::NodeVisitor* visitor) {
-		osg::Camera* camera = dynamic_cast<osg::Camera*>(node);
+		osg::MatrixTransform* matrix = dynamic_cast<osg::MatrixTransform*>(node);
 
-		if(!camera) {
+		if(!matrix) {
 			traverse(node, visitor);
 
 			return;
 		}
 
-		const osg::FrameStamp* fs = visitor->getFrameStamp();
+		const osg::FrameStamp* fs      = visitor->getFrameStamp();
+		double                 time    = fs->getSimulationTime();
+		double                 elapsed = time - _last;
 
-		if((fs->getSimulationTime() - _last) >= 1.0f) {
-			_last = fs->getSimulationTime();
+		if(elapsed >= 1.0f) {
+			_last      = time;
+			_direction = -_direction;
+		}
 
+		else if(elapsed >= 0.05f) {
+			double rot = elapsed * osg::PI_4;
 
-			camera->setViewMatrixAsLookAt(
-				_pos,
-				osg::Vec3(0.0f, 0.0f, 0.0f),
-				osg::Vec3(0.0f, 1.0f, 0.0f)
-			);
-
-			_pos += osg::Vec3(10.0f, 10.0f, 10.0f);
+			if(_direction < 0.0f) rot = (1.0f * osg::PI_4) - (elapsed * osg::PI_4);
+	
+			matrix->setMatrix(osg::Matrix::rotate(rot, 0.0f, 1.0f, 0.0f));
 		}
 
 		traverse(node, visitor);
 	}
 };
-
-class BoundVisitor: public osg::NodeVisitor {
-	virtual void apply(osg::Node& node) {
-		
-
-		traverse(node);
-	}
-};
-*/
 
 int main(int argc, char** argv) {
 	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
@@ -220,55 +181,123 @@ int main(int argc, char** argv) {
 	paths.push_back("examples/osgcairoviewer/");
 	paths.push_back("./");
 
-	/*
-	osgDB::Input input;
-
-	std::istringstream options("x 100 y 200");
-
-	input.attach(&options);
-
-	int x, y;
-
-	input.read("x", x);
-	input.read("y", y);
-
-	osg::notify(osg::NOTICE) << "x: " << x << " y: " << y << " save: " << input.read("saveSurface") << std::endl;
-	*/
-
-	osgViewer::Viewer viewer;
-
+	// Setup a single graphics context; I got this code from the osgcompositeviewer
+	// example.
+	osg::GraphicsContext::WindowingSystemInterface* wsi = 
+		osg::GraphicsContext::getWindowingSystemInterface()
+	;
+	
+	if(!wsi) {
+		osg::notify(osg::NOTICE)
+			<<"Error, no WindowSystemInterface available, cannot create windows."
+			<<std::endl
+		;
+		
+		return 1;
+	}
+	
 	unsigned int width  = 256 * 3 + 40;
 	unsigned int height = 276;
-
-	osg::Camera* camera = createPerspectiveCamera(width, height);
-	osg::Group*  group  = new osg::Group();
-	osg::Geode*  geode1 = createExample_simpleDrawing();
-	osg::Geode*  geode2 = createExample_loadImages();
-
-	group->addChild(geode1);
-	group->addChild(geode2);
 	
-	for(unsigned int i = 0; i < 5; i++) group->addChild(createExample_simpleDrawing());
+	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits();
 
-	camera->addChild(group);
-	// camera->addUpdateCallback(new UpdateViewMatrix());
+	traits->x                = 100;
+	traits->y                = 100;
+	traits->width            = width;
+	traits->height           = height * 2;
+	traits->windowDecoration = true;
+	traits->doubleBuffer     = true;
+	traits->sharedContext    = 0;
 
-	// ----------------------------------------------------------------------------------------
-	const osg::BoundingSphere& bs = group->getBound();
-
-	osg::Vec3 eye = osg::Vec3(bs.center().x(), bs.center().y(), bs.radius());
-
-	osg::notify(osg::NOTICE)
-		<< "radius: " << bs.radius() << std::endl
-		<< "center: " << bs.center() << std::endl
-		<< "eye: " << eye << std::endl
+	osg::ref_ptr<osg::GraphicsContext> gc =
+		osg::GraphicsContext::createGraphicsContext(traits.get())
 	;
+	
+	if(gc.valid()) {
+		gc->setClearColor(osg::Vec4f(0.2f, 0.2f, 0.6f, 1.0f));
+		gc->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	}
 
-	camera->setViewMatrixAsLookAt(eye, bs.center(), osg::Vec3(0.0f, 1.0f, 0.0f));
-	// ----------------------------------------------------------------------------------------
+	// Now we setup the viewer. The size of the osg::Views is hard-coded for now, since
+	// I know all the objects are going to be 256x256.
+	osgViewer::CompositeViewer viewer;
 
-	viewer.setUpViewInWindow(50, 50, width, height);
-	viewer.setSceneData(camera);
+	// Here's our main scene data; it will be viewed in two different ways, but it's the
+	// same data both times.
+	osg::ref_ptr<osg::Geode> ex1 = createExample_loadImages();
+	osg::ref_ptr<osg::Geode> ex2 = createExample_simpleDrawing();
+	osg::ref_ptr<osg::Node>  cow = osgDB::readNodeFile("cow.osg");
 
+	// Setup our ORTHOGRAPHIC view into the scene.
+	{
+		osg::Camera*     camera = createCamera(width, height);
+		osg::Group*      group  = new osg::Group();
+		osgViewer::View* view   = new osgViewer::View();
+
+		camera->addChild(ex1.get());
+		camera->addChild(ex2.get());
+		camera->setProjectionMatrixAsOrtho2D(0, width, 0, height);
+		camera->setViewMatrix(osg::Matrix::identity());
+
+		group->addChild(cow);
+		group->addChild(camera);
+
+		view->setSceneData(group);
+		view->setCameraManipulator(new osgGA::TrackballManipulator());
+		view->getCamera()->setViewport(new osg::Viewport(0, 0, width, height));
+		view->getCamera()->setGraphicsContext(gc.get());
+		view->getCamera()->setProjectionMatrixAsPerspective(
+			30.0f,
+			static_cast<float>(width) / static_cast<float>(height),
+			1.0f,
+			1000.0f
+		);
+
+		viewer.addView(view);
+	}
+
+	// Setup our PERSPECTIVE view into the scene.
+	{
+		osg::Camera*          camera = createCamera(width, height);
+		osg::MatrixTransform* matrix = new osg::MatrixTransform();
+		osg::Group*           group  = new osg::Group();
+		osgViewer::View*      view   = new osgViewer::View();
+
+		matrix->addChild(ex1.get());
+		matrix->addChild(ex2.get());
+		matrix->addUpdateCallback(new UpdateMatrixTransform());
+
+		camera->addChild(matrix);
+		camera->setProjectionMatrixAsPerspective(
+			30.0f,
+			static_cast<float>(width) / static_cast<float>(height),
+			-1.0f,
+			1.0f
+		);
+
+		const osg::BoundingSphere& bs  = matrix->getBound();
+		const osg::Vec3&           c   = bs.center();
+		const osg::Vec3&           eye = osg::Vec3(c.x(), c.y(), bs.radius() * 2.0f);
+
+		camera->setViewMatrixAsLookAt(eye, bs.center(), osg::Vec3(0.0f, 1.0f, 0.0f));
+
+		group->addChild(cow);
+		group->addChild(camera);
+
+		view->setSceneData(group);
+		view->setCameraManipulator(new osgGA::TrackballManipulator());
+		view->getCamera()->setViewport(new osg::Viewport(0, height, width, height));
+		view->getCamera()->setGraphicsContext(gc.get());
+		view->getCamera()->setProjectionMatrixAsPerspective(
+			30.0f,
+			static_cast<float>(width) / static_cast<float>(height),
+			1.0f,
+			1000.0f
+		);
+
+
+		viewer.addView(view);
+	}
+	
 	return viewer.run();
 }
