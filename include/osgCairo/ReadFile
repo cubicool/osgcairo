@@ -4,6 +4,7 @@
 #define OSGCAIRO_READFILE
 
 #include <osgDB/ReadFile>
+#include <osgCairo/Image>
 
 namespace osgCairo {
 
