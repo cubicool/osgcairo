@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #include <cstring>
 #include <osg/Notify>
@@ -93,7 +93,7 @@ double* createKernel(double radius, double deviation) {
 
 	double radiusf = fabs(radius) + 1.0f;
 
-	if(deviation == 0.0f) deviation = sqrt(-(radiusf ** 2) / (2.0f * log(1.0f / 255.0f)));
+	if(deviation == 0.0f) deviation = sqrt(-(radiusf * radiusf) / (2.0f * log(1.0f / 255.0f)));
 
 	kernel[0] = size;
 
@@ -104,7 +104,7 @@ double* createKernel(double radius, double deviation) {
 		kernel[1 + i] = 
 			1.0f / (2.506628275f * deviation) *
 			expf(-((value * value) /
-			(2.0f * (deviation ** 2))))
+			(2.0f * (deviation * deviation))))
 		;
 
 		sum   += kernel[1 + i];
@@ -184,9 +184,7 @@ void Image::gaussianBlur(unsigned int radius) {
 
 				if(x <= 0 || x > _s) continue;
 
-				double* dataPtr = static_cast<double>(_data[
-					iY * stride + x * channels
-				]);
+				unsigned char* dataPtr = &_data[iY * stride + x * channels];
 
 				double kernip1 = kernel[i + 1];
 

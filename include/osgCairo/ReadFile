@@ -1,43 +1,11 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #ifndef OSGCAIRO_READFILE
 #define OSGCAIRO_READFILE
 
 #include <osgDB/ReadFile>
-#include <osgCairo/Image>
 
 namespace osgCairo {
-
-typedef std::vector<osg::ref_ptr<Image> > ImageVector;
-
-struct OSGCAIRO_EXPORT PDFOptions {
-	PDFOptions():
-	keepAspectRatio (true),
-	keepPageSize    (false),
-	width           (512),
-	height          (512),
-	maxPages        (-1),
-	backgroundColor (1.0f, 1.0f, 1.0f, 1.0f) {
-	}
-
-	bool keepAspectRatio;
-	bool keepPageSize;
-
-	unsigned int width;
-	unsigned int height;
-
-	int maxPages;
-
-	osg::Vec4 backgroundColor;
-};
-
-// Reads every page of the PDF into a vector of osgCairo::Image objects, rendered
-// at the given resolution.
-bool OSGCAIRO_EXPORT readFilePDF(
-	const std::string&,
-	ImageVector&,
-	const PDFOptions& = PDFOptions()
-);
 
 OSGCAIRO_EXPORT Image* readImageFile(const std::string&, osgDB::Options*);
 
@@ -45,6 +13,6 @@ inline Image* readImageFile(const std::string& filename) {
 	return readImageFile(filename, osgDB::Registry::instance()->getOptions());
 }
 
-} // namespace osgCairo
+}
 
 #endif

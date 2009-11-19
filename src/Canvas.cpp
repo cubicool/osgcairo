@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2006 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #include <osgCairo/Canvas>
 
@@ -20,21 +20,21 @@ Canvas::Canvas(
 	CairoFormat          format,
 	const unsigned char* data
 ):
-_format          (format),
-_width           (width),
-_height          (height),
-_textureWidth    (textureWidth),
-_textureHeight   (textureHeight) {
+_format        (format),
+_width         (width),
+_height        (height),
+_textureWidth  (textureWidth),
+_textureHeight (textureHeight) {
 	allocateSurface(_width, _height, _textureWidth, _textureHeight, data);
 }
 
 Canvas::Canvas(const Canvas& c, const osg::CopyOp& co):
-osg::Object      (c, co),
-_format          (c._format),
-_width           (c._width),
-_height          (c._height),
-_textureWidth    (c._textureWidth),
-_textureHeight   (c._textureHeight) {
+osg::Object    (c, co),
+_format        (c._format),
+_width         (c._width),
+_height        (c._height),
+_textureWidth  (c._textureWidth),
+_textureHeight (c._textureHeight) {
 }
 
 bool Canvas::allocateSurface(
@@ -86,4 +86,4 @@ bool Canvas::allocateSurface(
 	}
 */
 
-} // namespace osgCairo
+}

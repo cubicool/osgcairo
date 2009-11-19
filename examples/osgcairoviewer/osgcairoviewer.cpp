@@ -112,7 +112,7 @@ osg::Geode* createExample_simpleDrawing() {
 
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
-		
+	
 		geode->addDrawable(createGroupCommon(image));
 	}
 
