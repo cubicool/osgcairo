@@ -1,36 +1,3 @@
-INTRODUCTION: Cairo
--------------------------------------------------------------------------------
-
-First things first: you should know what Cairo is and why you want to use it.
-Visit this website and look around for a few minutes:
-
-	http://cairographics.org
-
-In summation, Cairo is a 2D vector graphics drawing library, which conceptually
-means you are creating images as "algorithms" or "instructions" rather than
-colored pixels. This is desirable for many reasons, the greatest of which is
-scalability. By this I mean you can take any image created by Cairo and scale it
-to any arbitrary dimensions without a single bit of loss in clarity. Clearly,
-this is the hotness.
-
-
-
-INTRODUCTION: osgCairo
--------------------------------------------------------------------------------
-
-osgCairo is a NodeKit for OpenSceneGraph that abstracts the work of glueing a
-Cairo image and an OSG image together, allowing you to concentrate wholly on
-creating your image. It should be noted and equally comitted to memory that
-osgCairo is currently an OFFLINE OR LOADTIME DRAWING library--it is not 
-intended to be used interactively (or, rather, if it is, infrequently).
-While it is absolutely possible to redraw your Cairo image as often as you
-like, performance in OSG will suffer.
-
-
-
-USAGE
--------------------------------------------------------------------------------
-
 First, get yourself a new Image object:
 
 	osgCairo::Image* image = new osgCairo::Image();

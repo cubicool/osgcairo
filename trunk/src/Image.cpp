@@ -85,7 +85,7 @@ void Image::setOriginBottomLeft() {
 	setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
-double* createKernel(double radius, double deviation) {
+double* Image::_gaussianBlurCreateKernel(double radius, double deviation) {
 	int     size   = 2 * static_cast<int>(radius) + 1;
 	double* kernel = new double[size + 1];
 	
@@ -116,6 +116,55 @@ double* createKernel(double radius, double deviation) {
 	return kernel;
 }
 
+/*
+void* _gaussianBlurDoPass() {
+	for(int iY = 0; iY < _t; iY++) {
+		for(int iX = 0; iX < _s; iX++) {
+			double red   = 0.0f;
+			double green = 0.0f;
+			double blue  = 0.0f;
+			double alpha = 0.0f;
+
+			int offset = static_cast<int>(kernel[0]) / -2;
+			
+			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
+				int x = iX + offset;
+
+				if(x < 0 || x >= _s) continue;
+
+				unsigned char* dataPtr = &_data[iY * stride + x * channels];
+				
+				double kernip1 = kernel[i + 1];
+
+				if(channels == 1) alpha += kernip1 * dataPtr[0];
+
+				else {
+					if(channels == 4) alpha += kernip1 * dataPtr[3];
+
+					red   += kernip1 * dataPtr[2];
+					green += kernip1 * dataPtr[1];
+					blue  += kernip1 * dataPtr[0];
+				}
+				
+				offset++;
+			}
+
+			int baseOffset = iY * stride + iX * channels;
+
+			if(channels == 1) horzBlur[baseOffset] = alpha;
+
+			else {
+				if(channels == 4) horzBlur[baseOffset + 3] = alpha;
+
+				horzBlur[baseOffset + 2] = red;
+				horzBlur[baseOffset + 1] = green;
+				horzBlur[baseOffset]     = blue;
+			}
+		}
+	}
+}
+*/
+
 void Image::gaussianBlur(unsigned int radius) {
 	if(!_surface) return;
 
@@ -134,7 +183,7 @@ void Image::gaussianBlur(unsigned int radius) {
 	// create buffers to hold the blur-passes
 	double* horzBlur = new double[_t * stride];
 	double* vertBlur = new double[_t * stride];
-	double* kernel   = createKernel(radius, 0.0f);
+	double* kernel   = _gaussianBlurCreateKernel(radius, 0.0f);
 
 	if(!kernel) return;
 
@@ -241,14 +290,14 @@ void Image::gaussianBlur(unsigned int radius) {
 		for(int iX = 0; iX < _s; iX++) {
 			int offset = iY * stride + iX * channels;
 
-			if(channels == 1) _data[offset] = (unsigned char)vertBlur[offset];
+			if(channels == 1) _data[offset] = static_cast<unsigned char>(vertBlur[offset]);
 
 			else {
-				if(channels == 4) _data[offset + 3] = (unsigned char)vertBlur[offset + 3];
+				if(channels == 4) _data[offset + 3] = static_cast<unsigned char>(vertBlur[offset + 3]);
 
-				_data[offset + 2] = (unsigned char)vertBlur[offset + 2];
-				_data[offset + 1] = (unsigned char)vertBlur[offset + 1];
-				_data[offset + 0] = (unsigned char)vertBlur[offset + 0];
+				_data[offset + 2] = static_cast<unsigned char>(vertBlur[offset + 2]);
+				_data[offset + 1] = static_cast<unsigned char>(vertBlur[offset + 1]);
+				_data[offset]     = static_cast<unsigned char>(vertBlur[offset + 0]);
 			}
 		}
 	}

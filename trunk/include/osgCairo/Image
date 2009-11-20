@@ -9,6 +9,8 @@
 namespace osgCairo {
 
 class OSGCAIRO_EXPORT Image: public Surface, public osg::Image {
+	double* _gaussianBlurCreateKernel(double, double);
+
 protected:
 	bool        _allocated;
 	CairoFormat _format;
