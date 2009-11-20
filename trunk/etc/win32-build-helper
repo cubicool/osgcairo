@@ -8,7 +8,7 @@ MODE='Release|Win32'
 case $1 in
 	ex*)
 		vcbuild examples/osgcairoviewer/osgcairoviewer.vcproj "${MODE}"
-		./examples/osgcairoviewer/Release/osgcairoviewer.exe
+		strace ./examples/osgcairoviewer/Release/osgcairoviewer.exe
 	;;
 
 	in*)
@@ -25,6 +25,7 @@ case $1 in
 
 	*)
 		vcbuild osgCairo.sln "${MODE}"
+		./${0} in
 	;;
 esac
 
