@@ -151,51 +151,20 @@ void Image::gaussianBlur(unsigned int radius) {
 			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
 				int x = iX + offset;
 
-				/*
-				// TODO: THIS
-				if(x >= 0 && x < _s) {
-					int baseOffset = iY * stride + x * channels;
-
-					if(channels == 1) alpha += (
-						kernel[1 + i] *
-						static_cast<double>(_data[baseOffset])
-					);
-
-					else {
-						if(channels == 4)
-							alpha += (kernel[1 + i] *
-							static_cast<double>(_data[baseOffset + 3]))
-						;
-
-						red += (kernel[1 + i] *
-							static_cast<double>(_data[baseOffset + 2]))
-						;
-
-						green += (kernel[1 + i] *
-							static_cast<double>(_data[baseOffset + 1]))
-						;
-
-						blue += (kernel[1 + i] *
-							static_cast<double>(_data[baseOffset + 0]))
-						;
-					}
-				}
-				*/
-
-				if(x <= 0 || x > _s) continue;
+				if(x < 0 || x >= _s) continue;
 
 				unsigned char* dataPtr = &_data[iY * stride + x * channels];
-
+				
 				double kernip1 = kernel[i + 1];
 
-				if(channels == 1) alpha += kernip1 * (*dataPtr);
+				if(channels == 1) alpha += kernip1 * dataPtr[0];
 
 				else {
-					if(channels == 4) alpha += kernip1 * (*(dataPtr + 3));
+					if(channels == 4) alpha += kernip1 * dataPtr[3];
 
-					red   += kernip1 * (*(dataPtr + 2));
-					green += kernip1 * (*(dataPtr + 1));
-					blue  += kernip1 * (*dataPtr);
+					red   += kernip1 * dataPtr[2];
+					green += kernip1 * dataPtr[1];
+					blue  += kernip1 * dataPtr[0];
 				}
 				
 				offset++;
@@ -210,7 +179,7 @@ void Image::gaussianBlur(unsigned int radius) {
 
 				horzBlur[baseOffset + 2] = red;
 				horzBlur[baseOffset + 1] = green;
-				horzBlur[baseOffset + 0] = blue;
+				horzBlur[baseOffset]     = blue;
 			}
 		}
 	}
@@ -228,29 +197,24 @@ void Image::gaussianBlur(unsigned int radius) {
 			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
 				int y = iY + offset;
 
-				if(y >= 0 && y < _t) {
-					int baseOffset = y * stride + iX * channels;
+				if(y < 0 || y >= _t) {
+					offset++;
 
-					if(channels == 1) alpha += (
-						kernel[1 + i] *
-						horzBlur[baseOffset]
-					);
+					continue;
+				}
+				
+				double* dataPtr = &horzBlur[y * stride + iX * channels];
 
-					else {
+				double kernip1 = kernel[i + 1];
 
-						if(channels == 4)
-							alpha += (kernel[1+i] *
-							horzBlur[baseOffset + 3]);
+				if(channels == 1) alpha += kernip1 * dataPtr[0];
 
-						red   += (kernel[1+i]  *
-							horzBlur[baseOffset + 2]);
+				else {
+					if(channels == 4) alpha += kernip1 * dataPtr[3];
 
-						green += (kernel[1+i]  *
-							horzBlur[baseOffset + 1]);
-
-						blue  += (kernel[1+i]  *
-							horzBlur[baseOffset + 0]);
-					}
+					red   += kernip1 * dataPtr[2];
+					green += kernip1 * dataPtr[1];
+					blue  += kernip1 * dataPtr[0];
 				}
 
 				offset++;
@@ -265,7 +229,7 @@ void Image::gaussianBlur(unsigned int radius) {
 
 				vertBlur[baseOffset + 2] = red;
 				vertBlur[baseOffset + 1] = green;
-				vertBlur[baseOffset + 0] = blue;
+				vertBlur[baseOffset]     = blue;
 			}
 		}
 	}
