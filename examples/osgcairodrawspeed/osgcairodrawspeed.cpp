@@ -4,6 +4,7 @@
 #include <osg/Geode>
 #include <osg/BlendFunc>
 #include <osgViewer/Viewer>
+#include <osgViewer/ViewerEventHandlers>
 #include <osgCairo/Image>
 
 class DrawImage: public osg::Drawable::UpdateCallback {
@@ -116,10 +117,11 @@ osg::Geode* createExample(unsigned int size) {
 int main(int, char**) {
 	osgViewer::Viewer viewer;
 
-	unsigned int size = 256;
+	unsigned int size = 512;
 
 	viewer.setSceneData(createExample(size));
 	viewer.setUpViewInWindow(50, 50, size + 40, size + 40);
-	
+	viewer.addEventHandler(new osgViewer::StatsHandler());
+
 	return viewer.run();
 }
