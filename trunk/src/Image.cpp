@@ -106,8 +106,7 @@ double* createKernel(double radius, double deviation) {
 	for(int i = 0; i < size; i++) {
 		kernel[1 + i] = 
 			1.0f / (2.506628275f * deviation) *
-			std::expf(-((value * value) /
-			(2.0f * (deviation * deviation))))
+			expf(-((value * value) / (2.0f * (deviation * deviation))))
 		;
 
 		sum   += kernel[1 + i];
