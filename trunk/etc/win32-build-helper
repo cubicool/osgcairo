@@ -7,8 +7,8 @@ MODE='Release|Win32'
 
 case $1 in
 	ex*)
-		vcbuild examples/osgcairoviewer/osgcairoviewer.vcproj "${MODE}"
-		strace ./examples/osgcairoviewer/Release/osgcairoviewer.exe
+		vcbuild examples/osgcairodrawspeed/osgcairodrawspeed.vcproj "${MODE}"
+		strace ./examples/osgcairodrawspeed/Release/osgcairodrawspeed.exe
 	;;
 
 	in*)
