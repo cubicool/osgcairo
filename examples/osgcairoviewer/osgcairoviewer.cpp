@@ -14,7 +14,7 @@
 #include <osgCairo/Image>
 #include <osgCairo/ReadFile>
 
-osg::Geometry* createGroupCommon(osg::Image* image, bool setBlendMode=true) {
+osg::Geometry* createGeometry(osg::Image* image, bool setBlendMode=true) {
 	static osg::Vec3 pos(10.0f, 10.0f, -0.8f);
 
 	osg::Texture2D* texture = new osg::Texture2D();
@@ -83,7 +83,7 @@ osg::Geode* createExample_loadImages() {
 		image->stroke();
 	}
 
-	geode->addDrawable(createGroupCommon(image));
+	geode->addDrawable(createGeometry(image));
 
 	return geode;
 }
@@ -115,13 +115,13 @@ osg::Geode* createExample_simpleDrawing() {
 	
 		image->gaussianBlur();
 		
-		geode->addDrawable(createGroupCommon(image));
+		geode->addDrawable(createGeometry(image));
 	}
 
 	return geode;
 }
 
-osg::Camera* createCamera(unsigned int width, unsigned int height) {
+osg::Camera* createCamera() {
 	osg::Camera* camera = new osg::Camera();
 
 	camera->getOrCreateStateSet()->setMode(
@@ -176,7 +176,7 @@ public:
 	}
 };
 
-int main(int argc, char** argv) {
+int main(int, char**) {
 	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
 	
 	paths.push_back("../examples/osgcairoviewer/");
@@ -232,7 +232,7 @@ int main(int argc, char** argv) {
 
 	// Setup our ORTHOGRAPHIC view into the scene.
 	{
-		osg::Camera*     camera = createCamera(width, height);
+		osg::Camera*     camera = createCamera();
 		osg::Group*      group  = new osg::Group();
 		osgViewer::View* view   = new osgViewer::View();
 
@@ -260,7 +260,7 @@ int main(int argc, char** argv) {
 
 	// Setup our PERSPECTIVE view into the scene.
 	{
-		osg::Camera*          camera = createCamera(width, height);
+		osg::Camera*          camera = createCamera();
 		osg::MatrixTransform* matrix = new osg::MatrixTransform();
 		osg::Group*           group  = new osg::Group();
 		osgViewer::View*      view   = new osgViewer::View();

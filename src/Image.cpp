@@ -1,6 +1,7 @@
 // -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
 
 #include <cstring>
+#include <cmath>
 #include <osg/Notify>
 #include <osgCairo/Image>
 
@@ -85,15 +86,17 @@ void Image::setOriginBottomLeft() {
 	setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
-double* Image::_gaussianBlurCreateKernel(double radius, double deviation) {
+double* createKernel(double radius, double deviation) {
 	int     size   = 2 * static_cast<int>(radius) + 1;
 	double* kernel = new double[size + 1];
 	
 	if(!kernel) return 0;
 
-	double radiusf = fabs(radius) + 1.0f;
+	double radiusf = std::fabs(radius) + 1.0f;
 
-	if(deviation == 0.0f) deviation = sqrt(-(radiusf * radiusf) / (2.0f * log(1.0f / 255.0f)));
+	if(deviation == 0.0f) deviation = std::sqrt(
+		-(radiusf * radiusf) / (2.0f * std::log(1.0f / 255.0f))
+	);
 
 	kernel[0] = size;
 
@@ -103,7 +106,7 @@ double* Image::_gaussianBlurCreateKernel(double radius, double deviation) {
 	for(int i = 0; i < size; i++) {
 		kernel[1 + i] = 
 			1.0f / (2.506628275f * deviation) *
-			expf(-((value * value) /
+			std::expf(-((value * value) /
 			(2.0f * (deviation * deviation))))
 		;
 
@@ -115,55 +118,6 @@ double* Image::_gaussianBlurCreateKernel(double radius, double deviation) {
 
 	return kernel;
 }
-
-/*
-void* _gaussianBlurDoPass() {
-	for(int iY = 0; iY < _t; iY++) {
-		for(int iX = 0; iX < _s; iX++) {
-			double red   = 0.0f;
-			double green = 0.0f;
-			double blue  = 0.0f;
-			double alpha = 0.0f;
-
-			int offset = static_cast<int>(kernel[0]) / -2;
-			
-			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
-				int x = iX + offset;
-
-				if(x < 0 || x >= _s) continue;
-
-				unsigned char* dataPtr = &_data[iY * stride + x * channels];
-				
-				double kernip1 = kernel[i + 1];
-
-				if(channels == 1) alpha += kernip1 * dataPtr[0];
-
-				else {
-					if(channels == 4) alpha += kernip1 * dataPtr[3];
-
-					red   += kernip1 * dataPtr[2];
-					green += kernip1 * dataPtr[1];
-					blue  += kernip1 * dataPtr[0];
-				}
-				
-				offset++;
-			}
-
-			int baseOffset = iY * stride + iX * channels;
-
-			if(channels == 1) horzBlur[baseOffset] = alpha;
-
-			else {
-				if(channels == 4) horzBlur[baseOffset + 3] = alpha;
-
-				horzBlur[baseOffset + 2] = red;
-				horzBlur[baseOffset + 1] = green;
-				horzBlur[baseOffset]     = blue;
-			}
-		}
-	}
-}
-*/
 
 void Image::gaussianBlur(unsigned int radius) {
 	if(!_surface) return;
@@ -180,14 +134,13 @@ void Image::gaussianBlur(unsigned int radius) {
 
 	unsigned int stride = _s * channels;
 
-	// create buffers to hold the blur-passes
 	double* horzBlur = new double[_t * stride];
 	double* vertBlur = new double[_t * stride];
-	double* kernel   = _gaussianBlurCreateKernel(radius, 0.0f);
+	double* kernel   = createKernel(radius, 0.0f);
 
 	if(!kernel) return;
 
-	// horizontal pass
+	// Horizontal pass.
 	for(int iY = 0; iY < _t; iY++) {
 		for(int iX = 0; iX < _s; iX++) {
 			double red   = 0.0f;
@@ -233,7 +186,7 @@ void Image::gaussianBlur(unsigned int radius) {
 		}
 	}
 
-	// vertical pass
+	// Vertical pass.
 	for(int iY = 0; iY < _t; iY++) {
 		for(int iX = 0; iX < _s; iX++) {
 			double red   = 0.0f;
@@ -288,16 +241,18 @@ void Image::gaussianBlur(unsigned int radius) {
 
 	for(int iY = 0; iY < _t; iY++) {
 		for(int iX = 0; iX < _s; iX++) {
-			int offset = iY * stride + iX * channels;
+			int i = iY * stride + iX * channels;
 
-			if(channels == 1) _data[offset] = static_cast<unsigned char>(vertBlur[offset]);
+			if(channels == 1) _data[i] = static_cast<unsigned char>(vertBlur[i]);
 
 			else {
-				if(channels == 4) _data[offset + 3] = static_cast<unsigned char>(vertBlur[offset + 3]);
+				if(channels == 4) _data[i + 3] = static_cast<unsigned char>(
+					vertBlur[i + 3]
+				);
 
-				_data[offset + 2] = static_cast<unsigned char>(vertBlur[offset + 2]);
-				_data[offset + 1] = static_cast<unsigned char>(vertBlur[offset + 1]);
-				_data[offset]     = static_cast<unsigned char>(vertBlur[offset + 0]);
+				_data[i + 2] = static_cast<unsigned char>(vertBlur[i + 2]);
+				_data[i + 1] = static_cast<unsigned char>(vertBlur[i + 1]);
+				_data[i]     = static_cast<unsigned char>(vertBlur[i]);
 			}
 		}
 	}
