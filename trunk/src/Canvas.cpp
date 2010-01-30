@@ -28,13 +28,13 @@ _textureHeight (textureHeight) {
 	allocateSurface(_width, _height, _textureWidth, _textureHeight, data);
 }
 
-Canvas::Canvas(const Canvas& c, const osg::CopyOp& co):
-osg::Object    (c, co),
-_format        (c._format),
-_width         (c._width),
-_height        (c._height),
-_textureWidth  (c._textureWidth),
-_textureHeight (c._textureHeight) {
+Canvas::Canvas(const Canvas& canvas, const osg::CopyOp& co):
+osg::Object    (canvas, co),
+_format        (canvas._format),
+_width         (canvas._width),
+_height        (canvas._height),
+_textureWidth  (canvas._textureWidth),
+_textureHeight (canvas._textureHeight) {
 }
 
 bool Canvas::allocateSurface(

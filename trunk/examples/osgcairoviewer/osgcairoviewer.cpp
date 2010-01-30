@@ -59,7 +59,9 @@ osg::Geode* createExample_loadImages() {
 	// to you could simply save an alpha channel in your PNG, in which case
 	// something like this isn't necessary. FUTHERMORE, if you dont' want (or
 	// need) an alpha channel, just leave the image as-is.
-	osg::ref_ptr<osgDB::Options> opts = new osgDB::Options("addAlphaToRGB");
+	osg::ref_ptr<osgDB::ReaderWriter::Options> opts = 
+		new osgDB::ReaderWriter::Options("addAlphaToRGB")
+	;
 
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = osgCairo::readImageFile("img.png", opts.get());

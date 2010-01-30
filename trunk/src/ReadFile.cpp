@@ -5,7 +5,7 @@
 
 namespace osgCairo {
 
-Image* readImageFile(const std::string& path, osgDB::Options* options) {
+Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* options) {
 	osg::Image* image = osgDB::readImageFile(path, options);
 
 	if(!image) return 0;
