@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
 
 #ifndef OSGCAIRO_READFILE
 #define OSGCAIRO_READFILE
@@ -8,7 +8,7 @@
 
 namespace osgCairo {
 
-OSGCAIRO_EXPORT Image* readImageFile(const std::string&, osgDB::Options*);
+OSGCAIRO_EXPORT Image* readImageFile(const std::string&, osgDB::ReaderWriter::Options*);
 
 inline Image* readImageFile(const std::string& filename) {
 	return readImageFile(filename, osgDB::Registry::instance()->getOptions());

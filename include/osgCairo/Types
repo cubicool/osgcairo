@@ -1,4 +1,7 @@
-// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+
+//! \file
+//! \brief This file redefines all of the Cairo C API types as cleaner C++ types.
 
 #ifndef OSGCAIRO_TYPES
 #define OSGCAIRO_TYPES
@@ -9,34 +12,74 @@
 
 namespace osgCairo {
 
-// These are types that I will also create osgCairo class wrappers for.	
-typedef cairo_pattern_t        CairoPattern;
-typedef cairo_path_t           CairoPath;
-typedef cairo_path_data_t      CairoPathData;
-typedef cairo_path_data_type_t CairoPathDataType;
-typedef cairo_glyph_t          CairoGlyph;
-typedef cairo_matrix_t         CairoMatrix;
-typedef cairo_scaled_font_t    CairoScaledFont;
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html#cairo-pattern-t">Cairo API Link</a>
+typedef cairo_pattern_t CairoPattern;
 
-// These are types that I will use directly w/out creating wrappers. For the most
-// part, they are all just C enum's anyway.
-typedef cairo_surface_t        CairoSurface;
-typedef cairo_t                CairoContext;
-typedef cairo_status_t         CairoStatus;
-typedef cairo_pattern_type_t   CairoPatternType;
-typedef cairo_content_t        CairoContent;
-typedef cairo_antialias_t      CairoAntialias;
-typedef cairo_fill_rule_t      CairoFillRule;
-typedef cairo_line_cap_t       CairoLineCap;
-typedef cairo_line_join_t      CairoLineJoin;
-typedef cairo_operator_t       CairoOperator;
-typedef cairo_extend_t         CairoExtend;
-typedef cairo_filter_t         CairoFilter;
-typedef cairo_format_t         CairoFormat;
-typedef cairo_hint_style_t     CairoHintStyle;
+//! <a href="http://www.cairographics.org/manual/cairo-paths.html#cairo-path-t">Cairo API Link</a>
+typedef cairo_path_t CairoPath;
+
+//! <a href="http://www.cairographics.org/manual/cairo-path.html#cairo-path-data-t">Cairo API Link</a>
+typedef cairo_path_data_t CairoPathData;
+
+//! <a href="http://www.cairographics.org/manual/cairo-path.html#cairo-path-data-type-t">Cairo API Link</a>
+typedef cairo_path_data_type_t CairoPathDataType;
+
+//! <a href="http://www.cairographics.org/manual/cairo-text.html#cairo-glyph-t">Cairo API Link</a>
+typedef cairo_glyph_t CairoGlyph;
+
+//! <a href="http://www.cairographics.org/manual/cairo-matrix.html#cairo-matrix-t">Cairo API Link</a>
+typedef cairo_matrix_t CairoMatrix;
+
+//! <a href="http://www.cairographics.org/manual/cairo-scaled-font.html">Cairo API Link</a>
+typedef cairo_scaled_font_t CairoScaledFont;
+
+//! <a href="http://www.cairographics.org/manual/cairo-surface.html">Cairo API Link</a>
+typedef cairo_surface_t CairoSurface;
+
+//! <a href="http://www.cairographics.org/manual/cairo-context.html">Cairo API Link</a>
+typedef cairo_t CairoContext;
+
+//! <a href="http://www.cairographics.org/manual/cairo-status.html">Cairo API Link</a>
+typedef cairo_status_t CairoStatus;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_pattern_type_t CairoPatternType;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_content_t CairoContent;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_antialias_t CairoAntialias;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_fill_rule_t CairoFillRule;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_line_cap_t CairoLineCap;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_line_join_t CairoLineJoin;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_operator_t CairoOperator;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_extend_t CairoExtend;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_filter_t CairoFilter;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_format_t CairoFormat;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
+typedef cairo_hint_style_t CairoHintStyle;
+
+//! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
 typedef cairo_subpixel_order_t CairoSubpixelOrder;
 
-std::string cairoFormatAsString(CairoFormat);
+//! Returns the CairoFormat object as a capitalized string name.
+std::string cairoFormatAsString(CairoFormat format);
 
 }
 

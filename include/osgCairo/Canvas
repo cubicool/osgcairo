@@ -1,4 +1,7 @@
-// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+
+//! \file
+//! \brief Defines the Canvas class.
 
 #ifndef OSGCAIRO_CANVAS
 #define OSGCAIRO_CANVAS
@@ -8,6 +11,9 @@
 
 namespace osgCairo {
 
+//! A Canvas is a grouping of power-of-two textures that are physically arranged in a 
+//! grid to simulate non-standard image dimensions. In general, you should do your best
+//! to use a single osgCairo::Image, if possible.
 class OSGCAIRO_EXPORT Canvas: public osg::Object {
 	CairoFormat _format;
 
@@ -19,27 +25,40 @@ class OSGCAIRO_EXPORT Canvas: public osg::Object {
 public:
 	META_Object(osgCairo, Canvas);
 
-	Canvas(CairoFormat = CAIRO_FORMAT_ARGB32);
+	//! Default constructor; requires that you call allocateSurface manually later.
+	//! This is useful when you don't know the dimensions and whatnot when the Canvas
+	//! is created.
+	Canvas(CairoFormat format = CAIRO_FORMAT_ARGB32);
 
+	//! Constructor that makes a single call to allocateSurface for you. These args 
+	//! match the arguments to allocateSurface, so please see that documentation for
+	//! further information.
 	Canvas(
-		unsigned int,
-		unsigned int,
-		unsigned int,
-		unsigned int,
-		CairoFormat          = CAIRO_FORMAT_ARGB32,
-		const unsigned char* = 0
+		unsigned int         width,
+		unsigned int         height,
+		unsigned int         textureWidth,
+		unsigned int         textureHeight,
+		CairoFormat          format = CAIRO_FORMAT_ARGB32,
+		const unsigned char* data   = 0
 	);
 	
-	Canvas(const Canvas&, const osg::CopyOp&);
+	Canvas(const Canvas& canvas, const osg::CopyOp& co);
 
+	//! The desired width and height, the power-of-two texture sizes used internally,
+	//! and finally whether or not you want to use a buffer of data initially. By
+	//! default, the entire surface area is set to all 0's, which means different
+	//! things for different format types; usually black or completely transparent black.
+	//! If you do specify a buffer of image data, you'll need to make sure it's formatted
+	//! properly against the CairoFormat object you used in the constructor.
 	bool allocateSurface(
-		unsigned int,
-		unsigned int,
-		unsigned int,
-		unsigned int,
-		const unsigned char* = 0
+		unsigned int         width,
+		unsigned int         height,
+		unsigned int         textureWidth,
+		unsigned int         textureHeight,
+		const unsigned char* data = 0
 	);
 
+	//! Returns whether or not the surface has been allocated properly internally.
 	bool valid();
 };
 
