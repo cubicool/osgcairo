@@ -45,7 +45,6 @@ SET(HEADER_FILES
 	${HEADER_PATH}/Path
 	${HEADER_PATH}/Pattern
 	${HEADER_PATH}/ReadFile
-	${HEADER_PATH}/ScaledFont
 	${HEADER_PATH}/Surface
 	${HEADER_PATH}/Types
 )
