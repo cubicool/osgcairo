@@ -8,7 +8,7 @@ namespace osgCairo {
 
 // This blur function was originally created my MacSlow and published on his website:
 // http://macslow.thepimp.net
-// My modifications were purely cosmetic to bring in more inline with what C++
+// My modifications were purely cosmetic to bring it more in line with what C++
 // programmers expect to look at.
 
 double* createKernel(double radius, double deviation) {
@@ -188,5 +188,56 @@ void gaussianBlur(
 	delete[] horzBlur;
 	delete[] vertBlur;
 }
+
+/*
+cairo_pattern_t* displaced_blend(
+	cairo_t *cr,
+	cairo_pattern_t *pat,
+	double dx,
+	double dy
+) {
+	cairo_push_group(cr);
+	cairo_set_operator(cr, CAIRO_OPERATOR_ADD);
+
+	cairo_set_source(cr, pat);
+	cairo_paint_with_alpha(cr, 0.5);
+
+	cairo_translate(cr, dx, dy);
+	cairo_set_source(cr, pat);
+	cairo_paint_with_alpha(cr, 0.5);
+
+	cairo_pattern_destroy(pat);
+	
+	return cairo_pop_group(cr);
+}
+
+cairo_pattern_t * blur_step(cairo_t *cr, cairo_pattern_t *pat) {
+	pat = displaced_blend(cr, pat, 0, 1);
+	pat = displaced_blend(cr, pat, 1, 0);
+	
+	return pat;
+}
+
+cairo_pattern_t* blurred_pattern(cairo_t *cr, cairo_pattern_t *pat, unsigned n) {
+	while (n-->0) pat = blur_step(cr, pat);
+
+	return pat;
+}
+
+void cairoBlur(CairoContext* cr, cairo_pattern_t* pat) {
+	// Blur the pattern up.
+	pat = blurred_pattern(cr, pat, 10);
+
+	// Paint the pattern.
+	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+	cairo_set_source(cr, pat);
+	cairo_paint(cr);
+
+	// Clean up.
+	// cairo_pattern_destroy(pat);
+	// cairo_destroy(cr);
+	// cairo_surface_destroy(surf);
+}
+*/
 
 }
