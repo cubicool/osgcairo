@@ -3,11 +3,19 @@
 #ifndef OSGCAIRO_UTIL
 #define OSGCAIRO_UTIL
 
-#include <osgCairo/Types>
+#include <osgCairo/Surface>
 
 namespace osgCairo {
 
-OSGCAIRO_EXPORT void gaussianBlur(CairoSurface*, int);
+OSGCAIRO_EXPORT void gaussianBlur(Surface&, double);
+
+OSGCAIRO_EXPORT void gaussianBlur(
+	unsigned char*,
+	CairoFormat,
+	int,
+	int,
+	double
+);
 
 }
 
