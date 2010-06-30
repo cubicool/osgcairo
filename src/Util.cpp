@@ -1,128 +1,192 @@
-// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
 // $Id$
 
-#include <pixman.h>
-#include <stdint.h>
-#include <cstdlib>
-#include <cstring>
 #include <cmath>
-#include <osg/Notify>
 #include <osgCairo/Util>
 
 namespace osgCairo {
 
-// Copyright 2008 Kristian Høgsberg
-// Copyright 2009 Chris Wilson
+// This blur function was originally created my MacSlow and published on his website:
+// http://macslow.thepimp.net
+// My modifications were purely cosmetic to bring in more inline with what C++
+// programmers expect to look at.
 
-void gaussianBlur(CairoSurface* surface, int radius) {
-	cairo_surface_t *tmp;
-	int width, height;
-	int src_stride, dst_stride;
-	int x, y, z, w;
-	uint8_t *src, *dst;
-	uint32_t *s, *d, a, p;
-	int i, j, k;
-	uint8_t kernel[17];
-	const int size = (sizeof(kernel) / sizeof(kernel)[0]);
-	const int half = size / 2;
+double* createKernel(double radius, double deviation) {
+	int     size   = 2 * static_cast<int>(radius) + 1;
+	double* kernel = new double[size + 1];
+	
+	if(!kernel) return 0;
 
-	if (cairo_surface_status (surface))
-		return;
+	double radiusf = std::fabs(radius) + 1.0f;
 
-	width = cairo_image_surface_get_width (surface);
-	height = cairo_image_surface_get_height (surface);
+	if(deviation == 0.0f) deviation = std::sqrt(
+		-(radiusf * radiusf) / (2.0f * std::log(1.0f / 255.0f))
+	);
 
-	switch (cairo_image_surface_get_format (surface)) {
-		case CAIRO_FORMAT_A1:
-		default:
-			/* Don't even think about it! */
-			return;
+	kernel[0] = size;
 
-		case CAIRO_FORMAT_A8:
-			/* Handle a8 surfaces by effectively unrolling the loops by a
-			 * factor of 4 - this is safe since we know that stride has to be a
-			 * multiple of uint32_t. */
-			width /= 4;
-			break;
+	double value = -radius;
+	double sum   = 0.0f;	
 
-		case CAIRO_FORMAT_RGB24:
-		case CAIRO_FORMAT_ARGB32:
-			break;
+	for(int i = 0; i < size; i++) {
+		kernel[1 + i] = 
+			1.0f / (2.506628275f * deviation) *
+			expf(-((value * value) / (2.0f * (deviation * deviation))))
+		;
+
+		sum   += kernel[1 + i];
+		value += 1.0f;
 	}
 
-	tmp = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
-	if (cairo_surface_status (tmp))
-		return;
+	for(int i = 0; i < size; i++) kernel[1 + i] /= sum;
 
-	src = cairo_image_surface_get_data (surface);
-	src_stride = cairo_image_surface_get_stride (surface);
+	return kernel;
+}
 
-	dst = cairo_image_surface_get_data (tmp);
-	dst_stride = cairo_image_surface_get_stride (tmp);
+void gaussianBlur(
+	unsigned char* data,
+	CairoFormat    format,
+	int            width,
+	int            height,
+	double         radius
+) {
+	unsigned int channels = 0;
 
-	a = 0;
-	for (i = 0; i < size; i++) {
-		double f = i - half;
-		a += kernel[i] = exp (- f * f / 30.0) * 80;
-	}
+	if(format == CAIRO_FORMAT_ARGB32) channels = 4;
+	
+	else if(format == CAIRO_FORMAT_RGB24) channels = 3;
+	
+	else if(format == CAIRO_FORMAT_A8) channels = 1;
 
-	/* Horizontally blur from surface -> tmp */
-	for (i = 0; i < height; i++) {
-		s = (uint32_t *) (src + i * src_stride);
-		d = (uint32_t *) (dst + i * dst_stride);
-		for (j = 0; j < width; j++) {
-			if (radius < j && j < width - radius) {
-				d[j] = s[j];
-				continue;
+	else return;
+
+	unsigned int stride = width * channels;
+
+	double* horzBlur = new double[height * stride];
+	double* vertBlur = new double[height * stride];
+	double* kernel   = createKernel(radius, 0.0f);
+
+	if(!kernel) return;
+
+	// Horizontal pass.
+	for(int iY = 0; iY < height; iY++) {
+		for(int iX = 0; iX < width; iX++) {
+			double red   = 0.0f;
+			double green = 0.0f;
+			double blue  = 0.0f;
+			double alpha = 0.0f;
+
+			int offset = static_cast<int>(kernel[0]) / -2;
+			
+			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
+				int x = iX + offset;
+
+				if(x < 0 || x >= width) continue;
+
+				unsigned char* dataPtr = &data[iY * stride + x * channels];
+				
+				double kernip1 = kernel[i + 1];
+
+				if(channels == 1) alpha += kernip1 * dataPtr[0];
+
+				else {
+					if(channels == 4) alpha += kernip1 * dataPtr[3];
+
+					red   += kernip1 * dataPtr[2];
+					green += kernip1 * dataPtr[1];
+					blue  += kernip1 * dataPtr[0];
+				}
+				
+				offset++;
 			}
 
-			x = y = z = w = 0;
-			for (k = 0; k < size; k++) {
-				if (j - half + k < 0 || j - half + k >= width)
-					continue;
+			int baseOffset = iY * stride + iX * channels;
 
-				p = s[j - half + k];
+			if(channels == 1) horzBlur[baseOffset] = alpha;
 
-				x += ((p >> 24) & 0xff) * kernel[k];
-				y += ((p >> 16) & 0xff) * kernel[k];
-				z += ((p >>  8) & 0xff) * kernel[k];
-				w += ((p >>  0) & 0xff) * kernel[k];
+			else {
+				if(channels == 4) horzBlur[baseOffset + 3] = alpha;
+
+				horzBlur[baseOffset + 2] = red;
+				horzBlur[baseOffset + 1] = green;
+				horzBlur[baseOffset]     = blue;
 			}
-			d[j] = (x / a << 24) | (y / a << 16) | (z / a << 8) | w / a;
 		}
 	}
 
-	/* Then vertically blur from tmp -> surface */
-	for (i = 0; i < height; i++) {
-		s = (uint32_t *) (dst + i * dst_stride);
-		d = (uint32_t *) (src + i * src_stride);
-		for (j = 0; j < width; j++) {
-			if (radius <= i && i < height - radius) {
-				d[j] = s[j];
-				continue;
-			}
+	// Vertical pass.
+	for(int iY = 0; iY < height; iY++) {
+		for(int iX = 0; iX < width; iX++) {
+			double red   = 0.0f;
+			double green = 0.0f;
+			double blue  = 0.0f;
+			double alpha = 0.0f;
 
-			x = y = z = w = 0;
-			for (k = 0; k < size; k++) {
-				if (i - half + k < 0 || i - half + k >= height)
+			int offset = static_cast<int>(kernel[0]) / -2;
+			
+			for(int i = 0; i < static_cast<int>(kernel[0]); i++) {
+				int y = iY + offset;
+
+				if(y < 0 || y >= height) {
+					offset++;
+
 					continue;
+				}
+				
+				double* dataPtr = &horzBlur[y * stride + iX * channels];
 
-				s = (uint32_t *) (dst + (i - half + k) * dst_stride);
-				p = s[j];
+				double kernip1 = kernel[i + 1];
 
-				x += ((p >> 24) & 0xff) * kernel[k];
-				y += ((p >> 16) & 0xff) * kernel[k];
-				z += ((p >>  8) & 0xff) * kernel[k];
-				w += ((p >>  0) & 0xff) * kernel[k];
+				if(channels == 1) alpha += kernip1 * dataPtr[0];
+
+				else {
+					if(channels == 4) alpha += kernip1 * dataPtr[3];
+
+					red   += kernip1 * dataPtr[2];
+					green += kernip1 * dataPtr[1];
+					blue  += kernip1 * dataPtr[0];
+				}
+
+				offset++;
 			}
-			d[j] = (x / a << 24) | (y / a << 16) | (z / a << 8) | w / a;
+
+			int baseOffset = iY * stride + iX * channels;
+
+			if(channels == 1) vertBlur[baseOffset] = alpha;
+
+			else {
+				if(channels == 4) vertBlur[baseOffset + 3] = alpha;
+
+				vertBlur[baseOffset + 2] = red;
+				vertBlur[baseOffset + 1] = green;
+				vertBlur[baseOffset]     = blue;
+			}
 		}
 	}
 
-	// cairo_surface_write_to_png(tmp, "tmp.png");
+	// We're done with the blurring.
+	delete[] kernel;
 
-	cairo_surface_destroy (tmp);
-	cairo_surface_mark_dirty (surface);
+	for(int iY = 0; iY < height; iY++) {
+		for(int iX = 0; iX < width; iX++) {
+			int i = iY * stride + iX * channels;
+
+			if(channels == 1) data[i] = static_cast<unsigned char>(vertBlur[i]);
+
+			else {
+				if(channels == 4) data[i + 3] = static_cast<unsigned char>(
+					vertBlur[i + 3]
+				);
+
+				data[i + 2] = static_cast<unsigned char>(vertBlur[i + 2]);
+				data[i + 1] = static_cast<unsigned char>(vertBlur[i + 1]);
+				data[i]     = static_cast<unsigned char>(vertBlur[i]);
+			}
+		}
+	}
+
+	delete[] horzBlur;
+	delete[] vertBlur;
 }
 
 }

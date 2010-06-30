@@ -116,7 +116,13 @@ osg::Geode* createExample_simpleDrawing() {
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
 	
-		osgCairo::gaussianBlur(image->getSurface(), 10);
+		osgCairo::gaussianBlur(
+			image->data(),
+			image->getFormat(),
+			image->s(),
+			image->t(),
+			10.0f
+		);
 
 		geode->addDrawable(createGeometry(image));
 	}
