@@ -70,6 +70,10 @@ double Surface::getTolerance() {
 	return cairo_get_tolerance(_context);
 }
 
+CairoScaledFont* Surface::getScaledFont() {
+	return cairo_get_scaled_font(_context);
+}
+
 bool Surface::inFill(double x, double y) {
 	return cairo_in_fill(_context, x, y);
 }
@@ -92,6 +96,10 @@ void Surface::setSource(Pattern* pattern) {
 
 void Surface::setSourceRGBA(double r, double g, double b, double a) {
 	cairo_set_source_rgba(_context, r, g, b, a);
+}
+
+void Surface::setSourceSurface(Surface* surface, double x, double y) {
+	cairo_set_source_surface(_context, surface->getSurface(), x, y);
 }
 
 void Surface::setAntialias(CairoAntialias aa) {
@@ -130,8 +138,8 @@ void Surface::setTolerance(double tolerance) {
 	cairo_set_tolerance(_context, tolerance);
 }
 
-void Surface::setScaledFont(ScaledFont* scaledFont) {
-	cairo_set_scaled_font(_context, scaledFont->getScaledFont());
+void Surface::setScaledFont(CairoScaledFont* scaledFont) {
+	cairo_set_scaled_font(_context, scaledFont);
 }
 
 void Surface::clip() {

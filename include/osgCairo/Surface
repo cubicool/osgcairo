@@ -9,7 +9,6 @@
 #include <osgCairo/Path>
 #include <osgCairo/Pattern>
 #include <osgCairo/Glyph>
-#include <osgCairo/ScaledFont>
 
 namespace osgCairo {
 
@@ -49,8 +48,7 @@ public:
 	// - cairo_pop_group
 	// - cairo_pop_group_to_source
 	// - cairo_get_group_target
-	// - cairo_set_soruce_rgb
-	// - cairo_set_source_surface
+	// - cairo_set_source_rgb
 	// - cairo_get_source
 	// - cairo_copy_page
 	// - cairo_show_page
@@ -63,41 +61,43 @@ public:
 	// The methods that will require more investigation are:
 	// - set_dash
 	
-	CairoStatus   status         ();
-	const char*   statusToString ();
-	CairoFillRule getFillRule    ();
-	CairoLineCap  getLineCap     ();
-	CairoLineJoin getLineJoin    ();
-	CairoOperator getOperator    ();
-	double        getLineWidth   ();
-	double        getMiterLimit  ();
-	double        getTolerance   ();
-	bool          inFill         (double, double);
-	bool          inStroke       (double, double);
-	void          save           ();
-	void          restore        ();
-	void          setSource      (Pattern*);
-	void          setSourceRGBA  (double, double, double, double=1.0f);
-	void          setAntialias   (CairoAntialias);
-	void          setFillRule    (CairoFillRule);
-	void          setLineCap     (CairoLineCap);
-	void          setLineJoin    (CairoLineJoin);
-	void          setLineWidth   (double);
-	void          setMiterLimit  (double);
-	void          setOperator    (CairoOperator);
-	void          setTolerance   (double);
-	void          setScaledFont  (ScaledFont*);
-	void          clip           ();
-	void          clipPreserve   ();
-	void          resetClip      ();
-	void          fill           ();
-	void          fillPreserve   ();
-	void          fillExtents    (double&, double&, double&, double&);
-	void          paint          ();
-	void          paintWithAlpha (double);
-	void          stroke         ();
-	void          strokePreserve ();
-	void          strokeExtents  (double&, double&, double&, double&);
+	CairoStatus      status           ();
+	const char*      statusToString   ();
+	CairoFillRule    getFillRule      ();
+	CairoLineCap     getLineCap       ();
+	CairoLineJoin    getLineJoin      ();
+	CairoOperator    getOperator      ();
+	double           getLineWidth     ();
+	double           getMiterLimit    ();
+	double           getTolerance     ();
+	CairoScaledFont* getScaledFont    ();
+	bool             inFill           (double, double);
+	bool             inStroke         (double, double);
+	void             save             ();
+	void             restore          ();
+	void             setSource        (Pattern*);
+	void             setSourceRGBA    (double, double, double, double=1.0f);
+	void             setSourceSurface (Surface*, double, double);
+	void             setAntialias     (CairoAntialias);
+	void             setFillRule      (CairoFillRule);
+	void             setLineCap       (CairoLineCap);
+	void             setLineJoin      (CairoLineJoin);
+	void             setLineWidth     (double);
+	void             setMiterLimit    (double);
+	void             setOperator      (CairoOperator);
+	void             setTolerance     (double);
+	void             setScaledFont    (CairoScaledFont*);
+	void             clip             ();
+	void             clipPreserve     ();
+	void             resetClip        ();
+	void             fill             ();
+	void             fillPreserve     ();
+	void             fillExtents      (double&, double&, double&, double&);
+	void             paint            ();
+	void             paintWithAlpha   (double);
+	void             stroke           ();
+	void             strokePreserve   ();
+	void             strokeExtents    (double&, double&, double&, double&);
 
 	// Path stuff: http://www.cairographics.org/manual/cairo-Paths.html
 	//
