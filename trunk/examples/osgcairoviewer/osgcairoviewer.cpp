@@ -13,6 +13,7 @@
 #include <osgDB/WriteFile>
 #include <osgCairo/Image>
 #include <osgCairo/ReadFile>
+#include <osgCairo/Util>
 
 osg::Geometry* createGeometry(osg::Image* image, bool setBlendMode=true) {
 	static osg::Vec3 pos(10.0f, 10.0f, -0.8f);
@@ -115,8 +116,8 @@ osg::Geode* createExample_simpleDrawing() {
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
 	
-		image->gaussianBlur();
-		
+		osgCairo::gaussianBlur(image->getSurface(), 10);
+
 		geode->addDrawable(createGeometry(image));
 	}
 

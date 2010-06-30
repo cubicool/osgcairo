@@ -33,6 +33,7 @@ SET(SRC_FILES
 	src/ReadFile.cpp
 	src/Surface.cpp
 	src/Types.cpp
+	src/Util.cpp
 )
 
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
@@ -47,6 +48,7 @@ SET(HEADER_FILES
 	${HEADER_PATH}/ReadFile
 	${HEADER_PATH}/Surface
 	${HEADER_PATH}/Types
+	${HEADER_PATH}/Util
 )
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})

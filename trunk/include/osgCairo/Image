@@ -1,4 +1,5 @@
 // -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// $Id$
 
 #ifndef OSGCAIRO_IMAGE
 #define OSGCAIRO_IMAGE
@@ -28,8 +29,7 @@ public:
 	META_Object(osgCairo, Image);
 
 	//! Default constructor; requires that you call allocateSurface manually later.
-	//! This is useful when you don't know the dimensions and whatnot when the Image
-	//! is created.
+	//! This is useful when you don't know the dimensions of the Image beforehand.
 	Image(CairoFormat format = CAIRO_FORMAT_ARGB32);
 
 	//! Constructor that makes a single call to allocateSurface for you. These args
@@ -69,10 +69,6 @@ public:
 	//! Readjusts the context's matrix so that the origin is in the bottom-left, like OpenGL.
 	//! By default the origin is in the upper-left.
 	void setOriginBottomLeft();
-
-	//! Applies a gaussian blur to the image; this operation is currently PERMANENT and affects
-	//! the entire image. USE WITH CAUTION.
-	void gaussianBlur(unsigned int kernel = 10);
 
 	//! A helper utility function which will return the image size in memory in bytes.
 	unsigned int getImageSizeInBytes() const;

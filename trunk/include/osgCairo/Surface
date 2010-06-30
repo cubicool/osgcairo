@@ -1,4 +1,5 @@
 // -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// $Id$
 
 #ifndef OSGCAIRO_SURFACE
 #define OSGCAIRO_SURFACE
@@ -153,6 +154,39 @@ public:
 	void roundedRectangle (double, double, double, double, double = 10.0f);
 	void roundedCorners   (double, double);
 };
+
+// This is a very lightweight wrapper around Surface that you can use to create
+// temporary Surfaces for use in Surface::setSourceSurface or similar. Also see
+// the Pattern class.
+class OSGCAIRO_EXPORT ImageSurface: public Surface {
+	CairoFormat _format;
+	int         _width;
+	int         _height;
+	
+	virtual CairoSurface* _createSurfaceImplementation();
+
+public:
+	ImageSurface(CairoFormat, int, int);
+
+	virtual bool valid() const;
+
+	unsigned char* getData();
+
+	CairoFormat getFormat() const {
+		return _format;
+	}
+
+	int getWidth() const {
+		return _width;
+	}
+
+	int getHeight() const {
+		return _height;
+	}
+};
+
+OSGCAIRO_EXPORT CairoSurface* createImageSurface        (CairoFormat, int, int);
+OSGCAIRO_EXPORT CairoSurface* createImageSurfaceForData (unsigned char*, CairoFormat, int, int);
 
 }
 
