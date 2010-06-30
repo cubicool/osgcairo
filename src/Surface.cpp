@@ -1,4 +1,5 @@
 // -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// $Id$
 
 #include <osgCairo/Surface>
 
@@ -240,9 +241,9 @@ void Surface::getCurrentPoint(double& x, double& y) {
 //	cairo_new_sub_path(_context);
 //}
 
-//void Surface::closePath() {
-//	cairo_close_path(_context);
-//}
+void Surface::closePath() {
+	cairo_close_path(_context);
+}
 
 void Surface::arc(double x, double y, double rad, double a1, double a2) {
 	cairo_arc(_context, x, y, rad, a1, a2);
@@ -399,6 +400,45 @@ void Surface::roundedCorners(double width, double height) {
 	roundedRectangle(0.01f, 0.01f, 0.98f, 0.98f, 0.075f);
 	fill();
 	restore();
+}
+
+ImageSurface::ImageSurface(CairoFormat format, int width, int height):
+_format (format),
+_width  (width),
+_height (height) {
+}
+
+CairoSurface* ImageSurface::_createSurfaceImplementation() {
+	return createImageSurface(_format, _width, _height);
+}
+
+bool ImageSurface::valid() const {
+	return(cairo_surface_status(_surface) == CAIRO_STATUS_SUCCESS);
+}
+
+unsigned char* ImageSurface::getData() {
+	if(valid()) return cairo_image_surface_get_data(_surface);
+
+	else return 0;
+}
+
+CairoSurface* createImageSurface(CairoFormat format, int width, int height) {
+	return cairo_image_surface_create(format, width, height);
+}
+
+CairoSurface* createImageSurfaceForData(
+	unsigned char* data,
+	CairoFormat    format,
+	int            width,
+	int            height
+) {
+	return cairo_image_surface_create_for_data(
+		data,
+		format,
+		width,
+		height,
+		cairo_format_stride_for_width(format, width)
+	);
 }
 
 // This code was written by the fantastic Behdad Esfahbod and adapated by Jeremy Moles

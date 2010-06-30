@@ -1,0 +1,14 @@
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+
+#ifndef OSGCAIRO_UTIL
+#define OSGCAIRO_UTIL
+
+#include <osgCairo/Types>
+
+namespace osgCairo {
+
+OSGCAIRO_EXPORT void gaussianBlur(CairoSurface*, int);
+
+}
+
+#endif

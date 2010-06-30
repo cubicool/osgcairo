@@ -1,4 +1,5 @@
 // -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// $Id$
 
 //! \file
 //! \brief This file redefines all of the Cairo C API types as cleaner C++ types.

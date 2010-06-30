@@ -1,4 +1,5 @@
 // -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// $Id$
 
 //! \file
 //! \brief Main doxygen docs; also defines compiler signature exports.
