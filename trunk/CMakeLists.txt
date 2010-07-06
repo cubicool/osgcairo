@@ -108,6 +108,7 @@ ENDFOREACH(INCLUDEFILE)
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
 ADD_SUBDIRECTORY(examples/osgcairomatrix)
 ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
+ADD_SUBDIRECTORY(examples/osgcairoutil)
 
 IF(OSGCAIROWIDGET)
 	ADD_SUBDIRECTORY(examples/osgcairowidget)
