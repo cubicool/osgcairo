@@ -44,8 +44,6 @@ osg::Geode* createExample(unsigned int size) {
 		state->setMode(GL_BLEND, osg::StateAttribute::ON);
 		state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
-		geom->setUpdateCallback(new DrawImage(lw));
-
 		geode->addDrawable(geom);
 	}
 
