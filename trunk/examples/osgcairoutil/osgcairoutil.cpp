@@ -2,7 +2,6 @@
 #include <osg/Geometry>
 #include <osg/Texture2D>
 #include <osg/Geode>
-#include <osg/BlendFunc>
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 #include <osgCairo/Image>
