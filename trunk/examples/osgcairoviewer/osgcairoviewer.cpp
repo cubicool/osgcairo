@@ -73,7 +73,8 @@ osg::Geode* createExample_loadImages() {
 	int height = image->t();
 
 	if(image->createContext()) {
-		image->roundedCorners(width, height);
+		osgCairo::util::roundedCorners(image);
+		
 		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
 		image->setLineWidth(40.0f);
 		image->arc(
@@ -93,9 +94,9 @@ osg::Geode* createExample_loadImages() {
 
 osg::Geode* createExample_simpleDrawing() {
 	osg::Geode*      geode = new osg::Geode();
-	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_ARGB32);
+	osgCairo::Image* image = new osgCairo::Image();
 	
-	if(image->allocateSurface(256, 256) && image->createContext()) {
+	if(image->allocateSurface(256, 256, CAIRO_FORMAT_ARGB32) && image->createContext()) {
 		image->scale(256.0f, 256.0f);
 	
 		const osg::Vec4 colors[] = {
@@ -116,13 +117,9 @@ osg::Geode* createExample_simpleDrawing() {
 		// If we wanted to create a PNG image of our surface, we could do so here.
 		// image->writeToPNG("output.png");
 	
-		osgCairo::gaussianBlur(
-			image->data(),
-			image->getFormat(),
-			image->s(),
-			image->t(),
-			10.0f
-		);
+		osgCairo::util::gaussianBlur(image, 10.0f);
+
+		image->dirty();
 
 		geode->addDrawable(createGeometry(image));
 	}
