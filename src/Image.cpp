@@ -8,47 +8,38 @@
 
 namespace osgCairo {
 
-Image::Image(CairoFormat format):
-_allocated (false),
-_format    (format) {
+Image::Image() {
 }
 
 Image::Image(
-	unsigned int         width,
-	unsigned int         height,
-	CairoFormat          format,
-	const unsigned char* data
-):
-_allocated (false),
-_format    (format) {
-	allocateSurface(width, height, data);
+	unsigned int   width,
+	unsigned int   height,
+	CairoFormat    format,
+	unsigned char* data
+) {
+	allocateSurface(width, height, format, data);
 }
 
 Image::Image(const Image& si, const osg::CopyOp& co):
-osg::Image (si, co),
-_allocated (si._allocated),
-_format    (si._format) {
-}
-
-CairoSurface* Image::_createSurfaceImplementation() {
-	return createImageSurfaceForData(_data, _format, _s, _t);
+osg::Image(si, co) {
 }
 
 bool Image::allocateSurface(
-	unsigned int         width,
-	unsigned int         height,
-	const unsigned char* data
+	unsigned int   width,
+	unsigned int   height,
+	CairoFormat    format,
+	unsigned char* data
 ) {
 	// The default is for CAIRO_FORMAT_ARGB32.
 	GLenum pf1 = GL_RGBA;
 	GLenum pf2 = GL_UNSIGNED_INT_8_8_8_8_REV;
 
-	if(_format == CAIRO_FORMAT_A8) {
+	if(format == CAIRO_FORMAT_A8) {
 		pf1 = GL_ALPHA;
 		pf2 = GL_UNSIGNED_BYTE;
 	}
 
-	else if(_format == CAIRO_FORMAT_RGB24) pf1 = GL_RGB;
+	else if(format == CAIRO_FORMAT_RGB24) pf1 = GL_RGB;
 
 	// Call the osg::Image allocation method.
 	allocateImage(width, height, 1, pf1, pf2);
@@ -58,7 +49,7 @@ bool Image::allocateSurface(
 	unsigned int i = 0;
 
 	// This will have to do for now. :)
-	if(_format == CAIRO_FORMAT_A8) i = 1;
+	if(format == CAIRO_FORMAT_A8) i = 1;
 
 	else i = 4;
 	
@@ -66,15 +57,17 @@ bool Image::allocateSurface(
 
 	else std::memset(_data, 0, (width * height) * i);
 
-	_allocated = true;
-
-	if(_format == CAIRO_FORMAT_A8) _pixelFormat = GL_ALPHA;
+	if(format == CAIRO_FORMAT_A8) _pixelFormat = GL_ALPHA;
 
 	else _pixelFormat = GL_BGRA;
 
 	dirty();
 
-	return true;
+	return Surface::allocateSurface(width, height, format, _data);
+}
+
+bool Image::valid() const {
+	return Surface::valid() && osg::Image::valid();
 }
 
 void Image::setOriginBottomLeft() {

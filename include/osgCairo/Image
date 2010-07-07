@@ -15,31 +15,23 @@ namespace osgCairo {
 //! advantage of OSG's image management API).
 class OSGCAIRO_EXPORT Image: public Surface, public osg::Image {
 protected:
-	bool        _allocated;
-	CairoFormat _format;
+	bool _allocated;
 
-	//! If you want to derive from Surface, your subclass needs to provide this
-	//! virtual routine. In the case of Image, we use the cairo C API to create
-	//! an image surface internally. If you wanted to create a PDF or SVG surface
-	//! in your custom class, you would use the appropriate functions in your
-	//! derivative.
-	virtual CairoSurface* _createSurfaceImplementation();
-	
 public:
 	META_Object(osgCairo, Image);
 
 	//! Default constructor; requires that you call allocateSurface manually later.
 	//! This is useful when you don't know the dimensions of the Image beforehand.
-	Image(CairoFormat format = CAIRO_FORMAT_ARGB32);
+	Image();
 
 	//! Constructor that makes a single call to allocateSurface for you. These args
 	//! match the arguments to allocateSurface, so please see that documentation for
 	//! further information.
 	Image(
-		unsigned int         width,
-		unsigned int         height,
-		CairoFormat          format = CAIRO_FORMAT_ARGB32,
-		const unsigned char* data   = 0
+		unsigned int   width,
+		unsigned int   height,
+		CairoFormat    format = CAIRO_FORMAT_ARGB32,
+		unsigned char* data   = 0
 	);
 	
 	Image(const Image& image, const osg::CopyOp& co);
@@ -51,20 +43,14 @@ public:
 	//! transparent black. If you do specify a buffer of image data, you'll need to make
 	//! sure it's formatted properly against the CairoFormat object you used in the constructor.
 	virtual bool allocateSurface(
-		unsigned int         width,
-		unsigned int         height,
-		const unsigned char* datat = 0
+		unsigned int   width,
+		unsigned int   height,
+		CairoFormat    format = CAIRO_FORMAT_ARGB32,
+		unsigned char* data   = 0
 	);
 
 	//! Returns whether or not the Image is valid internally.
-	virtual bool valid() const {
-		return osg::Image::valid() && _allocated;
-	}
-
-	// Returns the CairoFormat used internally.
-	CairoFormat getFormat() const {
-		return _format;
-	}
+	virtual bool valid() const;
 
 	//! Readjusts the context's matrix so that the origin is in the bottom-left, like OpenGL.
 	//! By default the origin is in the upper-left.

@@ -8,9 +8,9 @@
 
 osg::Geode* createExample(unsigned int size) {
 	osg::Geode*      geode = new osg::Geode();
-	osgCairo::Image* image = new osgCairo::Image(CAIRO_FORMAT_ARGB32);
+	osgCairo::Image* image = new osgCairo::Image();
 	
-	if(image->allocateSurface(size, size) && image->createContext()) {
+	if(image->allocateSurface(size, size, CAIRO_FORMAT_ARGB32) && image->createContext()) {
 		osg::Texture2D* texture = new osg::Texture2D();
 		osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
 			osg::Vec3(0.0f, 0.0f, 0.0f),
