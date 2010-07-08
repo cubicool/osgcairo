@@ -1,0 +1,44 @@
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// $Id$
+
+//! \file
+//! \brief ...
+
+#ifndef OSGCAIRO_TEXT
+#define OSGCAIRO_TEXT
+
+#include <osgCairo/Types>
+
+namespace osgCairo {
+
+class OSGCAIRO_EXPORT TextExtents: public CairoTextExtents {
+public:
+	TextExtents(const CairoTextExtents& te) {
+		x_bearing = te.x_bearing;
+		y_bearing = te.y_bearing;
+		width     = te.width;
+		height    = te.height;
+		x_advance = te.x_advance;
+		y_advance = te.y_advance;
+	}
+
+	TextExtents(
+		double xb = 0.0f,
+		double yb = 0.0f,
+		double w  = 0.0f,
+		double h  = 0.0f,
+		double xa = 0.0f,
+		double ya = 0.0f
+	) {
+		x_bearing = xb;
+		y_bearing = yb;
+		width     = w;
+		height    = h;
+		x_advance = xa;
+		y_advance = ya;
+	}
+};
+
+}
+
+#endif

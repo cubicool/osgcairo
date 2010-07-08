@@ -79,6 +79,15 @@ typedef cairo_hint_style_t CairoHintStyle;
 //! <a href="http://www.cairographics.org/manual/cairo-pattern.html">Cairo API Link</a>
 typedef cairo_subpixel_order_t CairoSubpixelOrder;
 
+//! <a href="http://cairographics.org/manual/cairo-scaled-font.html#cairo-text-extents-t">Cairo API Link</a>
+typedef cairo_text_extents_t CairoTextExtents;
+
+//! <a href="http://cairographics.org/manual/cairo-text.html#cairo-font-slant-t">Cairo API Link</a>
+typedef cairo_font_slant_t CairoFontSlant;
+
+//! <a href="http://cairographics.org/manual/cairo-text.html#cairo-font-weight-t">Cairo API Link</a>
+typedef cairo_font_weight_t CairoFontWeight;
+
 //! Returns the CairoFormat object as a capitalized string name.
 std::string cairoFormatAsString(CairoFormat format);
 

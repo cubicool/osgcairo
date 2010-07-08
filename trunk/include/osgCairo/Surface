@@ -10,6 +10,7 @@
 #include <osgCairo/Path>
 #include <osgCairo/Pattern>
 #include <osgCairo/Glyph>
+#include <osgCairo/Text>
 
 namespace osgCairo {
 
@@ -134,7 +135,7 @@ public:
 	Path copyPath     ();
 	Path copyPathFlat ();
 	
-	void appendPath      (Path);
+	void appendPath      (Path&);
 	void newPath         ();
 	void newSubPath      ();
 	void closePath       ();
@@ -166,6 +167,11 @@ public:
 	void deviceToUser         (double&, double&);
 	void deviceToUserDistance (double&, double&);
 	
+	// Text stuff: http://cairographics.org/manual/cairo-text.html
+	TextExtents textExtents    (const std::string&);
+	void        selectFontFace (const std::string&, CairoFontSlant, CairoFontWeight);
+	void        setFontSize    (double);
+
 	void writeToPNG(const std::string&);
 
 	// Provide an easier OSG'ish wrapper for setSourceRGBA.
