@@ -269,21 +269,21 @@ Path Surface::copyPathFlat() {
 	return cairo_copy_path_flat(_context);
 }
 
-void Surface::appendPath(Path path) {
-	cairo_append_path(_context, path._path);
+void Surface::appendPath(Path& path) {
+	cairo_append_path(_context, path.getPath());
 }
 
 void Surface::getCurrentPoint(double& x, double& y) {
 	cairo_get_current_point(_context, &x, &y);
 }
 
-//void Surface::newPath() {
-//	cairo_new_path(_context);
-//}
+void Surface::newPath() {
+	cairo_new_path(_context);
+}
 
-//void Surface::newSubPath() {
-//	cairo_new_sub_path(_context);
-//}
+void Surface::newSubPath() {
+	cairo_new_sub_path(_context);
+}
 
 void Surface::closePath() {
 	cairo_close_path(_context);
@@ -313,10 +313,6 @@ void Surface::rectangle(double x, double y, double width, double height) {
 	cairo_rectangle(_context, x, y, width, height);
 }
 
-//void Surface::glyphPath(CairoGlyph* glyphs, int num) {
-//	cairo_glyph_path(_context, glyphs, num);
-//}
-
 void Surface::textPath(const std::string& path) {
 	cairo_text_path(_context, path.c_str());
 }
@@ -331,6 +327,14 @@ void Surface::relLineTo(double x, double y) {
 
 void Surface::relMoveTo(double x, double y) {
 	cairo_rel_move_to(_context, x, y);
+}
+
+Matrix Surface::getMatrix() {
+	Matrix m;
+
+	cairo_get_matrix(_context, &m);
+
+	return m;
 }
 
 void Surface::translate(double tx, double ty) {
@@ -377,12 +381,20 @@ void Surface::deviceToUserDistance(double& x, double& y) {
 	cairo_device_to_user_distance(_context, &x, &y);
 }
 
-Matrix Surface::getMatrix() {
-	Matrix m;
+TextExtents Surface::textExtents(const std::string& text) {
+	CairoTextExtents extents;
+	
+	cairo_text_extents(_context, text.c_str(), &extents);
 
-	cairo_get_matrix(_context, &m);
+	return extents;
+}
 
-	return m;
+void Surface::selectFontFace(const std::string& text, CairoFontSlant slant, CairoFontWeight weight) {
+	cairo_select_font_face(_context, text.c_str(), slant, weight);
+}
+
+void Surface::setFontSize(double size) {
+	cairo_set_font_size(_context, size);
 }
 
 }
