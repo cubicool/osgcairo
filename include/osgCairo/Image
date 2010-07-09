@@ -61,10 +61,6 @@ public:
 	int              getSurfaceStride() const;
 	unsigned char*   getSurfaceData() const;
 
-	//! Readjusts the context's matrix so that the origin is in the bottom-left, like OpenGL.
-	//! By default the origin is in the upper-left.
-	void setOriginBottomLeft();
-
 	//! A helper utility function which will return the image size in memory in bytes.
 	unsigned int getImageSizeInBytes() const;
 
