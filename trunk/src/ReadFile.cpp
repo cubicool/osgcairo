@@ -3,6 +3,7 @@
 
 #include <osg/Notify>
 #include <osgCairo/ReadFile>
+#include <osgCairo/Util>
 
 namespace osgCairo {
 
@@ -11,8 +12,8 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 
 	if(!image) return 0;
 
-	GLenum      format      = image->getPixelFormat();
-	CairoFormat cairoFormat = CAIRO_FORMAT_ARGB32;
+	GLenum         format      = image->getPixelFormat();
+	cairo_format_t cairoFormat = CAIRO_FORMAT_ARGB32;
 
 	if(format != GL_RGB && format != GL_RGBA && format != GL_ALPHA) return 0;
 
@@ -40,7 +41,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 	if(!newData) {
 		osg::notify(osg::WARN)
 			<< "Failed to convert " << path << " to an appropriate Cairo format ("
-			<< cairoFormatAsString(cairoFormat) << ")." << std::endl
+			<< util::cairoFormatAsString(cairoFormat) << ")." << std::endl
 		;
 
 		return 0;

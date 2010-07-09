@@ -4,8 +4,9 @@
 #ifndef OSGCAIRO_IMAGE
 #define OSGCAIRO_IMAGE
 
+#include <cairo.h>
 #include <osg/Image>
-#include <osgCairo/Surface>
+#include <osgCairo/Export>
 
 namespace osgCairo {
 
@@ -13,10 +14,7 @@ namespace osgCairo {
 //! takes place. It derives from both Surface (providing the cairo context) and
 //! osg::Image, which is where the actual data is stored (so that we can take
 //! advantage of OSG's image management API).
-class OSGCAIRO_EXPORT Image: public Surface, public osg::Image {
-protected:
-	bool _allocated;
-
+class OSGCAIRO_EXPORT Image: public osg::Image {
 public:
 	META_Object(osgCairo, Image);
 
@@ -30,11 +28,13 @@ public:
 	Image(
 		unsigned int   width,
 		unsigned int   height,
-		CairoFormat    format = CAIRO_FORMAT_ARGB32,
+		cairo_format_t format = CAIRO_FORMAT_ARGB32,
 		unsigned char* data   = 0
 	);
 	
 	Image(const Image& image, const osg::CopyOp& co);
+
+	virtual ~Image();
 
 	//! The first two arguments are the power-of-two image dimensions; your GPU
 	//! must support this size. The final argument is whether or not you want to use
@@ -45,12 +45,21 @@ public:
 	virtual bool allocateSurface(
 		unsigned int   width,
 		unsigned int   height,
-		CairoFormat    format = CAIRO_FORMAT_ARGB32,
+		cairo_format_t format = CAIRO_FORMAT_ARGB32,
 		unsigned char* data   = 0
 	);
 
+	cairo_t* createContext() const;
+
 	//! Returns whether or not the Image is valid internally.
 	virtual bool valid() const;
+
+	cairo_surface_t* getSurface() const;
+	cairo_format_t   getSurfaceFormat() const;
+	int              getSurfaceWidth() const;
+	int              getSurfaceHeight() const;
+	int              getSurfaceStride() const;
+	unsigned char*   getSurfaceData() const;
 
 	//! Readjusts the context's matrix so that the origin is in the bottom-left, like OpenGL.
 	//! By default the origin is in the upper-left.
@@ -58,6 +67,9 @@ public:
 
 	//! A helper utility function which will return the image size in memory in bytes.
 	unsigned int getImageSizeInBytes() const;
+
+protected:
+	cairo_surface_t* _surface;
 };
 
 //! This is a special global function that will create a data buffer to be used during an
@@ -65,8 +77,8 @@ public:
 //! This doesn't work for all osg::Image formats, so be sure you check the return value
 //! is non-zero.
 OSGCAIRO_EXPORT unsigned char* createNewImageDataAsCairoFormat(
-	osg::Image* image,
-	CairoFormat format
+	osg::Image*    image,
+	cairo_format_t format
 );
 
 }

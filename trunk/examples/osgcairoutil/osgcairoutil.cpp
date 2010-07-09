@@ -9,9 +9,7 @@
 #include <osgCairo/Image>
 #include <osgCairo/Util>
 
-void drawPie(osgCairo::Surface* s) {
-	double w   = s->getWidth();
-	double h   = s->getHeight();
+void drawPie(cairo_t* c, int w, int h) {
 	double w2  = w / 2.0f;
 	double h2  = h / 2.0f;
 	double r   = h2 * 0.8f;
@@ -21,7 +19,7 @@ void drawPie(osgCairo::Surface* s) {
 	// each "tier" or level or an arc
 	double lvl[] = { 0.0f, 0.25f, 0.50f, 0.75f, 1.0f };
 
-	std::string atts[] = {
+	const char* atts[] = {
 		"Milk",
 		"Horns",
 		"Beefiness",
@@ -33,88 +31,86 @@ void drawPie(osgCairo::Surface* s) {
 	};
 	
 	double attl[] = {
-		0.25,
-		0,
-		0.50,
-		1.0,
-		0,
-		0.25,
-		0.75,
-		1.0
+		0.25f,
+		0.0f,
+		0.50f,
+		1.0f,
+		0.0f,
+		0.25f,
+		0.75f,
+		1.0f
 	};
 
-	s->setLineWidth(((w + h) / 2.0) * 0.003);
-	s->selectFontFace("SegoeUI", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	s->setFontSize(((w + h) / 2.0) * 0.05);
+	cairo_set_line_width(c, ((w + h) / 2.0f) * 0.003f);
+	cairo_select_font_face(c, "SegoeUI", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size(c, ((w + h) / 2.0f) * 0.05f);
         
-	/*
-	s->setSourceRGBA(0.7, 0.7, 0.7, 1.0);
-	s->rectangle(0, 0, w, h);
-	s->fill();
-	*/
-
-	s->translate(w2, h2);
-	s->rotate(-seg / 2.0);
-	s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
+	cairo_translate(c, w2, h2);
+	cairo_rotate(c, -seg / 2.0f);
+	cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
 
 	for(unsigned int i = 0; i < 8; i++) {
 		// Pick a random level...
-		s->moveTo(0.0, 0.0);
-		s->lineTo(0.0, -r);
-        	s->arc(0.0, 0.0, attl[i] * r, top, top + seg);
-		s->lineTo(0.0, 0.0);
-		s->setSourceRGBA(0.2, 0.8, 0.2, 0.5);
-		s->fill();
-		s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
+		cairo_move_to(c, 0.0f, 0.0f);
+		cairo_line_to(c, 0.0f, -r);
+        	cairo_arc(c, 0.0f, 0.0f, attl[i] * r, top, top + seg);
+		cairo_line_to(c, 0.0f, 0.0f);
+		cairo_set_source_rgba(c, 0.2f, 0.8f, 0.2f, 0.5f);
+		cairo_fill(c);
+		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
 	
         	// Do the various levels...
-		s->moveTo(0.0, 0.0);
-		s->lineTo(0.0, -r);
-		s->stroke();
+		cairo_move_to(c, 0.0f, 0.0f);
+		cairo_line_to(c, 0.0f, -r);
+		cairo_stroke(c);
 		
 		for(unsigned int l = 0; l < 5; l++) {
-			s->arc(0.0, 0.0, lvl[l] * r, top, top + seg);
-			s->stroke();
+			cairo_arc(c, 0.0f, 0.0f, lvl[l] * r, top, top + seg);
+			cairo_stroke(c);
 		}
 
-		osgCairo::TextExtents extents = s->textExtents(atts[i]);
+		cairo_text_extents_t extents;
+		
+		cairo_text_extents(c, atts[i], &extents);
 		
 		double arcsize = r * seg;
 	
 		// ------------------------------------
-		s->save();
+		cairo_save(c);
 	
 		double tr = extents.width / r;
-		double aa = ((arcsize - extents.width) / 2.0) / r;
+		double aa = ((arcsize - extents.width) / 2.0f) / r;
 
-		s->arc(0.0, 0.0, h2 * 0.85, top + aa, top + aa + tr);
-		s->setTolerance(0.01);
+		cairo_arc(c, 0.0f, 0.0f, h2 * 0.85f, top + aa, top + aa + tr);
+		cairo_set_tolerance(c, 0.01f);
 
-		osgCairo::Path path = s->copyPathFlat();
-	
-		s->newPath();
-		s->textPath(atts[i]);
+		cairo_path_t* path = cairo_copy_path_flat(c);
 
-		osgCairo::util::mapPathOnto(s, path);
+		cairo_new_path(c);
+		cairo_text_path(c, atts[i]);
+
+		osgCairo::util::mapPathOnto(c, path);
 	
-		s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
-		s->setLineWidth(1.0);
-        	s->strokePreserve();
-		s->setSourceRGBA(0.8, 0.5, 0.1, 0.7);
-		s->fill();
+		cairo_path_destroy(path);
+
+		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
+		cairo_set_line_width(c, 1.0f);
+        	cairo_stroke_preserve(c);
+		cairo_set_source_rgba(c, 0.8f, 0.5f, 0.1f, 0.7f);
+		cairo_fill(c);
 	
-		s->restore();
+		cairo_restore(c);
 		// ------------------------------------
 	
         	// Pick a random level...
-		s->moveTo(0.0, 0.0);
-		s->lineTo(0.0, -r);
-		s->arc(0.0, 0.0, r, top, top + seg);
-		s->lineTo(0.0, 0.0);
-		s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
-		s->stroke();
+		cairo_move_to(c, 0.0f, 0.0f);
+		cairo_line_to(c, 0.0f, -r);
+		cairo_arc(c, 0.0f, 0.0f, r, top, top + seg);
+		cairo_line_to(c, 0.0f, 0.0f);
+		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
+		cairo_stroke(c);
 
-		s->rotate(seg);
+		cairo_rotate(c, seg);
 	}
 }
 
@@ -122,7 +118,7 @@ osg::Geode* createExample(unsigned int size) {
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = new osgCairo::Image();
 	
-	if(image->allocateSurface(size, size, CAIRO_FORMAT_ARGB32) && image->createContext()) {
+	if(image->allocateSurface(size, size, CAIRO_FORMAT_ARGB32)) {
 		osg::Texture2D* texture = new osg::Texture2D();
 		osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
 			osg::Vec3(0.0f, 0.0f, 0.0f),
@@ -133,8 +129,14 @@ osg::Geode* createExample(unsigned int size) {
 			1.0f,
 			1.0f
 		);
+		
+		cairo_t* c = image->createContext();
 
-		drawPie(image);
+		if(!cairo_status(c)) {
+			drawPie(c, image->s(), image->t());
+
+			cairo_destroy(c);
+		}
 
 		texture->setImage(image);
 		texture->setDataVariance(osg::Object::DYNAMIC);

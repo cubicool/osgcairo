@@ -27,12 +27,7 @@ FIND_PACKAGE(OpenSceneGraph)
 SET(SRC_FILES
 	src/Canvas.cpp
 	src/Image.cpp
-	src/Matrix.cpp
-	src/Path.cpp
-	src/Pattern.cpp
 	src/ReadFile.cpp
-	src/Surface.cpp
-	src/Types.cpp
 	src/Util.cpp
 )
 
@@ -40,14 +35,8 @@ SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
 SET(HEADER_FILES
 	${HEADER_PATH}/Canvas
 	${HEADER_PATH}/Export
-	${HEADER_PATH}/Glyph
 	${HEADER_PATH}/Image
-	${HEADER_PATH}/Matrix
-	${HEADER_PATH}/Path
-	${HEADER_PATH}/Pattern
 	${HEADER_PATH}/ReadFile
-	${HEADER_PATH}/Surface
-	${HEADER_PATH}/Types
 	${HEADER_PATH}/Util
 )
 
@@ -106,7 +95,6 @@ FOREACH(INCLUDEFILE ${HEADER_FILES})
 ENDFOREACH(INCLUDEFILE)
 
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
-ADD_SUBDIRECTORY(examples/osgcairomatrix)
 ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
 ADD_SUBDIRECTORY(examples/osgcairoutil)
 
