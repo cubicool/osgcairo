@@ -72,19 +72,24 @@ osg::Geode* createExample_loadImages() {
 	int width  = image->s();
 	int height = image->t();
 
-	if(image->createContext()) {
-		osgCairo::util::roundedCorners(image);
-		
-		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 0.5f);
-		image->setLineWidth(40.0f);
-		image->arc(
+	cairo_t* c = image->createContext();
+
+	if(!cairo_status(c)) {
+		osgCairo::util::roundedCorners(c, image->s(), image->t());
+	
+		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 0.5f);
+		cairo_set_line_width(c, 40.0f);
+		cairo_arc(
+			c,
 			width / 2.0f,
 			height / 2.0f,
 			60.0f,
 			0.0f,
 			osg::PI + (osg::PI / 2.0f)
 		);
-		image->stroke();
+
+		cairo_stroke(c);
+		cairo_destroy(c);
 	}
 
 	geode->addDrawable(createGeometry(image));
@@ -96,30 +101,38 @@ osg::Geode* createExample_simpleDrawing() {
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = new osgCairo::Image();
 	
-	if(image->allocateSurface(256, 256, CAIRO_FORMAT_ARGB32) && image->createContext()) {
-		image->scale(256.0f, 256.0f);
-	
-		const osg::Vec4 colors[] = {
-			osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f),
-			osg::Vec4(1.0f, 0.0f, 0.0f, 0.8f),
-			osg::Vec4(0.0f, 1.0f, 0.0f, 0.6f),
-			osg::Vec4(0.0f, 0.0f, 1.0f, 0.4f),
-			osg::Vec4(1.0f, 1.0f, 1.0f, 0.2f),
-		};
+	if(image->allocateSurface(256, 256, CAIRO_FORMAT_ARGB32)) {
+		cairo_t* c = image->createContext();
 
-		for(unsigned int i = 1; i <= 5; i++) {
-			image->setSourceRGBA(colors[i - 1]);
-			image->setLineWidth(0.05f);
-			image->arc(0.5f, 0.5f, i / 12.0f, 0.0f, osg::PI * 2);
-			image->stroke();
+		if(!cairo_status(c)) {
+			cairo_scale(c, 256.0f, 256.0f);
+	
+			const osg::Vec4 colors[] = {
+				osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f),
+				osg::Vec4(1.0f, 0.0f, 0.0f, 0.8f),
+				osg::Vec4(0.0f, 1.0f, 0.0f, 0.6f),
+				osg::Vec4(0.0f, 0.0f, 1.0f, 0.4f),
+				osg::Vec4(1.0f, 1.0f, 1.0f, 0.2f),
+			};
+
+			for(unsigned int i = 1; i <= 5; i++) {
+				const osg::Vec4& co = colors[i - 1];
+
+				cairo_set_source_rgba(c, co[0], co[1], co[2], co[3]);
+				cairo_set_line_width(c, 0.05f);
+				cairo_arc(c, 0.5f, 0.5f, i / 12.0f, 0.0f, osg::PI * 2);
+				cairo_stroke(c);
+			}
+
+			// If we wanted to create a PNG image of our surface, we could do so here.
+			// osgCairo::util::writeToPNG(image->getSurface(), "output.png");
+	
+			osgCairo::util::gaussianBlur(image->getSurface(), 10.0f);
+
+			cairo_destroy(c);
+
+			image->dirty();
 		}
-
-		// If we wanted to create a PNG image of our surface, we could do so here.
-		// image->writeToPNG("output.png");
-	
-		osgCairo::util::gaussianBlur(image, 10.0f);
-
-		image->dirty();
 
 		geode->addDrawable(createGeometry(image));
 	}

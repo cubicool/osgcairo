@@ -5,7 +5,7 @@
 
 namespace osgCairo {
 
-Canvas::Canvas(CairoFormat format):
+Canvas::Canvas(cairo_format_t format):
 _format        (format),
 _width         (0),
 _height        (0),
@@ -18,7 +18,7 @@ Canvas::Canvas(
 	unsigned int         height,
 	unsigned int         textureWidth,
 	unsigned int         textureHeight,
-	CairoFormat          format,
+	cairo_format_t       format,
 	const unsigned char* data
 ):
 _format        (format),

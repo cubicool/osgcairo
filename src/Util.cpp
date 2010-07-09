@@ -2,25 +2,36 @@
 // $Id$
 
 #include <cmath>
+#include <osg/Math>
+#include <osg/Notify>
 #include <osgCairo/Util>
 
 namespace osgCairo {
 namespace util {
 
+void writeToPNG(cairo_surface_t* surface, const std::string& path) {
+#ifdef CAIRO_HAS_PNG_FUNCTIONS
+	cairo_surface_write_to_png(surface, path.c_str());
+#else
+	osg::notify(osg::WARN) << "You version of Cairo does not support PNG writing!" << std::endl;
+#endif
+}
+
 void roundedRectangle(
-	Surface* surface,
+	cairo_t* c,
 	double   x,
 	double   y,
 	double   width,
 	double   height,
 	double   radius
 ) {
-	if(!surface || surface->status()) return;
+	if(cairo_status(c)) return;
 
-	surface->moveTo(x + radius, y);
-	surface->lineTo(x + width - radius, y);
+	cairo_move_to(c, x + radius, y);
+	cairo_line_to(c, x + width - radius, y);
 
-	surface->arc(
+	cairo_arc(
+		c,
 		x + width - radius,
 		y + radius,
 		radius,
@@ -28,9 +39,10 @@ void roundedRectangle(
 		0.0f * osg::PI / 180.0f
 	);
 
-	surface->lineTo(x + width, y + height - radius);
+	cairo_line_to(c, x + width, y + height - radius);
 
-	surface->arc(
+	cairo_arc(
+		c,
 		x + width - radius,
 		y + height - radius,
 		radius,
@@ -38,9 +50,10 @@ void roundedRectangle(
 		90.0f * osg::PI / 180.0f
 	);
 
-	surface->lineTo(x + radius, y + height);
+	cairo_line_to(c, x + radius, y + height);
 
-	surface->arc(
+	cairo_arc(
+		c,
 		x + radius,
 		y + height - radius,
 		radius,
@@ -48,9 +61,10 @@ void roundedRectangle(
 		180.0f * osg::PI / 180.0f
 	);
 
-	surface->lineTo(x, y + radius);
+	cairo_line_to(c, x, y + radius);
 
-	surface->arc(
+	cairo_arc(
+		c,
 		x + radius,
 		y + radius,
 		radius,
@@ -59,18 +73,20 @@ void roundedRectangle(
 	);
 }
 
-void roundedCorners(Surface* surface, double size, double radius) {
-	if(!surface || surface->status()) return;
+void roundedCorners(cairo_t* c, int w, int h, double size, double radius) {
+	if(cairo_status(c)) return;
 
-	SolidPattern p(0.0f, 0.0f, 0.0f, 1.0f);
+	cairo_pattern_t* p = cairo_pattern_create_rgba(0.0f, 0.0f, 0.0f, 1.0f);
 
-	surface->save();
-	surface->scale(surface->getWidth(), surface->getHeight());
-	surface->setOperator(CAIRO_OPERATOR_DEST_IN);
-	surface->setSource(&p);
+	if(cairo_pattern_status(p)) return;
+
+	cairo_save(c);
+	cairo_scale(c, w, h);
+	cairo_set_operator(c, CAIRO_OPERATOR_DEST_IN);
+	cairo_set_source(c, p);
 	
 	roundedRectangle(
-		surface,
+		c,
 		size,
 		size,
 		1.0f - (size * 2.0f),
@@ -78,8 +94,9 @@ void roundedCorners(Surface* surface, double size, double radius) {
 		radius
 	);
 	
-	surface->fill();
-	surface->restore();
+	cairo_fill(c);
+	cairo_restore(c);
+	cairo_pattern_destroy(p);
 }
 
 // This blur function was originally created my MacSlow and published on his website:
@@ -119,13 +136,13 @@ double* createKernel(double radius, double deviation) {
 	return kernel;
 }
 
-void gaussianBlur(Surface* surface, double radius) {
-	if(!surface || surface->status()) return;
+void gaussianBlur(cairo_surface_t* surface, double radius) {
+	if(cairo_surface_status(surface)) return;
 
-	unsigned char* data   = surface->getData();
-	CairoFormat    format = surface->getFormat();
-	int            width  = surface->getWidth();
-	int            height = surface->getHeight();
+	unsigned char* data   = cairo_image_surface_get_data(surface);
+	cairo_format_t format = cairo_image_surface_get_format(surface);
+	int            width  = cairo_image_surface_get_width(surface);
+	int            height = cairo_image_surface_get_height(surface);
 	
 	// TODO: When channels == 1, this entire function fails in some way. :(
 	unsigned int channels = 0;
@@ -619,25 +636,37 @@ void point_on_path(parametrized_path_t* param, double* x, double* y) {
 
 // Projects the current path of cr onto the provided path.
 // void mapPathOnto(Surface* surface, cairo_path_t* path) {
-void mapPathOnto(Surface* surface, Path& path) {
+void mapPathOnto(cairo_t* c, cairo_path_t* path) {
 	parametrized_path_t param;
 
-	param.path            = path.getPath();
-	param.parametrization = parametrize_path(path.getPath());
+	param.path            = path;
+	param.parametrization = parametrize_path(path);
 
-	Path curPath = surface->copyPath();
+	cairo_path_t* curPath = cairo_copy_path(c);
 
-	surface->newPath();
+	cairo_new_path(c);
 
 	transform_path(
-		curPath.getPath(),
+		curPath,
 		reinterpret_cast<transform_point_func_t>(point_on_path),
 		&param
 	);
 	
-	surface->appendPath(curPath);
+	cairo_append_path(c, curPath);
 
 	delete[] param.parametrization;
+
+	cairo_path_destroy(curPath);
+}
+
+std::string cairoFormatAsString(cairo_format_t format) {
+	if(format == CAIRO_FORMAT_ARGB32) return "CAIRO_FORMAT_ARGB32";
+
+	else if(format == CAIRO_FORMAT_RGB24) return "CAIRO_FORMAT_RGB24";
+
+	else if(format == CAIRO_FORMAT_A8) return "CAIRO_FORMAT_A8";
+
+	else return "CAIRO_FORMAT_A1";
 }
 
 }

@@ -36,19 +36,28 @@ public:
 
 		if(!image) return;
 	
+		cairo_t* c = image->createContext();
+
+		if(cairo_status(c)) return;
+
+		cairo_scale(c, image->s(), image->t());
+		cairo_set_line_width(c, _lw);
+		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
+
 		if(_nextArc >= 0.5f) {
 			_nextArc    = _lw * 2.0f;
 			_nextRadian = 0.0f;
 
-			image->setOperator(CAIRO_OPERATOR_CLEAR);
-			image->paint();
-			image->setOperator(CAIRO_OPERATOR_OVER);
+			cairo_set_operator(c, CAIRO_OPERATOR_CLEAR);
+			cairo_paint(c);
+			cairo_set_operator(c, CAIRO_OPERATOR_OVER);
 		}
 
 		else {
 			double n = (osg::PI * 2.0f) * 0.25f;
 
-			image->arc(
+			cairo_arc(
+				c,
 				0.5f,
 				0.5f,
 				_nextArc,
@@ -56,7 +65,7 @@ public:
 				_nextRadian + n
 			);
 
-			image->stroke();
+			cairo_stroke(c);
 
 			if(_nextRadian >= (osg::PI * 2.0f)) {
 				_nextRadian =  0.0f;
@@ -66,6 +75,8 @@ public:
 			else _nextRadian += n;
 		}
 
+		cairo_destroy(c);
+
 		image->dirty();
 	}
 };
@@ -74,7 +85,7 @@ osg::Geode* createExample(unsigned int size) {
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = new osgCairo::Image();
 	
-	if(image->allocateSurface(size, size, CAIRO_FORMAT_ARGB32) && image->createContext()) {
+	if(image->allocateSurface(size, size, CAIRO_FORMAT_ARGB32)) {
 		osg::Texture2D* texture = new osg::Texture2D();
 		osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
 			osg::Vec3(0.0f, 0.0f, 0.0f),
@@ -87,11 +98,7 @@ osg::Geode* createExample(unsigned int size) {
 		);
 
 		double lw = 1.0f / static_cast<double>(size / 2);
-		
-		image->scale(size, size);
-		image->setLineWidth(lw);
-		image->setSourceRGBA(1.0f, 1.0f, 1.0f, 1.0f);
-
+	
 		texture->setImage(image);
 		texture->setDataVariance(osg::Object::DYNAMIC);
         

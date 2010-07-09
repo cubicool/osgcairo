@@ -1,3 +1,1 @@
-- Get the code out of Surface.cpp and into Util.cpp.
-- Create a script in tools that checks and warns me of which API functions
-  I'm not implementing.
+- Finish Canvas.
