@@ -2,6 +2,8 @@
 #include <osg/Geometry>
 #include <osg/Texture2D>
 #include <osg/Geode>
+#include <osg/BlendFunc>
+#include <osgDB/ReadFile>
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 #include <osgCairo/Image>
@@ -20,14 +22,14 @@ void drawPie(osgCairo::Surface* s) {
 	double lvl[] = { 0.0f, 0.25f, 0.50f, 0.75f, 1.0f };
 
 	std::string atts[] = {
-		"stuff_0",
-		"stuff_1",
-		"stuff_2",
-		"stuff_3",
-		"stuff_4",
-		"stuff_5",
-		"stuff_6",
-		"stuff_7",
+		"Milk",
+		"Horns",
+		"Beefiness",
+		"Moo/HR",
+		"Grazing",
+		"Sleeping",
+		"Cowpower!",
+		"s p o t s"
 	};
 	
 	double attl[] = {
@@ -37,21 +39,20 @@ void drawPie(osgCairo::Surface* s) {
 		1.0,
 		0,
 		0.25,
-		0,
-		0
+		0.75,
+		1.0
 	};
 
-	s->setLineWidth(((w + h) / 2.0) * 0.005);
+	s->setLineWidth(((w + h) / 2.0) * 0.003);
 	s->selectFontFace("SegoeUI", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	s->setFontSize(((w + h) / 2.0) * 0.07);
-        s->setSourceRGBA(0.7, 0.7, 0.7, 1.0);
+	s->setFontSize(((w + h) / 2.0) * 0.05);
+        
+	/*
+	s->setSourceRGBA(0.7, 0.7, 0.7, 1.0);
 	s->rectangle(0, 0, w, h);
 	s->fill();
-	
-	// s->set_source_rgb(1.0, 1.0, 1.0)
-	// s->arc(w2, h2, r, 0.0, 2 * math.pi)
-        // s->fill()
-	
+	*/
+
 	s->translate(w2, h2);
 	s->rotate(-seg / 2.0);
 	s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
@@ -62,7 +63,7 @@ void drawPie(osgCairo::Surface* s) {
 		s->lineTo(0.0, -r);
         	s->arc(0.0, 0.0, attl[i] * r, top, top + seg);
 		s->lineTo(0.0, 0.0);
-		s->setSourceRGBA(0.1, 0.5, 0.8, 0.3);
+		s->setSourceRGBA(0.2, 0.8, 0.2, 0.5);
 		s->fill();
 		s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
 	
@@ -97,7 +98,7 @@ void drawPie(osgCairo::Surface* s) {
 		osgCairo::util::mapPathOnto(s, path);
 	
 		s->setSourceRGBA(1.0, 1.0, 1.0, 1.0);
-		s->setLineWidth(3.0);
+		s->setLineWidth(1.0);
         	s->strokePreserve();
 		s->setSourceRGBA(0.8, 0.5, 0.1, 0.7);
 		s->fill();
@@ -126,7 +127,7 @@ osg::Geode* createExample(unsigned int size) {
 		osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
 			osg::Vec3(0.0f, 0.0f, 0.0f),
 			osg::Vec3(image->s(), 0.0f, 0.0f),
-			osg::Vec3(0.0f, 0.0f, image->t()),
+			osg::Vec3(0.0f, image->t(), 0.0f),
 			0.0f,
 			0.0f, 
 			1.0f,
@@ -148,6 +149,11 @@ osg::Geode* createExample(unsigned int size) {
         
 		state->setMode(GL_BLEND, osg::StateAttribute::ON);
 		state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+		state->setAttributeAndModes(
+			new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE_MINUS_SRC_ALPHA)
+		);
+
+		image->dirty();
 
 		geode->addDrawable(geom);
 	}
@@ -155,13 +161,54 @@ osg::Geode* createExample(unsigned int size) {
 	return geode;
 }
 
+osg::Matrix createInvertedYOrthoProjectionMatrix(float width, float height) {
+	osg::Matrix m = osg::Matrix::ortho2D(0.0f, width, 0.0f, height);
+	osg::Matrix s = osg::Matrix::scale(1.0f, -1.0f, 1.0f);
+	osg::Matrix t = osg::Matrix::translate(0.0f, -height, 0.0f);
+
+	return t * s * m;
+}
+
+osg::Camera* createOrthoCamera(float width, float height) {
+	osg::Camera* camera = new osg::Camera();
+
+	camera->getOrCreateStateSet()->setMode(
+		GL_LIGHTING,
+		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
+	);
+
+	camera->setProjectionMatrix(osg::Matrix::ortho2D(0.0, width, 0.0f, height));
+	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
+	camera->setViewMatrix(osg::Matrix::identity());
+	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
+	camera->setRenderOrder(osg::Camera::POST_RENDER);
+
+	return camera;
+}
+
+osg::Camera* createInvertedYOrthoCamera(float width, float height) {
+	osg::Camera* camera = createOrthoCamera(width, height);
+
+	camera->setProjectionMatrix(createInvertedYOrthoProjectionMatrix(width, height));
+
+	return camera;
+}
+
 int main(int, char**) {
 	osgViewer::Viewer viewer;
 
 	unsigned int size = 512;
 
-	viewer.setSceneData(createExample(size));
-	viewer.setUpViewInWindow(50, 50, size + 40, size + 40);
+	osg::Camera* camera = createInvertedYOrthoCamera(size, size);
+	osg::Group*  group  = new osg::Group();
+
+	camera->addChild(createExample(size));
+
+	group->addChild(camera);
+	group->addChild(osgDB::readNodeFile("cow.osg"));
+
+	viewer.setSceneData(group);
+	viewer.setUpViewInWindow(50, 50, size, size);
 	viewer.addEventHandler(new osgViewer::StatsHandler());
 
 	return viewer.run();

@@ -9,7 +9,7 @@
 
 namespace osgCairo {
 
-class OSGCAIRO_EXPORT Pattern : public osg::Referenced {
+class OSGCAIRO_EXPORT Pattern: public osg::Referenced {
 protected:
 	CairoPattern* _pattern;
 	
