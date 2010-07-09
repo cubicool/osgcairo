@@ -1,0 +1,21 @@
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+
+#ifndef OSGCAIRO_UTIL
+#define OSGCAIRO_UTIL
+
+#include <osgCairo/Surface>
+
+namespace osgCairo {
+namespace util {
+
+OSGCAIRO_EXPORT void roundedRectangle (Surface*, double, double, double, double, double = 10.0f);
+OSGCAIRO_EXPORT void roundedCorners   (Surface*, double = 0.01f, double = 0.075f);
+OSGCAIRO_EXPORT void gaussianBlur     (Surface*, double);
+OSGCAIRO_EXPORT void mapPathOnto      (Surface*, Path&);
+
+// OSGCAIRO_EXPORT void cairoBlur(CairoContext*, cairo_pattern_t*);
+
+}
+}
+
+#endif

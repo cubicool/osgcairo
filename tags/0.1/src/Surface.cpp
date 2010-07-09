@@ -1,0 +1,400 @@
+// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// $Id$
+
+#include <osgCairo/Surface>
+
+namespace osgCairo {
+
+Surface::Surface():
+_surface (0),
+_context (0) {
+}
+
+Surface::Surface(
+	unsigned int   width,
+	unsigned int   height,
+	CairoFormat    format,
+	unsigned char* data
+):
+_surface (0),
+_context (0) {
+	allocateSurface(width, height, format, data);
+}
+
+Surface::~Surface() {
+	cairo_surface_destroy(_surface);
+	cairo_destroy(_context);
+}
+
+bool Surface::valid() const {
+	return(cairo_surface_status(_surface) == CAIRO_STATUS_SUCCESS);
+}
+
+bool Surface::allocateSurface(
+	unsigned int   width,
+	unsigned int   height,
+	CairoFormat    format,
+	unsigned char* data
+) {
+	if(data) _surface = cairo_image_surface_create_for_data(
+		data,
+		format,
+		width,
+		height,
+		cairo_format_stride_for_width(format, width)
+	);
+
+	else _surface = cairo_image_surface_create(format, width, height);
+
+	if(!_surface || !valid()) return false;
+
+	return true;
+}
+
+bool Surface::createContext() {
+	_context = cairo_create(_surface);
+
+	if(!_context || status()) return false;
+	
+	return true;
+}
+
+CairoFormat Surface::getFormat() const {
+	return cairo_image_surface_get_format(_surface);
+}
+
+int Surface::getWidth() const {
+	return cairo_image_surface_get_width(_surface);
+}
+
+int Surface::getHeight() const {
+	return cairo_image_surface_get_height(_surface);
+}
+
+int Surface::getStride() const {
+	return cairo_image_surface_get_height(_surface);
+}
+
+unsigned char* Surface::getData() {
+	return cairo_image_surface_get_data(_surface);
+}
+
+CairoStatus Surface::status() {
+	return cairo_status(_context);
+}
+
+const char* Surface::statusToString() {
+	return cairo_status_to_string(status());
+}
+
+CairoFillRule Surface::getFillRule() {
+	return cairo_get_fill_rule(_context);
+}
+
+CairoLineCap Surface::getLineCap() {
+	return cairo_get_line_cap(_context);
+}
+
+CairoLineJoin Surface::getLineJoin() {
+	return cairo_get_line_join(_context);
+}
+
+CairoOperator Surface::getOperator() {
+	return cairo_get_operator(_context);
+}
+
+double Surface::getLineWidth() {
+	return cairo_get_line_width(_context);
+}
+
+double Surface::getMiterLimit() {
+	return cairo_get_miter_limit(_context);
+}
+
+double Surface::getTolerance() {
+	return cairo_get_tolerance(_context);
+}
+
+CairoScaledFont* Surface::getScaledFont() {
+	return cairo_get_scaled_font(_context);
+}
+
+bool Surface::inFill(double x, double y) {
+	return cairo_in_fill(_context, x, y);
+}
+
+bool Surface::inStroke(double x, double y) {
+	return cairo_in_stroke(_context, x, y);
+}
+
+void Surface::save() {
+	cairo_save(_context);
+}
+
+void Surface::restore() {
+	cairo_restore(_context);
+}
+
+void Surface::setSource(Pattern* pattern) {
+	cairo_set_source(_context, pattern->getPattern());
+}
+
+void Surface::setSourceRGBA(double r, double g, double b, double a) {
+	cairo_set_source_rgba(_context, r, g, b, a);
+}
+
+void Surface::setSourceSurface(Surface* surface, double x, double y) {
+	cairo_set_source_surface(_context, surface->getSurface(), x, y);
+}
+
+void Surface::setAntialias(CairoAntialias aa) {
+	cairo_set_antialias(_context, aa);
+}
+
+//void Surface::setDash(double* dashes, int num, double offset) {
+//	cairo_set_dash(_context, dashes, num, offset);
+//}
+
+void Surface::setFillRule(CairoFillRule rule) {
+	cairo_set_fill_rule(_context, rule);
+}
+
+void Surface::setLineCap(CairoLineCap cap) {
+	cairo_set_line_cap(_context, cap);
+}
+
+void Surface::setLineJoin(CairoLineJoin join) {
+	cairo_set_line_join(_context, join);
+}
+
+void Surface::setLineWidth(double width) {
+	cairo_set_line_width(_context, width);
+}
+
+void Surface::setMiterLimit(double limit) {
+	cairo_set_miter_limit(_context, limit);
+}
+
+void Surface::setOperator(CairoOperator op) {
+	cairo_set_operator(_context, op);
+}
+
+void Surface::setTolerance(double tolerance) {
+	cairo_set_tolerance(_context, tolerance);
+}
+
+void Surface::setScaledFont(CairoScaledFont* scaledFont) {
+	cairo_set_scaled_font(_context, scaledFont);
+}
+
+void Surface::clip() {
+	cairo_clip(_context);
+}
+
+void Surface::clipPreserve() {
+	cairo_clip_preserve(_context);
+}
+
+void Surface::resetClip() {
+	cairo_reset_clip(_context);
+}
+
+void Surface::fill() {
+	cairo_fill(_context);
+}
+
+void Surface::fillPreserve() {
+	cairo_fill_preserve(_context);
+}
+
+void Surface::fillExtents(double& x1, double& y1, double& x2, double& y2) {
+	cairo_fill_extents(_context, &x1, &y1, &x2, &y2);
+}
+
+//void Surface::mask(CairoPattern* mask) {
+//	cairo_mask(_context, mask);
+//}
+
+//void Surface::maskSurface(CairoSurface* surface, double x, double y) {
+//	cairo_mask_surface(_context, surface, x, y);
+//}
+
+void Surface::paint() {
+	cairo_paint(_context);
+}
+
+void Surface::paintWithAlpha(double alpha) {
+	cairo_paint_with_alpha(_context, alpha);
+}
+
+void Surface::stroke() {
+	cairo_stroke(_context);
+}
+
+void Surface::strokePreserve() {
+	cairo_stroke_preserve(_context);
+}
+
+void Surface::strokeExtents(double& x1, double& y1, double& x2, double& y2) {
+	cairo_stroke_extents(_context, &x1, &y1, &x2, &y2);
+}
+
+void Surface::showGlyphs(const GlyphList& gl) {
+	cairo_show_glyphs(_context, &gl.front(), gl.size());
+}
+
+void Surface::showGlyphs(const Glyph& glyph) {
+	cairo_show_glyphs(_context, &glyph, 1);
+}
+
+void Surface::glyphPath(const GlyphList& gl) {
+	cairo_glyph_path(_context, &gl.front(), gl.size());
+}
+
+void Surface::glyphPath(const Glyph& glyph) {
+	cairo_glyph_path(_context, &glyph, 1);
+}
+
+void Surface::writeToPNG(const std::string& filename) {
+	cairo_surface_write_to_png(_surface, filename.c_str());
+}
+
+// Path stuff...
+
+Path Surface::copyPath() {
+	return cairo_copy_path(_context);
+}
+
+Path Surface::copyPathFlat() {
+	return cairo_copy_path_flat(_context);
+}
+
+void Surface::appendPath(Path& path) {
+	cairo_append_path(_context, path.getPath());
+}
+
+void Surface::getCurrentPoint(double& x, double& y) {
+	cairo_get_current_point(_context, &x, &y);
+}
+
+void Surface::newPath() {
+	cairo_new_path(_context);
+}
+
+void Surface::newSubPath() {
+	cairo_new_sub_path(_context);
+}
+
+void Surface::closePath() {
+	cairo_close_path(_context);
+}
+
+void Surface::arc(double x, double y, double rad, double a1, double a2) {
+	cairo_arc(_context, x, y, rad, a1, a2);
+}
+
+void Surface::arcNegative(double x, double y, double rad, double a1, double a2) {
+	cairo_arc_negative(_context, x, y, rad, a1, a2);
+}
+
+void Surface::curveTo(double x1, double y1, double x2, double y2, double x3, double y3) {
+	cairo_curve_to(_context, x1, y1, x2, y2, x3, y3);
+}
+
+void Surface::lineTo(double x, double y) {
+	cairo_line_to(_context, x, y);
+}
+
+void Surface::moveTo(double x, double  y) {
+	cairo_move_to(_context, x, y);
+}
+
+void Surface::rectangle(double x, double y, double width, double height) {
+	cairo_rectangle(_context, x, y, width, height);
+}
+
+void Surface::textPath(const std::string& path) {
+	cairo_text_path(_context, path.c_str());
+}
+
+void Surface::relCurveTo(double x1, double y1, double x2, double y2, double x3, double y3) {
+	cairo_rel_curve_to(_context, x1, y1, x2, y2, x3, y3);
+}
+
+void Surface::relLineTo(double x, double y) {
+	cairo_rel_line_to(_context, x, y);
+}
+
+void Surface::relMoveTo(double x, double y) {
+	cairo_rel_move_to(_context, x, y);
+}
+
+Matrix Surface::getMatrix() {
+	Matrix m;
+
+	cairo_get_matrix(_context, &m);
+
+	return m;
+}
+
+void Surface::translate(double tx, double ty) {
+	cairo_translate(_context, tx, ty);
+}
+
+void Surface::scale(double sx, double sy) {
+	cairo_scale(_context, sx, sy);
+}
+
+void Surface::rotate(double rad) {
+	cairo_rotate(_context, rad);
+}
+
+void Surface::transform(const Matrix& mat) {
+	cairo_transform(_context, &mat);
+}
+
+void Surface::setMatrix(const Matrix& mat) {
+	cairo_set_matrix(_context, &mat);
+}
+
+void Surface::setFontMatrix(const Matrix& mat) {
+	cairo_set_font_matrix(_context, &mat);
+}
+
+void Surface::identityMatrix() {
+	cairo_identity_matrix(_context);
+}
+
+void Surface::userToDevice(double& x, double& y) {
+	cairo_user_to_device(_context, &x, &y);
+}
+
+void Surface::userToDeviceDistance(double& x, double& y) {
+	cairo_user_to_device_distance(_context, &x, &y);
+}
+
+void Surface::deviceToUser(double& x, double& y) {
+	cairo_device_to_user(_context, &x, &y);
+}
+
+void Surface::deviceToUserDistance(double& x, double& y) {
+	cairo_device_to_user_distance(_context, &x, &y);
+}
+
+TextExtents Surface::textExtents(const std::string& text) {
+	CairoTextExtents extents;
+	
+	cairo_text_extents(_context, text.c_str(), &extents);
+
+	return extents;
+}
+
+void Surface::selectFontFace(const std::string& text, CairoFontSlant slant, CairoFontWeight weight) {
+	cairo_select_font_face(_context, text.c_str(), slant, weight);
+}
+
+void Surface::setFontSize(double size) {
+	cairo_set_font_size(_context, size);
+}
+
+}

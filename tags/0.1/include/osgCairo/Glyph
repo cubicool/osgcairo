@@ -1,0 +1,42 @@
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// $Id$
+
+//! \file
+//! \brief Defines the Glyph class and the GlyphList list.
+
+#ifndef OSGCAIRO_GLYPH
+#define OSGCAIRO_GLYPH
+
+#include <list>
+#include <osgCairo/Types>
+
+namespace osgCairo {
+
+//! A Glyph object is nothing more than a VERY SIMPLE wrapper around the CairoGlyph
+//! type (cairo_glyph_t in the C API). As a matter of fact, we use the fanciness of
+//! C++ to just inherit from that type, which defines an index (which the user
+//! uses as a kind of key), and an XY position pair. You generally will not
+//! interact with Glyph directly, especially if you use 
+//! <a href="http://osgpango.googlecode.com">osgPango</a>.
+class OSGCAIRO_EXPORT Glyph: public CairoGlyph {
+public:
+	Glyph(unsigned int i = 0, double xx = 0.0f, double yy = 0.0f) {
+		index = i;
+		x     = xx;
+		y     = yy;
+	}
+
+	Glyph(const CairoGlyph& glyph) {
+		index = glyph.index;
+		x     = glyph.x;
+		y     = glyph.y;
+	}
+};
+
+//! Since we usually work with a GROUP of Glyphs, lets go ahead and define a premade
+//! container to reuse.
+typedef std::list<Glyph> GlyphList;
+
+}
+
+#endif
