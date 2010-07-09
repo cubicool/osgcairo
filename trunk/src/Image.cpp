@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2009 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
 // $Id$
 
 #include <cstring>
@@ -110,11 +110,6 @@ int Image::getSurfaceStride() const {
 
 unsigned char* Image::getSurfaceData() const {
 	return cairo_image_surface_get_data(_surface);
-}
-
-void Image::setOriginBottomLeft() {
-	// TODO: THIS!
-	// setMatrix(Matrix::translate(0.0f, -_t) * Matrix::scale(1.0f, -1.0f));
 }
 
 unsigned int Image::getImageSizeInBytes() const {
