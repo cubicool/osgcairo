@@ -20,14 +20,16 @@ namespace osgCairo {
 //! <a href="http://osgpango.googlecode.com">osgPango</a>.
 class OSGCAIRO_EXPORT Glyph: public CairoGlyph {
 public:
-	Glyph(unsigned int _index = 0, double _x = 0.0f, double _y = 0.0f) {
-		setGlyph(_index, _x, _y);
+	Glyph(unsigned int i = 0, double xx = 0.0f, double yy = 0.0f) {
+		index = i;
+		x     = xx;
+		y     = yy;
 	}
 
-	void setGlyph(unsigned int _index, double _x, double _y) {
-		index = _index;
-		x     = _x;
-		y     = _y;
+	Glyph(const CairoGlyph& glyph) {
+		index = glyph.index;
+		x     = glyph.x;
+		y     = glyph.y;
 	}
 };
 

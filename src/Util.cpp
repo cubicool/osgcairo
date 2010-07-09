@@ -620,33 +620,22 @@ void point_on_path(parametrized_path_t* param, double* x, double* y) {
 // Projects the current path of cr onto the provided path.
 // void mapPathOnto(Surface* surface, cairo_path_t* path) {
 void mapPathOnto(Surface* surface, Path& path) {
-	/*
-	parametrized_path_t param;
-	
-	param.path            = path->_path;
-	param.parametrization = parametrize_path(path->_path);
-
-	Path^ cPath = surface->CopyPath();
-
-	surface->NewPath();
-
-	transform_path(cPath->_path, (transform_point_func_t)(point_on_path), &param);
-
-	surface->AppendPath(cPath);
-	*/
-
 	parametrized_path_t param;
 
 	param.path            = path.getPath();
 	param.parametrization = parametrize_path(path.getPath());
 
-	Path current_path = surface->copyPath();
+	Path curPath = surface->copyPath();
 
 	surface->newPath();
 
-	transform_path(current_path.getPath(), (transform_point_func_t)(point_on_path), &param);
+	transform_path(
+		curPath.getPath(),
+		reinterpret_cast<transform_point_func_t>(point_on_path),
+		&param
+	);
 	
-	surface->appendPath(current_path);
+	surface->appendPath(curPath);
 
 	delete[] param.parametrization;
 }
