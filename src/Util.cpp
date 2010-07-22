@@ -143,8 +143,8 @@ void gaussianBlur(cairo_surface_t* surface, double radius) {
 	cairo_format_t format = cairo_image_surface_get_format(surface);
 	int            width  = cairo_image_surface_get_width(surface);
 	int            height = cairo_image_surface_get_height(surface);
+	int            stride = cairo_image_surface_get_stride(surface);
 	
-	// TODO: When channels == 1, this entire function fails in some way. :(
 	unsigned int channels = 0;
 
 	if(format == CAIRO_FORMAT_ARGB32) channels = 4;
@@ -154,8 +154,6 @@ void gaussianBlur(cairo_surface_t* surface, double radius) {
 	else if(format == CAIRO_FORMAT_A8) channels = 1;
 
 	else return;
-
-	unsigned int stride = width * channels;
 
 	double* horzBlur = new double[height * stride];
 	double* vertBlur = new double[height * stride];
