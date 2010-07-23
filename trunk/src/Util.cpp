@@ -136,7 +136,7 @@ double* createKernel(double radius, double deviation) {
 	return kernel;
 }
 
-void gaussianBlur(cairo_surface_t* surface, double radius) {
+void gaussianBlur(cairo_surface_t* surface, double radius, double deviation) {
 	if(cairo_surface_status(surface)) return;
 
 	unsigned char* data   = cairo_image_surface_get_data(surface);
@@ -157,7 +157,7 @@ void gaussianBlur(cairo_surface_t* surface, double radius) {
 
 	double* horzBlur = new double[height * stride];
 	double* vertBlur = new double[height * stride];
-	double* kernel   = createKernel(radius, 0.0f);
+	double* kernel   = createKernel(radius, deviation);
 
 	if(!kernel) return;
 
