@@ -210,8 +210,8 @@ int main(int, char**) {
 	
 	if(!wsi) {
 		osg::notify(osg::NOTICE)
-			<<"Error, no WindowSystemInterface available, cannot create windows."
-			<<std::endl
+			<< "No WindowSystemInterface available, cannot create windows."
+			<< std::endl
 		;
 		
 		return 1;
