@@ -13,7 +13,7 @@ void writeToPNG(cairo_surface_t* surface, const std::string& path) {
 #ifdef CAIRO_HAS_PNG_FUNCTIONS
 	cairo_surface_write_to_png(surface, path.c_str());
 #else
-	osg::notify(osg::WARN) << "You version of Cairo does not support PNG writing!" << std::endl;
+	osg::notify(osg::WARN) << "Your version of Cairo does not support PNG writing!" << std::endl;
 #endif
 }
 
@@ -633,7 +633,6 @@ void point_on_path(parametrized_path_t* param, double* x, double* y) {
 }
 
 // Projects the current path of cr onto the provided path.
-// void mapPathOnto(Surface* surface, cairo_path_t* path) {
 void mapPathOnto(cairo_t* c, cairo_path_t* path) {
 	parametrized_path_t param;
 
