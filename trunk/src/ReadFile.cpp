@@ -22,7 +22,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 	else if(format == GL_RGB) {
 		// Check the options string to see if the want to add an alpha channel
 		// to RGB images; this can be really useful sometimes.
-		std::string ops = options->getOptionString();
+		std::string ops = options ? options->getOptionString() : std::string();
 
 		if(ops.find("addAlphaToRGB") != std::string::npos) {
 			osg::notify()
