@@ -222,7 +222,7 @@ void gaussianBlur(cairo_surface_t* surface, double radius, double deviation) {
 
 				if(y < 0 || y >= height) {
 					offset++;
-
+					
 					continue;
 				}
 				
@@ -281,57 +281,6 @@ void gaussianBlur(cairo_surface_t* surface, double radius, double deviation) {
 	delete[] horzBlur;
 	delete[] vertBlur;
 }
-
-/*
-cairo_pattern_t* displaced_blend(
-	cairo_t *cr,
-	cairo_pattern_t *pat,
-	double dx,
-	double dy
-) {
-	cairo_push_group(cr);
-	cairo_set_operator(cr, CAIRO_OPERATOR_ADD);
-
-	cairo_set_source(cr, pat);
-	cairo_paint_with_alpha(cr, 0.5);
-
-	cairo_translate(cr, dx, dy);
-	cairo_set_source(cr, pat);
-	cairo_paint_with_alpha(cr, 0.5);
-
-	cairo_pattern_destroy(pat);
-	
-	return cairo_pop_group(cr);
-}
-
-cairo_pattern_t * blur_step(cairo_t *cr, cairo_pattern_t *pat) {
-	pat = displaced_blend(cr, pat, 0, 1);
-	pat = displaced_blend(cr, pat, 1, 0);
-	
-	return pat;
-}
-
-cairo_pattern_t* blurred_pattern(cairo_t *cr, cairo_pattern_t *pat, unsigned n) {
-	while (n-->0) pat = blur_step(cr, pat);
-
-	return pat;
-}
-
-void cairoBlur(CairoContext* cr, cairo_pattern_t* pat) {
-	// Blur the pattern up.
-	pat = blurred_pattern(cr, pat, 10);
-
-	// Paint the pattern.
-	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
-	cairo_set_source(cr, pat);
-	cairo_paint(cr);
-
-	// Clean up.
-	// cairo_pattern_destroy(pat);
-	// cairo_destroy(cr);
-	// cairo_surface_destroy(surf);
-}
-*/
 
 // This code was written by the fantastic Behdad Esfahbod and adapated by Jeremy Moles
 // from the cairotwisted.c file in Pango. Thanks Behdad!
@@ -510,12 +459,12 @@ void point_on_path(parametrized_path_t* param, double* x, double* y) {
 
 	int i;
 
-	for(i = 0; i + path->data[i].header.length < path->num_data &&
-			(the_x > parametrization[i] ||
-			 path->data[i].header.type == CAIRO_PATH_MOVE_TO);
-			i += path->data[i].header.length
-		) {
-		
+	for(
+		i = 0;
+		i + path->data[i].header.length < path->num_data &&
+		(the_x > parametrization[i] || path->data[i].header.type == CAIRO_PATH_MOVE_TO);
+		i += path->data[i].header.length
+	) {	
 		the_x -= parametrization[i];
 		data   = &path->data[i];
 
@@ -668,3 +617,4 @@ std::string cairoFormatAsString(cairo_format_t format) {
 
 }
 }
+
