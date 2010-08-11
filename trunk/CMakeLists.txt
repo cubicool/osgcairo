@@ -28,7 +28,13 @@ SET(SRC_FILES
 	src/Canvas.cpp
 	src/Image.cpp
 	src/ReadFile.cpp
-	src/Util.cpp
+)
+
+SET(SRC_UTIL_FILES
+	src/util/DisplacedBlur.cpp
+	src/util/GaussianBlur.cpp
+	src/util/MapPathOnto.cpp
+	src/util/Util.cpp
 )
 
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
@@ -41,6 +47,8 @@ SET(HEADER_FILES
 )
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
+SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
+SOURCE_GROUP("Source Files\\Util" FILES ${SRC_UTIL_FILES})
 
 SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
@@ -55,7 +63,7 @@ LINK_DIRECTORIES(
 	${CAIRO_LIBRARY_DIRS}
 )
 
-ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
+ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES} ${SRC_UTIL_FILES})
 
 # Add debug postfix to OSG libraries so we link to the right ones in debug.
 # Cairo is a C-only library so the same one (release) can be linked to both
