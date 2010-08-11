@@ -127,7 +127,7 @@ osg::Geode* createExample_simpleDrawing() {
 			// If we wanted to create a PNG image of our surface, we could do so here.
 			// osgCairo::util::writeToPNG(image->getSurface(), "output.png");
 	
-			osgCairo::util::gaussianBlur(image->getSurface(), 10.0f);
+			// osgCairo::util::gaussianBlur(image->getSurface(), 10.0f);
 
 			cairo_destroy(c);
 
@@ -154,46 +154,6 @@ osg::Camera* createCamera() {
 
 	return camera;
 }
-
-class UpdateMatrixTransform: public osg::NodeCallback {
-	double _last;
-	double _direction;
-
-public:
-	UpdateMatrixTransform():
-	_last      (0.0f),
-	_direction (1.0f) {
-	}
-
-	virtual void operator()(osg::Node* node, osg::NodeVisitor* visitor) {
-		osg::MatrixTransform* matrix = dynamic_cast<osg::MatrixTransform*>(node);
-
-		if(!matrix) {
-			traverse(node, visitor);
-
-			return;
-		}
-
-		const osg::FrameStamp* fs      = visitor->getFrameStamp();
-		double                 time    = fs->getSimulationTime();
-		double                 elapsed = time - _last;
-
-		if(elapsed >= 1.0f) {
-			_last      = time;
-			_direction = -_direction;
-		}
-
-		else if(elapsed >= 0.05f) {
-			double rot = elapsed * osg::PI_4;
-
-			if(_direction < 0.0f) rot = (1.0f * osg::PI_4) - (elapsed * osg::PI_4);
-	
-			matrix->setMatrix(osg::Matrix::rotate(rot, 0.0f, 1.0f, 0.0f));
-		}
-
-		traverse(node, visitor);
-	}
-};
 
 int main(int, char**) {
 	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
@@ -229,6 +189,7 @@ int main(int, char**) {
 	traits->windowDecoration = true;
 	traits->doubleBuffer     = true;
 	traits->sharedContext    = 0;
+	traits->windowName       = "osgcairoviewer";
 
 	osg::ref_ptr<osg::GraphicsContext> gc =
 		osg::GraphicsContext::createGraphicsContext(traits.get())
@@ -286,7 +247,7 @@ int main(int, char**) {
 
 		matrix->addChild(ex1.get());
 		matrix->addChild(ex2.get());
-		matrix->addUpdateCallback(new UpdateMatrixTransform());
+		matrix->setMatrix(osg::Matrix::rotate(osg::PI_4, 0.0f, 1.0f, 0.0f));
 
 		camera->addChild(matrix);
 		camera->setProjectionMatrixAsPerspective(

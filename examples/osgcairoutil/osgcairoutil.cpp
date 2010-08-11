@@ -41,6 +41,8 @@ void drawPie(cairo_t* c, int w, int h) {
 		1.0f
 	};
 
+	// cairo_push_group(c);
+
 	cairo_set_line_width(c, ((w + h) / 2.0f) * 0.003f);
 	cairo_select_font_face(c, "SegoeUI", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(c, ((w + h) / 2.0f) * 0.05f);
@@ -112,6 +114,17 @@ void drawPie(cairo_t* c, int w, int h) {
 
 		cairo_rotate(c, seg);
 	}
+
+	/*
+	cairo_pattern_t* pat = osgCairo::util::displacedBlur(c, cairo_pop_group(c), 10);
+
+	cairo_set_operator(c, CAIRO_OPERATOR_SOURCE);
+	cairo_translate(c, -5, -5);
+	cairo_set_source(c, pat);
+	cairo_paint(c);
+
+	cairo_pattern_destroy(pat);
+	*/
 }
 
 osg::Geode* createExample(unsigned int size) {
