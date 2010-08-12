@@ -1,0 +1,262 @@
+#!/usr/bin/env python
+
+import pygtk; pygtk.require("2.0")
+import gtk
+import cairo
+import pango
+import sys
+import os
+
+import osgcairoutil
+
+DEFAULT_BUFFER = """\
+# This is a Python script to quickly test Cairo stuff!
+
+c.set_source_rgb(0.3, 0.3, 0.3)
+c.set_line_width(10)
+c.move_to(0, 0)
+c.line_to(w, h)
+c.stroke()
+c.move_to(w, 0)
+c.line_to(0, h)
+c.stroke()
+"""
+
+class CairoDrawingArea(gtk.DrawingArea):
+	def __init__(self, width=0, height=0, win=None, buf=DEFAULT_BUFFER):
+		gtk.DrawingArea.__init__(self)
+
+		self.__buffer = buf
+		self.__win    = win
+
+		self.set_size_request(width, height)
+		
+		self.connect("expose-event", self.__render)
+
+	def __render(self, widget, event):
+		cr   = self.window.cairo_create()
+		w, h = self.allocation.width, self.allocation.height
+
+		if self.__win:
+			self.__win.SetStatus(w, h)
+
+		self.__eval(self.__buffer, cr, w, h)
+
+		return True
+
+	def __eval(self, buf, cr, w, h):
+		eval(compile(buf, "<cairoscript>", "exec"), {"c": cr, "w": w, "h": h})
+
+	def Parse(self, buf):
+		self.__buffer = buf
+
+		self.queue_draw()
+
+	def WriteToPNG(self, path):
+		w, h = self.allocation.width, self.allocation.height
+		
+		surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
+		context = cairo.Context(surface)
+
+		self.__eval(self.__buffer, context, w, h)
+
+		surface.write_to_png(path)
+
+	def WriteToSVG(self, path):
+		w, h = self.allocation.width, self.allocation.height
+
+		surface = cairo.SVGSurface(path, w, h)
+		context = cairo.Context(surface)
+
+		self.__eval(self.__buffer, context, w, h)
+
+		surface.flush()
+		surface.finish()
+
+class TextView(gtk.TextView):
+	def __init__(self, text=""):
+		gtk.TextView.__init__(self)
+
+		buf = gtk.TextBuffer()
+
+		buf.set_text(text)
+
+		self.set_buffer(buf)
+		self.set_size_request(-1, 300)
+		self.connect("realize", self.__realize)
+
+	def __realize(self, *args):
+		self.SetFontSize(10)
+
+	def SetText(self, text):
+		self.get_buffer().set_text(text)
+
+	def SetFontSize(self, size):
+		font = pango.FontDescription("Droid Sans Mono")
+
+		font.set_size(pango.SCALE * size)
+
+		self.modify_font(font)
+
+	def GetText(self):
+		buf = self.get_buffer()
+		
+		return buf.get_text(buf.get_start_iter(), buf.get_end_iter())
+
+class CairoWindow(gtk.Window):
+	def __init__(self, w, h, script=None):
+		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
+
+		b = script and file(script).read() or DEFAULT_BUFFER
+
+		self.__draw   = CairoDrawingArea(w, h, self, b)
+		self.__text   = TextView(b)
+		self.__status = gtk.Statusbar()
+
+		tool   = gtk.HBox()
+		vbox   = gtk.VBox()
+		scroll = gtk.ScrolledWindow()
+		paned  = gtk.VPaned()
+		frame  = gtk.Frame()
+
+		scroll.set_policy(gtk.POLICY_AUTOMATIC, gtk.POLICY_AUTOMATIC)
+		scroll.add(self.__text)
+
+		frame.add(scroll)
+
+		paned.add1(self.__draw)
+		paned.add2(frame)
+
+		vbox.pack_start(paned)
+		vbox.pack_start(tool, False, False, 2)
+		vbox.pack_start(self.__status, False, False)
+
+		for st, tt, cb in zip((
+			gtk.STOCK_OPEN,
+			gtk.STOCK_SAVE,
+			gtk.STOCK_YES,
+			gtk.STOCK_REFRESH,
+			gtk.STOCK_QUIT
+		), (
+			"Open an existing script",
+			"Save this script",
+			"Write script to PNG/SVG images",
+			"Refresh the DrawingArea",
+			"Quit the application"
+		), (
+			self.__openScript,
+			self.__saveScript,
+			self.__savePNG,
+			self.__parseCode,
+			lambda *a, **k: gtk.main_quit()
+		)):
+			button = gtk.Button()
+			image  = gtk.Image()
+
+			image.set_from_stock(st, gtk.ICON_SIZE_MENU)
+
+			button.set_relief(gtk.RELIEF_NONE)
+			button.set_focus_on_click(False)
+			button.set_image(image)
+			button.set_tooltip_text(tt)
+			button.connect("clicked", cb)
+			
+			tool.pack_start(button, False, False)
+
+		fontSizeLabel = gtk.Label("Font Size:")
+		fontSize      = gtk.combo_box_new_text()
+
+		fontSizeLabel.set_alignment(1.0, 0.5)
+
+		[fontSize.append_text("%i" % i) for i in range(8, 13)]
+
+		fontSize.connect("changed", self.__setFont)
+		fontSize.set_active(2)
+
+		tool.pack_start(fontSizeLabel, True, True, 5)
+		tool.pack_start(fontSize, False, False)
+
+		self.set_title("cairodraw")
+		self.add(vbox)
+		self.set_focus(self.__text)
+
+	def __openScript(self, *args):
+		fc = gtk.FileChooserDialog(
+			"Select a script file...",
+			self,
+			buttons=(gtk.STOCK_CANCEL, 0, gtk.STOCK_OPEN, 1)
+		)
+
+		fl1 = gtk.FileFilter()
+
+		fl1.set_name("Pycairo Scripts")
+		fl1.add_pattern("*.py")
+
+		fl2 = gtk.FileFilter()
+
+		fl2.set_name("All Files")
+		fl2.add_pattern("*")
+
+		fc.add_filter(fl1)
+		fc.add_filter(fl2)
+
+		if fc.run():
+			self.__text.SetText(file(fc.get_filename()).read())
+
+			self.__parseCode()
+
+		fc.destroy()
+
+	def __saveScript(self, *args):
+		fc = gtk.FileChooserDialog(
+			"Save File As...",
+			self,
+			gtk.FILE_CHOOSER_ACTION_SAVE,
+			(gtk.STOCK_CANCEL, 0, gtk.STOCK_SAVE, 1)
+		)
+
+		if fc.run():
+			f = fc.get_filename()
+
+			if not ".cairo" in f:
+				f += ".cairo"
+
+			print >> file(f, "w"), self.__text.GetText()
+
+		fc.destroy()
+
+	def __savePNG(self, *args):
+		fc = gtk.FileChooserDialog(
+			"Save PNG/SVG Images As...",
+			self,
+			gtk.FILE_CHOOSER_ACTION_SAVE,
+			(gtk.STOCK_CANCEL, 0, gtk.STOCK_SAVE, 1)
+		)
+
+		if fc.run():
+			self.__draw.WriteToPNG(fc.get_filename() + ".png")
+			self.__draw.WriteToSVG(fc.get_filename() + ".svg")
+
+		fc.destroy()
+
+	def __parseCode(self, *args):
+		self.__draw.Parse(self.__text.GetText())
+	
+	def __setFont(self, cb):
+		self.__text.SetFontSize(int(cb.get_active_text()))
+
+	def SetStatus(self, w, h):
+		self.__status.push(0, "Dimensions: %i x %i" % (w, h))
+
+if __name__ == "__main__":
+	f = None
+
+	if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
+		f = sys.argv[1]
+
+	cw = CairoWindow(512, 256, f)
+	
+	cw.connect("destroy", gtk.main_quit)
+	cw.show_all()
+
+	gtk.main()

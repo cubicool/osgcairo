@@ -116,10 +116,9 @@ void drawPie(cairo_t* c, int w, int h) {
 	}
 
 	/*
-	cairo_pattern_t* pat = osgCairo::util::displacedBlur(c, cairo_pop_group(c), 10);
+	cairo_pattern_t* pat = osgCairo::util::displacedBlur(c, cairo_pop_group(c), 20);
 
 	cairo_set_operator(c, CAIRO_OPERATOR_SOURCE);
-	cairo_translate(c, -5, -5);
 	cairo_set_source(c, pat);
 	cairo_paint(c);
 
