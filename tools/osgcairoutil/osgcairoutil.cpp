@@ -69,7 +69,9 @@ static PyObject* py_displaced_blur(PyObject* self, PyObject* args) {
 
 	if(!blur) return 0;
 
-	return PycairoPattern_FromPattern(blur, 0);
+	Py_RETURN_NONE;
+
+	// return PycairoPattern_FromPattern(blur, 0);
 }
 
 static PyMethodDef module_methods[] = {
