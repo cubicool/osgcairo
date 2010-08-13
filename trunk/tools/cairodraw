@@ -34,18 +34,18 @@ class CairoDrawingArea(gtk.DrawingArea):
 		self.connect("expose-event", self.__render)
 
 	def __render(self, widget, event):
-		cr   = self.window.cairo_create()
+		c    = self.window.cairo_create()
 		w, h = self.allocation.width, self.allocation.height
 
 		if self.__win:
 			self.__win.SetStatus(w, h)
 
-		self.__eval(self.__buffer, cr, w, h)
+		self.__eval(self.__buffer, c, w, h)
 
 		return True
 
-	def __eval(self, buf, cr, w, h):
-		eval(compile(buf, "<cairoscript>", "exec"), {"c": cr, "w": w, "h": h})
+	def __eval(self, buf, c, w, h):
+		eval(compile(buf, "<cairoscript>", "exec"), {"c": c, "w": w, "h": h})
 
 	def Parse(self, buf):
 		self.__buffer = buf
@@ -218,8 +218,8 @@ class CairoWindow(gtk.Window):
 		if fc.run():
 			f = fc.get_filename()
 
-			if not ".cairo" in f:
-				f += ".cairo"
+			if not ".py" in f:
+				f += ".py"
 
 			print >> file(f, "w"), self.__text.GetText()
 

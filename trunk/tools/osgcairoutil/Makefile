@@ -1,7 +1,5 @@
 ifeq ($(OSG_DIR), )
-exit:
-	@echo "You must define OSG_DIR."
-	@exit
+OSG_DIR=/home/cubicool/local
 endif
 
 _osgcairoutil.so: osgcairoutil.cpp

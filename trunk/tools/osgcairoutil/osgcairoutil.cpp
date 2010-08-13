@@ -48,30 +48,30 @@ static PyObject* py_displaced_blur(PyObject* self, PyObject* args) {
 	PyObject* cr       = 0;
 	PyObject* pattern  = 0;
 	int       numBlurs = 0;
-	int       radius   = 1;
 
 	if(!PyArg_ParseTuple(
-		args, "O!O!i|i",
+		args, "O!O!i",
 		&PycairoContext_Type, &cr,
 		&PycairoPattern_Type, &pattern,
-		&numBlurs,
-		&radius
+		&numBlurs
 	)) return 0;
 
 	if(!cr || !pattern) return 0;
 
+	
+	cairo_pattern_t* iPattern = ((PycairoPattern*)(pattern))->pattern;
+
+	cairo_pattern_reference(iPattern);
+
 	cairo_pattern_t* blur = osgCairo::util::displacedBlur(
 		((PycairoContext*)(cr))->ctx,
-		((PycairoPattern*)(pattern))->pattern,
-		numBlurs,
-		radius
+		iPattern,
+		numBlurs
 	);
 
 	if(!blur) return 0;
 
-	Py_RETURN_NONE;
-
-	// return PycairoPattern_FromPattern(blur, 0);
+	return PycairoPattern_FromPattern(blur, NULL);
 }
 
 static PyMethodDef module_methods[] = {
