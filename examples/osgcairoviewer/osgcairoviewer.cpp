@@ -277,7 +277,6 @@ int main(int, char**) {
 			1000.0f
 		);
 
-
 		viewer.addView(view);
 	}
 	
