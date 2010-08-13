@@ -1,21 +1,20 @@
 import osgcairoutil
 
-	cairo_push_group(c);
+c.push_group();
 
-	cairo_set_line_width(c, lineWidth);
-	cairo_move_to(c, S / 2.0f, 0.0f);
-	cairo_line_to(c, S / 2.0f, S);
-	cairo_stroke(c);
+c.set_line_width(1.0);
+c.move_to(w / 2.0, 0.0);
+c.line_to(w / 2.0, h);
+c.stroke();
 
-	cairo_pattern_t* pattern = displacedBlur(c, cairo_pop_group(c), numBlurs);
+blur = osgcairoutil.displaced_blur(c, c.pop_group(), 10);
 
-	cairo_set_source(c, pattern);
-	cairo_paint(c);
+c.set_source(blur);
+c.paint();
 
-	cairo_set_line_width(c, 1.0f);
-	cairo_set_source_rgb(c, 1.0f, 0.0f, 0.0f);
-	cairo_move_to(c, S / 2.0f, 0.0f);
-	cairo_line_to(c, S / 2.0f, S);
-	cairo_stroke(c);
-
+c.set_line_width(1.0);
+c.set_source_rgb(1.0, 0.0, 0.0);
+c.move_to(w / 2.0, 0.0);
+c.line_to(w / 2.0, h);
+c.stroke();
 
