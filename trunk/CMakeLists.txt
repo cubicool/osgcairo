@@ -31,7 +31,6 @@ SET(SRC_FILES
 )
 
 SET(SRC_UTIL_FILES
-	src/util/DisplacedBlur.cpp
 	src/util/GaussianBlur.cpp
 	src/util/MapPathOnto.cpp
 	src/util/Util.cpp

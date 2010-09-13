@@ -17,8 +17,7 @@ OSGCAIRO_EXPORT void roundedCorners   (cairo_t*, int, int, double = 0.01f, doubl
 OSGCAIRO_EXPORT void gaussianBlur     (cairo_surface_t*, double, double = 0.0f);
 OSGCAIRO_EXPORT void mapPathOnto      (cairo_t*, cairo_path_t*);
 
-OSGCAIRO_EXPORT cairo_pattern_t* displacedBlur       (cairo_t*, cairo_pattern_t*, unsigned int);
-OSGCAIRO_EXPORT std::string      cairoFormatAsString (cairo_format_t);
+OSGCAIRO_EXPORT std::string cairoFormatAsString (cairo_format_t);
 
 }
 }

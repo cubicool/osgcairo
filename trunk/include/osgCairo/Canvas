@@ -10,6 +10,9 @@
 #include <osg/Group>
 #include <osgCairo/Image>
 
+// TODO: INVESTIGATE THE NEW CAIRO cairo_surface_create_for_rectangle() function. This will
+// make things so much easier...
+
 namespace osgCairo {
 
 //! A Canvas is a grouping of power-of-two textures that are physically arranged in a 
