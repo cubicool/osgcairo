@@ -44,36 +44,6 @@ static PyObject* py_gaussian_blur(PyObject* self, PyObject* args) {
 	Py_RETURN_NONE;
 }
 
-static PyObject* py_displaced_blur(PyObject* self, PyObject* args) {
-	PyObject* cr       = 0;
-	PyObject* pattern  = 0;
-	int       numBlurs = 0;
-
-	if(!PyArg_ParseTuple(
-		args, "O!O!i",
-		&PycairoContext_Type, &cr,
-		&PycairoPattern_Type, &pattern,
-		&numBlurs
-	)) return 0;
-
-	if(!cr || !pattern) return 0;
-
-	
-	cairo_pattern_t* iPattern = ((PycairoPattern*)(pattern))->pattern;
-
-	cairo_pattern_reference(iPattern);
-
-	cairo_pattern_t* blur = osgCairo::util::displacedBlur(
-		((PycairoContext*)(cr))->ctx,
-		iPattern,
-		numBlurs
-	);
-
-	if(!blur) return 0;
-
-	return PycairoPattern_FromPattern(blur, NULL);
-}
-
 static PyMethodDef module_methods[] = {
 	{ 
 		"map_path_onto", py_map_path_onto, METH_VARARGS,
@@ -82,10 +52,6 @@ static PyMethodDef module_methods[] = {
 	{
 		"gaussian_blur", py_gaussian_blur, METH_VARARGS,
 		"Do a permanent ARGB32 cairo_surface_t blur using a variable kernel size."
-	},
-	{
-		"displaced_blur", py_displaced_blur, METH_VARARGS,
-		"foo"
 	},
 	{ 0, 0, 0, 0 }
 };
