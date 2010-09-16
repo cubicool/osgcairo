@@ -80,7 +80,6 @@ void roundedCorners(cairo_t* c, int w, int h, double size, double radius) {
 	if(cairo_pattern_status(p)) return;
 
 	cairo_save(c);
-	cairo_scale(c, w, h);
 	cairo_set_operator(c, CAIRO_OPERATOR_DEST_IN);
 	cairo_set_source(c, p);
 	
@@ -88,8 +87,8 @@ void roundedCorners(cairo_t* c, int w, int h, double size, double radius) {
 		c,
 		size,
 		size,
-		1.0f - (size * 2.0f),
-		1.0f - (size * 2.0f),
+		w - (size * 2.0f),
+		h - (size * 2.0f),
 		radius
 	);
 	

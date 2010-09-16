@@ -75,7 +75,7 @@ osg::Geode* createExample_loadImages() {
 	cairo_t* c = image->createContext();
 
 	if(!cairo_status(c)) {
-		osgCairo::util::roundedCorners(c, image->s(), image->t());
+		osgCairo::util::roundedCorners(c, image->s(), image->t(), 10.0f, 10.0f);
 	
 		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 0.5f);
 		cairo_set_line_width(c, 40.0f);

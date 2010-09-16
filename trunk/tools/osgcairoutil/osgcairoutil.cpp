@@ -44,6 +44,67 @@ static PyObject* py_gaussian_blur(PyObject* self, PyObject* args) {
 	Py_RETURN_NONE;
 }
 
+static PyObject* py_rounded_rectangle(PyObject* self, PyObject* args) {
+	PyObject* cr = 0;
+	double    x  = 0.0f;
+	double    y  = 0.0f;
+	double    w  = 0.0f;
+	double    h  = 0.0f;
+	double    r  = 10.0f;
+
+	if(!PyArg_ParseTuple(
+		args, "O!dddd|d",
+		&PycairoContext_Type, &cr,
+		&x,
+		&y,
+		&w,
+		&h,
+		&r
+	)) return 0;
+
+	if(!cr) return 0;
+
+	osgCairo::util::roundedRectangle(
+		((PycairoContext*)(cr))->ctx,
+		x,
+		y,
+		w,
+		h,
+		r
+	);
+
+	Py_RETURN_NONE;
+}
+
+static PyObject* py_rounded_corners(PyObject* self, PyObject* args) {
+	PyObject* cr = 0;
+	double    w  = 0.0f;
+	double    h  = 0.0f;
+	double    s  = 0.01f;
+	double    r  = 0.075f;
+
+	if(!PyArg_ParseTuple(
+		args, "O!dd|dd",
+		&PycairoContext_Type, &cr,
+		&w,
+		&h,
+		&s,
+		&r
+	)) return 0;
+
+	if(!cr) return 0;
+
+	osgCairo::util::roundedCorners(
+		((PycairoContext*)(cr))->ctx,
+		w,
+		h,
+		s,
+		r
+	);
+
+	Py_RETURN_NONE;
+}
+
 static PyMethodDef module_methods[] = {
 	{ 
 		"map_path_onto", py_map_path_onto, METH_VARARGS,
@@ -52,6 +113,14 @@ static PyMethodDef module_methods[] = {
 	{
 		"gaussian_blur", py_gaussian_blur, METH_VARARGS,
 		"Do a permanent ARGB32 cairo_surface_t blur using a variable kernel size."
+	},
+	{
+		"rounded_rectangle", py_rounded_rectangle, METH_VARARGS,
+		"..."
+	},
+	{
+		"rounded_corners", py_rounded_corners, METH_VARARGS,
+		"..."
 	},
 	{ 0, 0, 0, 0 }
 };

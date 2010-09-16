@@ -52,8 +52,8 @@ class CairoDrawingArea(gtk.DrawingArea):
 
 		self.queue_draw()
 
-	def WriteToPNG(self, path):
-		w, h = self.allocation.width, self.allocation.height
+	def WriteToPNG(self, path, w=None, h=None):
+		w, h = self.__setWidthAndHeight(w, h)
 		
 		surface = cairo.ImageSurface(cairo.FORMAT_ARGB32, w, h)
 		context = cairo.Context(surface)
@@ -62,8 +62,8 @@ class CairoDrawingArea(gtk.DrawingArea):
 
 		surface.write_to_png(path)
 
-	def WriteToSVG(self, path):
-		w, h = self.allocation.width, self.allocation.height
+	def WriteToSVG(self, path, w=None, h=None):
+		w, h = self.__setWidthAndHeight(w, h)
 
 		surface = cairo.SVGSurface(path, w, h)
 		context = cairo.Context(surface)
@@ -72,6 +72,15 @@ class CairoDrawingArea(gtk.DrawingArea):
 
 		surface.flush()
 		surface.finish()
+
+	def __setWidthAndHeight(self, w, h):
+		if not w:
+			w = self.allocation.width
+		
+		if not h:
+			h = self.allocation.height
+		
+		return w, h
 
 class TextView(gtk.TextView):
 	def __init__(self, text=""):
@@ -104,7 +113,7 @@ class TextView(gtk.TextView):
 		return buf.get_text(buf.get_start_iter(), buf.get_end_iter())
 
 class CairoWindow(gtk.Window):
-	def __init__(self, w, h, script=None):
+	def __init__(self, w, h, script=None, autosave=None):
 		gtk.Window.__init__(self, gtk.WINDOW_TOPLEVEL)
 
 		b = script and file(script).read() or DEFAULT_BUFFER
@@ -146,7 +155,7 @@ class CairoWindow(gtk.Window):
 		), (
 			self.__openScript,
 			self.__saveScript,
-			self.__savePNG,
+			self.__saveImage,
 			self.__parseCode,
 			lambda *a, **k: gtk.main_quit()
 		)):
@@ -180,6 +189,10 @@ class CairoWindow(gtk.Window):
 		self.add(vbox)
 		self.set_focus(self.__text)
 
+		if autosave:
+			self.__draw.queue_draw()	
+			self.__saveImage(w, h)
+
 	def __openScript(self, *args):
 		fc = gtk.FileChooserDialog(
 			"Select a script file...",
@@ -209,7 +222,7 @@ class CairoWindow(gtk.Window):
 
 	def __saveScript(self, *args):
 		fc = gtk.FileChooserDialog(
-			"Save File As...",
+			"Save Python Script as...",
 			self,
 			gtk.FILE_CHOOSER_ACTION_SAVE,
 			(gtk.STOCK_CANCEL, 0, gtk.STOCK_SAVE, 1)
@@ -225,17 +238,17 @@ class CairoWindow(gtk.Window):
 
 		fc.destroy()
 
-	def __savePNG(self, *args):
+	def __saveImage(self, w=None, h=None):
 		fc = gtk.FileChooserDialog(
-			"Save PNG/SVG Images As...",
+			"Save PNG & SVG Images as...",
 			self,
 			gtk.FILE_CHOOSER_ACTION_SAVE,
 			(gtk.STOCK_CANCEL, 0, gtk.STOCK_SAVE, 1)
 		)
 
 		if fc.run():
-			self.__draw.WriteToPNG(fc.get_filename() + ".png")
-			self.__draw.WriteToSVG(fc.get_filename() + ".svg")
+			self.__draw.WriteToPNG(fc.get_filename() + ".png", w, h)
+			self.__draw.WriteToSVG(fc.get_filename() + ".svg", w, h)
 
 		fc.destroy()
 
@@ -250,13 +263,26 @@ class CairoWindow(gtk.Window):
 
 if __name__ == "__main__":
 	f = None
+	w = 512
+	h = 256
+	s = False
 
 	if len(sys.argv) >= 2 and os.path.exists(sys.argv[1]):
 		f = sys.argv[1]
 
-	cw = CairoWindow(512, 256, f)
-	
-	cw.connect("destroy", gtk.main_quit)
-	cw.show_all()
+	if len(sys.argv) >= 4:
+		try:
+			w = int(sys.argv[2])
+			h = int(sys.argv[3])
+			s = True
 
-	gtk.main()
+		except:
+			pass
+
+	cw = CairoWindow(w, h, f, s)
+
+	if not s:
+		cw.connect("destroy", gtk.main_quit)
+		cw.show_all()
+
+		gtk.main()
