@@ -4,8 +4,8 @@
 //! \file
 //! \brief Main doxygen docs; also defines compiler signature exports.
 
-#ifndef OSGCAIRO_EXPORT
-#define OSGCAIRO_EXPORT
+#ifndef OSGCAIRO_EXPORT_
+#define OSGCAIRO_EXPORT_
 
 //! \mainpage osgCairo NodeKit Documentation
 //!
