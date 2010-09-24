@@ -25,7 +25,6 @@ ENDIF(NOT WIN32)
 FIND_PACKAGE(OpenSceneGraph)
 
 SET(SRC_FILES
-	src/Canvas.cpp
 	src/Image.cpp
 	src/ReadFile.cpp
 )
@@ -38,7 +37,6 @@ SET(SRC_UTIL_FILES
 
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
 SET(HEADER_FILES
-	${HEADER_PATH}/Canvas
 	${HEADER_PATH}/Export
 	${HEADER_PATH}/Image
 	${HEADER_PATH}/ReadFile
