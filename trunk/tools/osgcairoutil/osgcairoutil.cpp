@@ -105,6 +105,34 @@ static PyObject* py_rounded_corners(PyObject* self, PyObject* args) {
 	Py_RETURN_NONE;
 }
 
+static PyObject* py_create_embossed_surface(PyObject* self, PyObject* args) {
+	PyObject*      surf      = 0;
+	double         azimuth   = 0.0f;
+	double         elevation = 0.0f;
+	unsigned short width45   = 0;
+
+	if(!PyArg_ParseTuple(
+		args, "O!ddH",
+		&PycairoSurface_Type, &surf,
+		&azimuth,
+		&elevation,
+		&width45
+	)) return 0;
+
+	if(!surf) return 0;
+
+	cairo_surface_t* embossed = osgCairo::util::createEmbossedSurface(
+		((PycairoSurface*)(surf))->surface,
+		azimuth,
+		elevation,
+		width45
+	);
+
+	if(!embossed) return 0;
+
+	return PycairoSurface_FromSurface(embossed, 0);
+}
+
 static PyMethodDef module_methods[] = {
 	{ 
 		"map_path_onto", py_map_path_onto, METH_VARARGS,
@@ -120,6 +148,10 @@ static PyMethodDef module_methods[] = {
 	},
 	{
 		"rounded_corners", py_rounded_corners, METH_VARARGS,
+		"..."
+	},
+	{
+		"create_embossed_surface", py_create_embossed_surface, METH_VARARGS,
 		"..."
 	},
 	{ 0, 0, 0, 0 }
