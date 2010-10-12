@@ -4,18 +4,27 @@
 #include <osg/Geode>
 #include <osgGA/TrackballManipulator>
 #include <osgViewer/CompositeViewer>
-#include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 #include <osgCairo/Image>
 
-osg::Geometry* createGeometry(osg::Image* image) {
-	static osg::Vec3 pos(10.0f, 10.0f, -0.8f);
+struct CairoPath: public osg::Referenced {
+	CairoPath(cairo_path_t* p):
+	path(p) {
+	}
 
+	~CairoPath() {
+		cairo_path_destroy(path);
+	}
+
+	cairo_path_t* path;
+};
+
+osg::Geometry* createRoadsImageQuad(osg::Image* image) {
 	osg::Texture2D* texture = new osg::Texture2D();
 	osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
-		pos,
+		osg::Vec3(0.0f, 0.0f, 0.0f),
 		osg::Vec3(image->s(), 0.0f, 0.0f),
-		osg::Vec3(0.0f, image->t(), 0.0f),
+		osg::Vec3(0.0f, 0.0f, image->t()),
 		0.0f,
 		0.0f, 
 		1.0f,
@@ -36,104 +45,127 @@ osg::Geometry* createGeometry(osg::Image* image) {
 	state->setMode(GL_BLEND, osg::StateAttribute::ON);
 	state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 
-	pos += osg::Vec3(image->s() + 10.0f, 0.0f, 0.1f);
-
 	return geom;
 }
 
-/*
-osg::Geode* createExample_loadImages() {
-	// We demonstrate using the standard osgDB::Options object here to tell
-	// osgCairo to add an alpha channel to our GL_RGB PNG image. If you wanted
-	// to you could simply save an alpha channel in your PNG, in which case
-	// something like this isn't necessary. FUTHERMORE, if you dont' want (or
-	// need) an alpha channel, just leave the image as-is.
-	osg::ref_ptr<osgDB::ReaderWriter::Options> opts = 
-		new osgDB::ReaderWriter::Options("addAlphaToRGB")
-	;
+osg::Geometry* createRoadsGeometry(osgCairo::Image* roads) {
+	static osg::Vec3::value_type h = 0.0f;
 
-	osg::Geode*      geode = new osg::Geode();
-	osgCairo::Image* image = osgCairo::readImageFile("img.png", opts.get());
+	CairoPath* cp = dynamic_cast<CairoPath*>(roads->getUserData());
 
-	if(!image) return geode;
+	if(!cp) return 0;
 
-	int width  = image->s();
-	int height = image->t();
+	osg::ref_ptr<osg::Vec3Array> verts  = new osg::Vec3Array();
+	osg::ref_ptr<osg::Vec4Array> colors = new osg::Vec4Array();
 
-	cairo_t* c = image->createContext();
+	unsigned int numQuads = 0;
 
-	if(!cairo_status(c)) {
-		osgCairo::util::roundedCorners(c, image->s(), image->t(), 10.0f, 10.0f);
-	
-		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 0.5f);
-		cairo_set_line_width(c, 40.0f);
-		cairo_arc(
-			c,
-			width / 2.0f,
-			height / 2.0f,
-			60.0f,
-			0.0f,
-			osg::PI + (osg::PI / 2.0f)
-		);
+	for(int i = 0; i < cp->path->num_data; i += cp->path->data[i].header.length) {
+		cairo_path_data_t* data = &cp->path->data[i];
 
-		cairo_stroke(c);
-		cairo_destroy(c);
+		if(data->header.type == CAIRO_PATH_LINE_TO) {
+			osg::Vec3 middle(
+				data[1].point.x,
+				h,
+				data[1].point.y
+			);
+
+			verts->push_back(middle + osg::Vec3(-1.0f, 0.0f, -1.0f));
+			verts->push_back(middle + osg::Vec3( 1.0f, 0.0f, -1.0f));
+			verts->push_back(middle + osg::Vec3( 1.0f, 0.0f,  1.0f));
+			verts->push_back(middle + osg::Vec3(-1.0f, 0.0f,  1.0f));
+
+			h += 0.1f;
+		
+			numQuads++;
+		}
 	}
 
-	geode->addDrawable(createGeometry(image));
+	if(!numQuads) return 0;
 
-	return geode;
+	osg::Vec4::value_type numQuadsFloat = static_cast<osg::Vec4::value_type>(numQuads);
+	
+	for(osg::Vec4::value_type i = 0.0f; i < numQuadsFloat; i += 1.0f) {
+		osg::Vec4::value_type tint = i / numQuadsFloat;
+
+		colors->push_back(osg::Vec4(tint, tint * 0.75f, 0.0f, 1.0f));
+	}
+
+	osg::notify(osg::NOTICE) << "Rendered " << numQuads << " quads." << std::endl;
+
+	osg::Geometry* geometry = new osg::Geometry();
+
+	geometry->setVertexArray(verts.get());
+	geometry->setColorArray(colors.get());
+	geometry->setColorBinding(osg::Geometry::BIND_PER_PRIMITIVE);
+	geometry->addPrimitiveSet(new osg::DrawArrays(osg::PrimitiveSet::QUADS, 0, numQuads * 4));
+
+	return geometry;
 }
-*/
 
-osgCairo::Image* createRoadsImage(unsigned int size, unsigned int numCurves) {
+osgCairo::Image* createRoadsImage(unsigned int size) {
 	osgCairo::Image* image = new osgCairo::Image();
 	
 	if(image->allocateSurface(size, size, CAIRO_FORMAT_A8)) {
 		cairo_t* c = image->createContext();
 
 		if(!cairo_status(c)) {
-			std::vector<osg::Vec2> curves(numCurves * 3);
-
-			for(unsigned int i = 0; i < numCurves * 3; i++) {
-				points[i    ].set(std::rand() % size, std::rand() % size);
-				points[i + 1].set(std::rand() % size, std::rand() % size);
-				points[i + 2].set(std::rand() % size, std::rand() % size);
-			}
+			// TODO: This is where we specify the "granularity" of the path; the
+			// smaller this number, the MORE geometry will be generated later.
+			cairo_set_tolerance(c, 0.01f);
 			
+			cairo_move_to(c, 0.0f, 0.0f);
+			cairo_curve_to(c, size, 0.0f, size, size, 0.0f, size);
+			cairo_curve_to(c, 0.0f, 0.0f, size, 0.0f, size, size);
+			
+			CairoPath* cp = new CairoPath(cairo_copy_path_flat(c));
+			
+			cairo_stroke(c);
 			cairo_destroy(c);
 
 			image->dirty();
+			image->setUserData(cp);
 		}
 	}
 
 	return image;
 }
 
-osg::Camera* createCamera() {
-	osg::Camera* camera = new osg::Camera();
+osgViewer::View* createView(
+	osg::Geometry*        geometry,
+	const osg::Vec4&      vp,
+	osg::GraphicsContext* gc
+) {
+	osg::Geode*      geode = new osg::Geode();
+	osgViewer::View* view  = new osgViewer::View();
 
-	camera->getOrCreateStateSet()->setMode(
+	geode->addDrawable(geometry);
+
+	view->setSceneData(geode);
+	view->getCamera()->setGraphicsContext(gc);
+	view->getCamera()->setProjectionMatrixAsPerspective(
+		30.0f,
+		static_cast<float>(vp[3] - 20.0f) / static_cast<float>(vp[2] - 20.0f),
+		1.0f,
+		1000.0f
+	);
+
+	view->getCamera()->getOrCreateStateSet()->setMode(
 		GL_LIGHTING,
 		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
 	);
-	
-	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
-	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
-	camera->setRenderOrder(osg::Camera::POST_RENDER);
 
-	return camera;
+	view->getCamera()->setViewport(new osg::Viewport(
+		vp[0] + 10.0f,
+		vp[1] + 10.0f,
+		vp[2] - 20.0f,
+		vp[3] - 20.0f
+	));
+
+	return view;
 }
 
-int main(int, char**) {
-	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
-	
-	paths.push_back("../examples/osgcairoroads/");
-	paths.push_back("examples/osgcairoroads/");
-	paths.push_back("./");
-
-	// Setup a single graphics context; I got this code from the osgcompositeviewer
-	// example.
+int main(int argc, char** argv) {
 	osg::GraphicsContext::WindowingSystemInterface* wsi = 
 		osg::GraphicsContext::getWindowingSystemInterface()
 	;
@@ -147,7 +179,7 @@ int main(int, char**) {
 		return 1;
 	}
 	
-	unsigned int size = 256;
+	unsigned int size = 512;
 	
 	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits();
 
@@ -171,71 +203,19 @@ int main(int, char**) {
 
 	osgViewer::CompositeViewer viewer;
 
-	osgCairo::Image* roads    = createRoadsImage(size, 5);
-	osg::Geometry*   geometry = createGeometry(roads);
-	osg::Geode*      geode    = new osg::Geode();
+	osgCairo::Image* roads = createRoadsImage(size);
 
-	geode->addDrawable(geometry);
-
-	// Setup our ORTHOGRAPHIC view of the Texture that made the roads.
-	{
-		osg::Camera*     camera = createCamera();
-		osgViewer::View* view   = new osgViewer::View();
-
-		camera->addChild(geode);
-		camera->setProjectionMatrixAsOrtho2D(0, size, 0, size);
-		camera->setViewMatrix(osg::Matrix::identity());
-
-		view->setSceneData(camera);
-		view->getCamera()->setViewport(new osg::Viewport(0, 0, size, size));
-		view->getCamera()->setGraphicsContext(gc.get());
-		view->getCamera()->setProjectionMatrixAsPerspective(
-			30.0f,
-			static_cast<float>(size) / static_cast<float>(size),
-			1.0f,
-			1000.0f
-		);
-
-		viewer.addView(view);
-	}
-
-	/*
-	// Setup our PERSPECTIVE view into the scene.
-	{
-		osg::Camera*     camera = createCamera();
-		osgViewer::View* view   = new osgViewer::View();
-
-		camera->addChild(osgDB::readNodeFile("cow.osg"));
-		camera->setProjectionMatrixAsPerspective(
-			30.0f,
-			static_cast<float>(size) / static_cast<float>(size),
-			-1.0f,
-			1.0f
-		);
-
-		const osg::BoundingSphere& bs  = matrix->getBound();
-		const osg::Vec3&           c   = bs.center();
-		const osg::Vec3&           eye = osg::Vec3(c.x(), c.y(), bs.radius() * 2.0f);
-
-		camera->setViewMatrixAsLookAt(eye, bs.center(), osg::Vec3(0.0f, 1.0f, 0.0f));
-
-		group->addChild(cow);
-		group->addChild(camera);
-
-		view->setSceneData(group);
-		view->setCameraManipulator(new osgGA::TrackballManipulator());
-		view->getCamera()->setViewport(new osg::Viewport(0, size, size * 2, size));
-		view->getCamera()->setGraphicsContext(gc.get());
-		view->getCamera()->setProjectionMatrixAsPerspective(
-			30.0f,
-			static_cast<float>(size) / static_cast<float>(size),
-			1.0f,
-			1000.0f
-		);
-
-		viewer.addView(view);
-	}
-	*/
+	viewer.addView(createView(
+		createRoadsImageQuad(roads),
+		osg::Vec4(0, 0, size, size),
+		gc.get()
+	));
+	
+	viewer.addView(createView(
+		createRoadsGeometry(roads),
+		osg::Vec4(size, 0, size, size),
+		gc.get()
+	));
 
 	return viewer.run();
 }
