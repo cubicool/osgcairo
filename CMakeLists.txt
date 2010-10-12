@@ -30,6 +30,7 @@ SET(SRC_FILES
 )
 
 SET(SRC_UTIL_FILES
+	src/util/Emboss.cpp
 	src/util/GaussianBlur.cpp
 	src/util/MapPathOnto.cpp
 	src/util/Util.cpp
@@ -99,9 +100,10 @@ FOREACH(INCLUDEFILE ${HEADER_FILES})
 	)
 ENDFOREACH(INCLUDEFILE)
 
-ADD_SUBDIRECTORY(examples/osgcairoviewer)
 ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
+ADD_SUBDIRECTORY(examples/osgcairoroads)
 ADD_SUBDIRECTORY(examples/osgcairoutil)
+ADD_SUBDIRECTORY(examples/osgcairoviewer)
 
 IF(OSGCAIROWIDGET)
 	ADD_SUBDIRECTORY(examples/osgcairowidget)
