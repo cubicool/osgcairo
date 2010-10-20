@@ -109,14 +109,12 @@ static PyObject* py_create_embossed_surface(PyObject* self, PyObject* args) {
 	PyObject*      surf      = 0;
 	double         azimuth   = 0.0f;
 	double         elevation = 0.0f;
-	unsigned short width45   = 0;
 
 	if(!PyArg_ParseTuple(
-		args, "O!ddH",
+		args, "O!dd",
 		&PycairoSurface_Type, &surf,
 		&azimuth,
-		&elevation,
-		&width45
+		&elevation
 	)) return 0;
 
 	if(!surf) return 0;
@@ -124,8 +122,7 @@ static PyObject* py_create_embossed_surface(PyObject* self, PyObject* args) {
 	cairo_surface_t* embossed = osgCairo::util::createEmbossedSurface(
 		((PycairoSurface*)(surf))->surface,
 		azimuth,
-		elevation,
-		width45
+		elevation
 	);
 
 	if(!embossed) return 0;
