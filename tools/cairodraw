@@ -79,8 +79,10 @@ class CairoDrawingArea(gtk.DrawingArea):
 		
 		if not h:
 			h = self.allocation.height
-		
-		return w, h
+	
+		print w, h
+
+		return int(w), int(h)
 
 class TextView(gtk.TextView):
 	def __init__(self, text=""):
@@ -132,6 +134,12 @@ class CairoWindow(gtk.Window):
 		scroll.add(self.__text)
 
 		frame.add(scroll)
+
+		"""
+		a = gtk.Alignment(0.5, 0.5)
+		a.set_padding(10, 10, 10, 10)
+		a.add(self.__draw)
+		"""
 
 		paned.add1(self.__draw)
 		paned.add2(frame)
@@ -190,8 +198,8 @@ class CairoWindow(gtk.Window):
 		self.set_focus(self.__text)
 
 		if autosave:
-			self.__draw.queue_draw()	
-			self.__saveImage(w, h)
+			self.__draw.queue_draw()
+			self.__saveImage(None, w, h)
 
 	def __openScript(self, *args):
 		fc = gtk.FileChooserDialog(
@@ -238,7 +246,7 @@ class CairoWindow(gtk.Window):
 
 		fc.destroy()
 
-	def __saveImage(self, w=None, h=None):
+	def __saveImage(self, widget, w=None, h=None):
 		fc = gtk.FileChooserDialog(
 			"Save PNG & SVG Images as...",
 			self,

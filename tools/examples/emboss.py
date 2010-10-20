@@ -12,10 +12,11 @@ cr.stroke()
 emboss = osgcairoutil.create_embossed_surface(
 	surface,
 	30 * (math.pi / 180.0),
-	30 * (math.pi / 180.0),
-	3
+	30 * (math.pi / 180.0)
 )
 
+"""
+# The code below is necessary on some (buggy?) versions of Pycairo. :(
 emboss2 = cairo.ImageSurface.create_for_data(
 	emboss.get_data(),
 	cairo.FORMAT_A8,
@@ -23,7 +24,8 @@ emboss2 = cairo.ImageSurface.create_for_data(
 	emboss.get_height(),
 	emboss.get_stride()
 )
+"""
 
-c.set_source_surface(emboss2, 0, 0)
+c.set_source_surface(emboss, 0, 0)
 c.paint()
 

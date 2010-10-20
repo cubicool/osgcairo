@@ -20,8 +20,7 @@ OSGCAIRO_EXPORT void mapPathOnto      (cairo_t*, cairo_path_t*);
 OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
 	cairo_surface_t*,
 	double,
-	double,
-	unsigned short
+	double
 );
 
 OSGCAIRO_EXPORT std::string cairoFormatAsString (cairo_format_t);
