@@ -30,9 +30,12 @@ SET(SRC_FILES
 	src/Util.cpp
 )
 
-SET(CAIROCKS_FILES
+SET(CAIROCKS_SRC_FILES
 	ext/cairocks/src/emboss.c
-	ext/cairocks/src/
+	ext/cairocks/src/gaussian-blur.c
+	ext/cairocks/src/map-path-onto.c
+	ext/cairocks/src/rounded.c
+)
 
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
 SET(HEADER_FILES
@@ -42,13 +45,20 @@ SET(HEADER_FILES
 	${HEADER_PATH}/Util
 )
 
+SET(CAIROCKS_HEADER_FILES
+	ext/cairocks/src/cairocks.h
+)
+
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
+SOURCE_GROUP("Header Files\\Cairocks" FILES ${CAIROCKS_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
+SOURCE_GROUP("Source Files\\Cairocks" FILES ${CAIROCKS_SRC_FILES})
 
 SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
 INCLUDE_DIRECTORIES(
 	include
+	ext/cairocks/src
 	${OPENSCENEGRAPH_INCLUDE_DIR}
 	${CAIRO_INCLUDE_DIRS}
 )
@@ -58,7 +68,7 @@ LINK_DIRECTORIES(
 	${CAIRO_LIBRARY_DIRS}
 )
 
-ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
+ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${CAIROCKS_HEADER_FILES} ${SRC_FILES} ${CAIROCKS_SRC_FILES})
 
 # Add debug postfix to OSG libraries so we link to the right ones in debug.
 # Cairo is a C-only library so the same one (release) can be linked to both
@@ -127,7 +137,8 @@ SET(CPACK_SOURCE_IGNORE_FILES
 	".*release/"
 )
 
-SET(OSGCAIRO_VERSION "0.1.0")
+SET(OSGCAIRO_VERSION "0.2.0")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "osgCairo-${OSGCAIRO_VERSION}")
 
 INCLUDE(CPack)
+
