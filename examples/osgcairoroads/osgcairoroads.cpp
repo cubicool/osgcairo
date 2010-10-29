@@ -165,7 +165,7 @@ osgViewer::View* createView(
 	return view;
 }
 
-int main(int argc, char** argv) {
+int main(int, char**) {
 	osg::GraphicsContext::WindowingSystemInterface* wsi = 
 		osg::GraphicsContext::getWindowingSystemInterface()
 	;

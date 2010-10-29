@@ -31,7 +31,7 @@ bool roundedRectangle(
 	double         radius,
 	const Corners& corners
 ) {
-	return cairocks_rounded_rectangle(c, x, y, width, height, radius, corners.corners);
+	return cairocks_rounded_rectangle(c, x, y, width, height, radius, corners.corners) != FALSE;
 }
 
 bool roundedRectangleApply(
@@ -43,15 +43,15 @@ bool roundedRectangleApply(
 	double         radius,
 	const Corners& corners
 ) {
-	return cairocks_rounded_rectangle_apply(c, x, y, width, height, radius, corners.corners);
+	return cairocks_rounded_rectangle_apply(c, x, y, width, height, radius, corners.corners) != FALSE;
 }
 
 bool gaussianBlur(cairo_surface_t* surface, double radius, double deviation) {
-	return cairocks_gaussian_blur(surface, radius, deviation);
+	return cairocks_gaussian_blur(surface, radius, deviation) != FALSE;
 }
 
 bool mapPathOnto(cairo_t* c, cairo_path_t* path) {
-	return cairocks_map_path_onto(c, path);
+	return cairocks_map_path_onto(c, path) != FALSE;
 }
 
 cairo_surface_t* createEmbossedSurface(
