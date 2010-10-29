@@ -68,7 +68,8 @@ LINK_DIRECTORIES(
 	${CAIRO_LIBRARY_DIRS}
 )
 
-ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${CAIROCKS_HEADER_FILES} ${SRC_FILES} ${CAIROCKS_SRC_FILES})
+ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
+ADD_LIBRARY(cairocks STATIC ${CAIROCKS_HEADER_FILES} ${CAIROCKS_SRC_FILES})
 
 # Add debug postfix to OSG libraries so we link to the right ones in debug.
 # Cairo is a C-only library so the same one (release) can be linked to both
@@ -88,6 +89,7 @@ TARGET_LINK_LIBRARIES(osgCairo
 	optimized osgViewer
 	debug     cairo
 	optimized cairo
+	cairocks
 )
 
 # The archive/runtime part is so that the lib/dll pair goes into lib and bin
