@@ -11,17 +11,38 @@
 namespace osgCairo {
 namespace util {
 
-OSGCAIRO_EXPORT void writeToPNG       (cairo_surface_t*, const std::string&);
-OSGCAIRO_EXPORT void roundedRectangle (cairo_t*, double, double, double, double, double);
-OSGCAIRO_EXPORT void roundedCorners   (cairo_t*, int, int, double, double);
-OSGCAIRO_EXPORT void gaussianBlur     (cairo_surface_t*, double, double = 0.0f);
-OSGCAIRO_EXPORT void mapPathOnto      (cairo_t*, cairo_path_t*);
+OSGCAIRO_EXPORT void writeToPNG(cairo_surface_t*, const std::string&);
 
+OSGCAIRO_EXPORT void roundedRectangle(
+	cairo_t*, 
+	double,
+	double,
+	double,
+	double,
+	double,
+	const cairo_bool_t* = 0
+);
+
+OSGCAIRO_EXPORT void roundedRectangleApply(
+	cairo_t*, 
+	double,
+	double,
+	double,
+	double,
+	double,
+	const cairo_bool_t* = 0
+);
+
+// OSGCAIRO_EXPORT void gaussianBlur     (cairo_surface_t*, double, double = 0.0f);
+// OSGCAIRO_EXPORT void mapPathOnto      (cairo_t*, cairo_path_t*);
+
+/*
 OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
 	cairo_surface_t*,
 	double,
 	double
 );
+*/
 
 OSGCAIRO_EXPORT std::string cairoFormatAsString (cairo_format_t);
 
