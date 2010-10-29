@@ -12,6 +12,7 @@ SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a postfix, usually d on windows")
 
 # On GCC, we need to set these compiler flags.
 IF(NOT WIN32)
+	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused")
 	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused")
 ENDIF(NOT WIN32)
 
@@ -50,9 +51,7 @@ SET(CAIROCKS_HEADER_FILES
 )
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
-SOURCE_GROUP("Header Files\\Cairocks" FILES ${CAIROCKS_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
-SOURCE_GROUP("Source Files\\Cairocks" FILES ${CAIROCKS_SRC_FILES})
 
 SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
@@ -69,6 +68,10 @@ LINK_DIRECTORIES(
 )
 
 ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
+
+SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILES})
+SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
+
 ADD_LIBRARY(cairocks STATIC ${CAIROCKS_HEADER_FILES} ${CAIROCKS_SRC_FILES})
 
 # Add debug postfix to OSG libraries so we link to the right ones in debug.
