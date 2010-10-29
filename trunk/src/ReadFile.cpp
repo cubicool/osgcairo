@@ -49,6 +49,12 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 
 	Image* cairoImage = new Image(image->s(), image->t(), cairoFormat, newData);
 
+	osg::notify()
+		<< "Loaded osgCairo::Image file " << path
+		<< " using format: " << util::cairoFormatAsString(cairoFormat)
+		<< std::endl
+	;
+
 	delete newData;
 
 	return cairoImage;
