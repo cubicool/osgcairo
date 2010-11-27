@@ -57,9 +57,12 @@ bool mapPathOnto(cairo_t* c, cairo_path_t* path) {
 cairo_surface_t* createEmbossedSurface(
 	cairo_surface_t* surface,
 	double           azimuth,
-	double           elevation
+	double           elevation,
+	double           height,
+	double           ambient,
+	double           diffuse
 ) {
-	return cairocks_create_embossed_surface(surface, azimuth, elevation);
+	return cairocks_emboss_create(surface, azimuth, elevation, height, ambient, diffuse);
 }
 
 std::string cairoFormatAsString(cairo_format_t format) {
