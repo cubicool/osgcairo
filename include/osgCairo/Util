@@ -50,6 +50,9 @@ OSGCAIRO_EXPORT bool mapPathOnto  (cairo_t*, cairo_path_t*);
 OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
 	cairo_surface_t*,
 	double,
+	double,
+	double,
+	double,
 	double
 );
 
