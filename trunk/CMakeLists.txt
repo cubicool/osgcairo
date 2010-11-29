@@ -34,6 +34,7 @@ SET(SRC_FILES
 SET(CAIROCKS_SRC_FILES
 	ext/cairocks/src/emboss.c
 	ext/cairocks/src/gaussian-blur.c
+	ext/cairocks/src/invert.c
 	ext/cairocks/src/map-path-onto.c
 	ext/cairocks/src/rounded.c
 )
