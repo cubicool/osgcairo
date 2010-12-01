@@ -41,8 +41,6 @@ void drawPie(cairo_t* c, int w, int h) {
 		1.0f
 	};
 
-	// cairo_push_group(c);
-
 	cairo_set_line_width(c, ((w + h) / 2.0f) * 0.003f);
 	cairo_select_font_face(c, "SegoeUI", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(c, ((w + h) / 2.0f) * 0.05f);
@@ -114,16 +112,82 @@ void drawPie(cairo_t* c, int w, int h) {
 
 		cairo_rotate(c, seg);
 	}
+}
 
-	/*
-	cairo_pattern_t* pat = osgCairo::util::displacedBlur(c, cairo_pop_group(c), 20);
+void drawBevelTextPath(cairo_t* c, int w, int h) {
+	static const char* text     = "COW!";
+	static double      fontsize = 150.0f;
 
+	cairo_text_extents_t extents;
+
+	cairo_select_font_face(c, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
+	cairo_set_font_size(c, fontsize);
+	cairo_text_extents(c, text, &extents);
+	
+	cairo_move_to(
+		c,
+		((w - extents.width) / 2.0) - extents.x_bearing,
+		(h - extents.y_bearing) / 2.0
+	);
+	
+	cairo_text_path(c, text);
+}
+
+void drawBevel(cairo_t* c, int w, int h) {
+	static double bevelWidth = 7.0f;
+	static double bevelStep  = 0.1f;
+	static double azimuth    = 0.2f;
+	static double elevation  = 0.0f;
+	static double height     = 10.0f;
+	static double ambient    = 0.5f;
+	static double diffuse    = 0.5f;
+
+	cairo_surface_t* bumpmap = cairo_image_surface_create(CAIRO_FORMAT_A8, w, h);
+	cairo_t*         cr      = cairo_create(bumpmap);
+
+	drawBevelTextPath(cr, w, h);
+	
+	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
+
+	for(double l = bevelWidth; l > 0.0f; l -= bevelStep) {
+		cairo_set_source_rgba(cr, 1.0f, 1.0f, 1.0f, 1.0f - (l / bevelWidth));
+		cairo_set_line_width(cr, l);
+		cairo_stroke_preserve(cr);
+	}
+
+	cairo_destroy(cr);
+
+	cairo_surface_t* lightmap = osgCairo::util::createEmbossedSurface(
+		bumpmap,
+		azimuth,
+		elevation,
+		height,
+		ambient,
+		diffuse
+	);
+
+	drawBevelTextPath(c, w, h);
+	
+	cairo_save(c);
+	cairo_clip_preserve(c);
 	cairo_set_operator(c, CAIRO_OPERATOR_SOURCE);
-	cairo_set_source(c, pat);
+	cairo_set_source_surface(c, lightmap, 0, 0);
 	cairo_paint(c);
+	cairo_set_operator(c, CAIRO_OPERATOR_SATURATE);
+	cairo_set_source_rgba(c, 0.6f, 0.8f, 1.0f, 0.75f);
+	cairo_paint(c);
+	cairo_restore(c);
+	
+	// TODO: This is a hack! Figure out why the border is poor quality...
+	cairo_set_line_width(c, 4.0);
+	cairo_set_operator(c, CAIRO_OPERATOR_CLEAR);
+	cairo_stroke(c);
 
-	cairo_pattern_destroy(pat);
-	*/
+	// cairo_surface_write_to_png(bumpmap, "bumpmap.png");
+	// cairo_surface_write_to_png(lightmap, "lightmap.png");
+
+	cairo_surface_destroy(bumpmap);
+	cairo_surface_destroy(lightmap);
 }
 
 osg::Geode* createExample(unsigned int size) {
@@ -145,7 +209,7 @@ osg::Geode* createExample(unsigned int size) {
 		cairo_t* c = image->createContext();
 
 		if(!cairo_status(c)) {
-			drawPie(c, image->s(), image->t());
+			drawBevel(c, image->s(), image->t());
 
 			cairo_destroy(c);
 		}
