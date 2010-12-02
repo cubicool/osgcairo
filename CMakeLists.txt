@@ -20,10 +20,11 @@ IF(NOT WIN32)
 	INCLUDE(FindPkgConfig)
 	PKG_CHECK_MODULES(CAIRO REQUIRED cairo)
 ELSE(NOT WIN32)
-	FIND_PACKAGE(Cairo)
+	FIND_PACKAGE(Win32GTKBundle)
 ENDIF(NOT WIN32)
 
-FIND_PACKAGE(OpenSceneGraph)
+SET(OPENSCENEGRAPH_INCLUDE_DIR "" CACHE PATH "Location of the OSG include headers.")
+SET(OPENSCENEGRAPH_LIB_DIR "" CACHE PATH "Location of the the OSG library objects.")
 
 SET(SRC_FILES
 	src/Image.cpp
@@ -53,8 +54,6 @@ SET(CAIROCKS_HEADER_FILES
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
-
-SET(OSGCAIROWIDGET FALSE CACHE BOOL "Build the osgWidget/osgCairo example?")
 
 INCLUDE_DIRECTORIES(
 	include
@@ -117,10 +116,6 @@ ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
 ADD_SUBDIRECTORY(examples/osgcairoroads)
 ADD_SUBDIRECTORY(examples/osgcairoutil)
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
-
-IF(OSGCAIROWIDGET)
-	ADD_SUBDIRECTORY(examples/osgcairowidget)
-ENDIF(OSGCAIROWIDGET)
 
 CONFIGURE_FILE(
 	"${CMAKE_CURRENT_SOURCE_DIR}/etc/uninstall.cmake"
