@@ -12,8 +12,8 @@ SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a postfix, usually d on windows")
 
 # On GCC, we need to set these compiler flags.
 IF(NOT WIN32)
-	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused")
-	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused")
+	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused -fPIC")
+	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused -fPIC")
 ENDIF(NOT WIN32)
 
 IF(NOT WIN32)
@@ -59,12 +59,12 @@ INCLUDE_DIRECTORIES(
 	include
 	ext/cairocks/src
 	${OPENSCENEGRAPH_INCLUDE_DIR}
-	${CAIRO_INCLUDE_DIR}
+	${CAIRO_INCLUDE_DIRS}
 )
 
 LINK_DIRECTORIES(
 	${OPENSCENEGRAPH_LIB_DIR}
-	${CAIRO_LIBRARY_DIR}
+	${CAIRO_LIBRARY_DIRS}
 )
 
 ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
