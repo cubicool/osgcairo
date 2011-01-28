@@ -1,0 +1,109 @@
+PROJECT(osgCairo-deps-cairo)
+
+ADD_DEFINITIONS(
+	-D_CRT_SECURE_NO_DEPRECATE
+	-D_CRT_NONSTDC_NO_DEPRECATE
+)
+
+INCLUDE_DIRECTORIES(
+	${OSGCAIRO_DEPS_BASE}/etc/cairo
+	${ZLIB_SRC}
+	${LIBPNG_SRC}
+	${PIXMAN_SRC}/pixman
+	${CAIRO_SRC}/src
+)
+
+SET(SRC_FILES
+	${CAIRO_SRC}/src/cairo-analysis-surface.c
+	${CAIRO_SRC}/src/cairo-arc.c
+	${CAIRO_SRC}/src/cairo-array.c
+	${CAIRO_SRC}/src/cairo-atomic.c
+	${CAIRO_SRC}/src/cairo-base64-stream.c
+	${CAIRO_SRC}/src/cairo-base85-stream.c
+	${CAIRO_SRC}/src/cairo-bentley-ottmann.c
+	${CAIRO_SRC}/src/cairo-bentley-ottmann-rectangular.c
+	${CAIRO_SRC}/src/cairo-bentley-ottmann-rectilinear.c
+	${CAIRO_SRC}/src/cairo-botor-scan-converter.c
+	${CAIRO_SRC}/src/cairo-boxes.c
+	${CAIRO_SRC}/src/cairo.c
+	${CAIRO_SRC}/src/cairo-cache.c
+	${CAIRO_SRC}/src/cairo-clip.c
+	${CAIRO_SRC}/src/cairo-color.c
+	${CAIRO_SRC}/src/cairo-composite-rectangles.c
+	${CAIRO_SRC}/src/cairo-debug.c
+	${CAIRO_SRC}/src/cairo-device.c
+	${CAIRO_SRC}/src/cairo-fixed.c
+	${CAIRO_SRC}/src/cairo-font-face.c
+	${CAIRO_SRC}/src/cairo-font-face-twin.c
+	${CAIRO_SRC}/src/cairo-font-face-twin-data.c
+	${CAIRO_SRC}/src/cairo-font-options.c
+	${CAIRO_SRC}/src/cairo-freelist.c
+	${CAIRO_SRC}/src/cairo-freed-pool.c
+	${CAIRO_SRC}/src/cairo-ft-font.c
+	${CAIRO_SRC}/src/cairo-gstate.c
+	${CAIRO_SRC}/src/cairo-hash.c
+	${CAIRO_SRC}/src/cairo-hull.c
+	${CAIRO_SRC}/src/cairo-image-info.c
+	${CAIRO_SRC}/src/cairo-image-surface.c
+	${CAIRO_SRC}/src/cairo-lzw.c
+	${CAIRO_SRC}/src/cairo-matrix.c
+	${CAIRO_SRC}/src/cairo-recording-surface.c
+	${CAIRO_SRC}/src/cairo-misc.c
+	${CAIRO_SRC}/src/cairo-mutex.c
+	${CAIRO_SRC}/src/cairo-observer.c
+	${CAIRO_SRC}/src/cairo-output-stream.c
+	${CAIRO_SRC}/src/cairo-paginated-surface.c
+	${CAIRO_SRC}/src/cairo-path-bounds.c
+	${CAIRO_SRC}/src/cairo-path.c
+	${CAIRO_SRC}/src/cairo-path-fill.c
+	${CAIRO_SRC}/src/cairo-path-fixed.c
+	${CAIRO_SRC}/src/cairo-path-in-fill.c
+	${CAIRO_SRC}/src/cairo-path-stroke.c
+	${CAIRO_SRC}/src/cairo-pattern.c
+	${CAIRO_SRC}/src/cairo-pen.c
+	${CAIRO_SRC}/src/cairo-polygon.c
+	${CAIRO_SRC}/src/cairo-rectangle.c
+	${CAIRO_SRC}/src/cairo-rectangular-scan-converter.c
+	${CAIRO_SRC}/src/cairo-region.c
+	${CAIRO_SRC}/src/cairo-rtree.c
+	${CAIRO_SRC}/src/cairo-scaled-font.c
+	${CAIRO_SRC}/src/cairo-slope.c
+	${CAIRO_SRC}/src/cairo-spans.c
+	${CAIRO_SRC}/src/cairo-spline.c
+	${CAIRO_SRC}/src/cairo-stroke-style.c
+	${CAIRO_SRC}/src/cairo-surface.c
+	${CAIRO_SRC}/src/cairo-surface-fallback.c
+	${CAIRO_SRC}/src/cairo-surface-clipper.c
+	${CAIRO_SRC}/src/cairo-surface-offset.c
+	${CAIRO_SRC}/src/cairo-surface-snapshot.c
+	${CAIRO_SRC}/src/cairo-surface-subsurface.c
+	${CAIRO_SRC}/src/cairo-surface-wrapper.c
+	${CAIRO_SRC}/src/cairo-system.c
+	${CAIRO_SRC}/src/cairo-tor-scan-converter.c
+	${CAIRO_SRC}/src/cairo-toy-font-face.c
+	${CAIRO_SRC}/src/cairo-traps.c
+	${CAIRO_SRC}/src/cairo-unicode.c
+	${CAIRO_SRC}/src/cairo-user-font.c
+	${CAIRO_SRC}/src/cairo-version.c
+	${CAIRO_SRC}/src/cairo-wideint.c
+	${CAIRO_SRC}/src/cairo-cff-subset.c
+	${CAIRO_SRC}/src/cairo-scaled-font-subsets.c
+	${CAIRO_SRC}/src/cairo-truetype-subset.c
+	${CAIRO_SRC}/src/cairo-type1-fallback.c
+	${CAIRO_SRC}/src/cairo-type1-subset.c
+	${CAIRO_SRC}/src/cairo-type3-glyph-surface.c
+	${CAIRO_SRC}/src/cairo-png.c
+	${CAIRO_SRC}/src/cairo-deflate-stream.c
+	${CAIRO_SRC}/src/cairo-svg-surface-private.h
+	${CAIRO_SRC}/src/cairo-svg-surface.c
+	${CAIRO_SRC}/src/test-fallback-surface.c
+	${CAIRO_SRC}/src/test-fallback16-surface.c
+	${CAIRO_SRC}/src/test-null-surface.c
+	${CAIRO_SRC}/src/test-paginated-surface.c
+	${CAIRO_SRC}/src/test-wrapping-surface.c
+	${CAIRO_SRC}/src/cairo-win32-surface.c
+	${CAIRO_SRC}/src/cairo-win32-printing-surface.c
+	${CAIRO_SRC}/src/cairo-win32-font.c
+)
+
+ADD_LIBRARY(osgCairo-deps-cairo STATIC ${SRC_FILES})
