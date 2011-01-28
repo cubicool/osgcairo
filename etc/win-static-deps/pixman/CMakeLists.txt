@@ -1,12 +1,5 @@
 PROJECT(osgCairo-deps-pixman)
 
-SET(
-	PIXMAN_SRC
-	"${OSGCAIRO_DEPS_BASE}/build/pixman-0.20.0"
-	CACHE PATH
-	"The extracted pixman source"
-)
-
 ADD_DEFINITIONS(
 	-MD
 	-D_CRT_SECURE_NO_DEPRECATE

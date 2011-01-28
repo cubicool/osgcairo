@@ -1,12 +1,5 @@
 PROJECT(osgCairo-deps-zlib)
 
-SET(
-	ZLIB_SRC
-	"${OSGCAIRO_DEPS_BASE}/build/zlib-1.2.5"
-	CACHE PATH
-	"The extracted zlib source"
-)
-
 ADD_DEFINITIONS(
 	-DWIN32
 	-DZLIB_WINAPI
