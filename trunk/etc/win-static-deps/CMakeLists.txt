@@ -21,7 +21,13 @@ SET(PIXMAN_SRC
 	CACHE PATH "The extracted pixman source"
 )
 
+SET(CAIRO_SRC
+	"${OSGCAIRO_DEPS_BASE}/build/cairo-1.10.2"
+	CACHE PATH "The extracted cairo source"
+)
+
 ADD_SUBDIRECTORY(zlib)
 ADD_SUBDIRECTORY(libpng)
 ADD_SUBDIRECTORY(pixman)
+ADD_SUBDIRECTORY(cairo)
 
