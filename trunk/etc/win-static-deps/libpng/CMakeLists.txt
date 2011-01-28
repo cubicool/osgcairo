@@ -1,11 +1,5 @@
 PROJECT(osgCairo-deps-libpng)
 
-SET(
-	LIBPNG_SRC
-	"${OSGCAIRO_DEPS_BASE}/build/libpng-1.4.3"
-	CACHE PATH
-	"The extracted libpng source"
-)
 
 # -D_DEBUG
 # -DDEBUG
@@ -17,7 +11,7 @@ ADD_DEFINITIONS(
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
-INCLUDE_DIRECTORIES(${LIBPNG_SRC})
+INCLUDE_DIRECTORIES(${ZLIB_SRC} ${LIBPNG_SRC})
 
 SET(SRC_FILES
 	${LIBPNG_SRC}/png.c
