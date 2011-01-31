@@ -94,8 +94,6 @@ SET(SRC_FILES
 	${CAIRO_SRC}/src/cairo-type3-glyph-surface.c
 	${CAIRO_SRC}/src/cairo-png.c
 	${CAIRO_SRC}/src/cairo-deflate-stream.c
-	${CAIRO_SRC}/src/cairo-svg-surface-private.h
-	${CAIRO_SRC}/src/cairo-svg-surface.c
 	${CAIRO_SRC}/src/test-fallback-surface.c
 	${CAIRO_SRC}/src/test-fallback16-surface.c
 	${CAIRO_SRC}/src/test-null-surface.c
