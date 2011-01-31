@@ -18,7 +18,7 @@ SET(SRC_FILES
 	${EXPAT_SRC}/lib/xmlrole.c
 	${EXPAT_SRC}/lib/xmltok.c
 	${EXPAT_SRC}/lib/xmltok_impl.c
-	${EXPAT_SRC}/lib/xmltolk_ns.c
+	${EXPAT_SRC}/lib/xmltok_ns.c
 )
 
 ADD_LIBRARY(osgCairo-deps-expat STATIC ${SRC_FILES})

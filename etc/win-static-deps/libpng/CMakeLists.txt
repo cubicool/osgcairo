@@ -1,6 +1,5 @@
 PROJECT(osgCairo-deps-libpng)
 
-
 # -D_DEBUG
 # -DDEBUG
 # -DPNG_DEBUG=1
@@ -11,24 +10,24 @@ ADD_DEFINITIONS(
 	-D_CRT_SECURE_NO_WARNINGS
 )
 
-INCLUDE_DIRECTORIES(${ZLIB_SRC} ${LIBPNG_SRC})
+INCLUDE_DIRECTORIES(${SRC_ZLIB} ${SRC_LIBPNG})
 
 SET(SRC_FILES
-	${LIBPNG_SRC}/png.c
-	${LIBPNG_SRC}/pngerror.c
-	${LIBPNG_SRC}/pngget.c
-	${LIBPNG_SRC}/pngmem.c
-	${LIBPNG_SRC}/pngpread.c
-	${LIBPNG_SRC}/pngread.c
-	${LIBPNG_SRC}/pngrio.c
-	${LIBPNG_SRC}/pngrtran.c
-	${LIBPNG_SRC}/pngrutil.c
-	${LIBPNG_SRC}/pngset.c
-	${LIBPNG_SRC}/pngtrans.c
-	${LIBPNG_SRC}/pngwio.c
-	${LIBPNG_SRC}/pngwrite.c
-	${LIBPNG_SRC}/pngwtran.c
-	${LIBPNG_SRC}/pngwutil.c
+	${SRC_LIBPNG}/png.c
+	${SRC_LIBPNG}/pngerror.c
+	${SRC_LIBPNG}/pngget.c
+	${SRC_LIBPNG}/pngmem.c
+	${SRC_LIBPNG}/pngpread.c
+	${SRC_LIBPNG}/pngread.c
+	${SRC_LIBPNG}/pngrio.c
+	${SRC_LIBPNG}/pngrtran.c
+	${SRC_LIBPNG}/pngrutil.c
+	${SRC_LIBPNG}/pngset.c
+	${SRC_LIBPNG}/pngtrans.c
+	${SRC_LIBPNG}/pngwio.c
+	${SRC_LIBPNG}/pngwrite.c
+	${SRC_LIBPNG}/pngwtran.c
+	${SRC_LIBPNG}/pngwutil.c
 )
 
 ADD_LIBRARY(osgCairo-deps-libpng STATIC ${SRC_FILES})

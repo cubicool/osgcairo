@@ -10,49 +10,50 @@ ADD_DEFINITIONS(
 )
 
 INCLUDE_DIRECTORIES(
-	"${FREETYPE_SRC}/include"
+	${SRC_EXPAT}/lib
+	${SRC_FREETYPE}/include
 )
 
 SET(SRC_FILES
-	${FREETYPE_SRC}/src/autofit/autofit.c
-	${FREETYPE_SRC}/src/base/ftbase.c
-	${FREETYPE_SRC}/src/base/ftbbox.c
-	${FREETYPE_SRC}/src/base/ftbitmap.c
-	${FREETYPE_SRC}/src/base/ftdebug.c
-	${FREETYPE_SRC}/src/base/ftfstype.c
-	${FREETYPE_SRC}/src/base/ftgasp.c
-	${FREETYPE_SRC}/src/base/ftglyph.c
-	${FREETYPE_SRC}/src/base/ftgxval.c
-	${FREETYPE_SRC}/src/base/ftinit.c
-	${FREETYPE_SRC}/src/base/ftlcdfil.c
-	${FREETYPE_SRC}/src/base/ftmm.c
-	${FREETYPE_SRC}/src/base/ftotval.c
-	${FREETYPE_SRC}/src/base/ftpatent.c
-	${FREETYPE_SRC}/src/base/ftpfr.c
-	${FREETYPE_SRC}/src/base/ftstroke.c
-	${FREETYPE_SRC}/src/base/ftsynth.c
-	${FREETYPE_SRC}/src/base/ftsystem.c
-	${FREETYPE_SRC}/src/base/fttype1.c
-	${FREETYPE_SRC}/src/base/ftwinfnt.c
-	${FREETYPE_SRC}/src/base/ftxf86.c
-	${FREETYPE_SRC}/src/bdf/bdf.c
-	${FREETYPE_SRC}/src/cache/ftcache.c
-	${FREETYPE_SRC}/src/cff/cff.c
-	${FREETYPE_SRC}/src/cid/type1cid.c
-	${FREETYPE_SRC}/src/gzip/ftgzip.c
-	${FREETYPE_SRC}/src/lzw/ftlzw.c
-	${FREETYPE_SRC}/src/pcf/pcf.c
-	${FREETYPE_SRC}/src/pfr/pfr.c
-	${FREETYPE_SRC}/src/psaux/psaux.c
-	${FREETYPE_SRC}/src/pshinter/pshinter.c
-	${FREETYPE_SRC}/src/psnames/psmodule.c
-	${FREETYPE_SRC}/src/raster/raster.c
-	${FREETYPE_SRC}/src/sfnt/sfnt.c
-	${FREETYPE_SRC}/src/smooth/smooth.c
-	${FREETYPE_SRC}/src/truetype/truetype.c
-	${FREETYPE_SRC}/src/type1/type1.c
-	${FREETYPE_SRC}/src/type42/type42.c
-	${FREETYPE_SRC}/src/winfonts/winfnt.c
+	${SRC_FREETYPE}/src/autofit/autofit.c
+	${SRC_FREETYPE}/src/base/ftbase.c
+	${SRC_FREETYPE}/src/base/ftbbox.c
+	${SRC_FREETYPE}/src/base/ftbitmap.c
+	${SRC_FREETYPE}/src/base/ftdebug.c
+	${SRC_FREETYPE}/src/base/ftfstype.c
+	${SRC_FREETYPE}/src/base/ftgasp.c
+	${SRC_FREETYPE}/src/base/ftglyph.c
+	${SRC_FREETYPE}/src/base/ftgxval.c
+	${SRC_FREETYPE}/src/base/ftinit.c
+	${SRC_FREETYPE}/src/base/ftlcdfil.c
+	${SRC_FREETYPE}/src/base/ftmm.c
+	${SRC_FREETYPE}/src/base/ftotval.c
+	${SRC_FREETYPE}/src/base/ftpatent.c
+	${SRC_FREETYPE}/src/base/ftpfr.c
+	${SRC_FREETYPE}/src/base/ftstroke.c
+	${SRC_FREETYPE}/src/base/ftsynth.c
+	${SRC_FREETYPE}/src/base/ftsystem.c
+	${SRC_FREETYPE}/src/base/fttype1.c
+	${SRC_FREETYPE}/src/base/ftwinfnt.c
+	${SRC_FREETYPE}/src/base/ftxf86.c
+	${SRC_FREETYPE}/src/bdf/bdf.c
+	${SRC_FREETYPE}/src/cache/ftcache.c
+	${SRC_FREETYPE}/src/cff/cff.c
+	${SRC_FREETYPE}/src/cid/type1cid.c
+	${SRC_FREETYPE}/src/gzip/ftgzip.c
+	${SRC_FREETYPE}/src/lzw/ftlzw.c
+	${SRC_FREETYPE}/src/pcf/pcf.c
+	${SRC_FREETYPE}/src/pfr/pfr.c
+	${SRC_FREETYPE}/src/psaux/psaux.c
+	${SRC_FREETYPE}/src/pshinter/pshinter.c
+	${SRC_FREETYPE}/src/psnames/psmodule.c
+	${SRC_FREETYPE}/src/raster/raster.c
+	${SRC_FREETYPE}/src/sfnt/sfnt.c
+	${SRC_FREETYPE}/src/smooth/smooth.c
+	${SRC_FREETYPE}/src/truetype/truetype.c
+	${SRC_FREETYPE}/src/type1/type1.c
+	${SRC_FREETYPE}/src/type42/type42.c
+	${SRC_FREETYPE}/src/winfonts/winfnt.c
 )
 
 ADD_LIBRARY(osgCairo-deps-freetype STATIC ${SRC_FILES})
