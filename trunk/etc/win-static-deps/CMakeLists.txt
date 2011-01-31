@@ -26,8 +26,26 @@ SET(CAIRO_SRC
 	CACHE PATH "The extracted cairo source"
 )
 
+SET(FREETYPE_SRC
+	"${OSGCAIRO_DEPS_BASE}/build/freetype-2.4.4"
+	CACHE PATH "The extracted freetpye source"
+)
+
+SET(EXPAT_SRC
+	"${OSGCAIRO_DEPS_BASE}/build/expat-2.0.1"
+	CACHE PATH "The extracted expat source"
+)
+
+SET(FONTCONFIG_SRC
+	"${OSGCAIRO_DEPS_BASE}/build/fontconfig-2.8.0"
+	CACHE PATH "The extracted fontconfig source"
+)
+
 ADD_SUBDIRECTORY(zlib)
 ADD_SUBDIRECTORY(libpng)
 ADD_SUBDIRECTORY(pixman)
 ADD_SUBDIRECTORY(cairo)
+ADD_SUBDIRECTORY(freetype)
+ADD_SUBDIRECTORY(expat)
+ADD_SUBDIRECTORY(fontconfig)
 
