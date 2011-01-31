@@ -8,24 +8,24 @@ ADD_DEFINITIONS(
 	-D_CRT_NONSTDC_NO_WARNINGS
 )
 
-INCLUDE_DIRECTORIES(${ZLIB_SRC})
+INCLUDE_DIRECTORIES(${SRC_ZLIB})
 
 SET(SRC_FILES
-	${ZLIB_SRC}/adler32.c
-	${ZLIB_SRC}/compress.c
-	${ZLIB_SRC}/crc32.c
-	${ZLIB_SRC}/deflate.c
-	${ZLIB_SRC}/gzclose.c
-	${ZLIB_SRC}/gzlib.c
-	${ZLIB_SRC}/gzread.c
-	${ZLIB_SRC}/gzwrite.c
-	${ZLIB_SRC}/infback.c
-	${ZLIB_SRC}/inffast.c
-	${ZLIB_SRC}/inflate.c
-	${ZLIB_SRC}/inftrees.c
-	${ZLIB_SRC}/trees.c
-	${ZLIB_SRC}/uncompr.c
-	${ZLIB_SRC}/zutil.c
+	${SRC_ZLIB}/adler32.c
+	${SRC_ZLIB}/compress.c
+	${SRC_ZLIB}/crc32.c
+	${SRC_ZLIB}/deflate.c
+	${SRC_ZLIB}/gzclose.c
+	${SRC_ZLIB}/gzlib.c
+	${SRC_ZLIB}/gzread.c
+	${SRC_ZLIB}/gzwrite.c
+	${SRC_ZLIB}/infback.c
+	${SRC_ZLIB}/inffast.c
+	${SRC_ZLIB}/inflate.c
+	${SRC_ZLIB}/inftrees.c
+	${SRC_ZLIB}/trees.c
+	${SRC_ZLIB}/uncompr.c
+	${SRC_ZLIB}/zutil.c
 )
 
 ADD_LIBRARY(osgCairo-deps-zlib STATIC ${SRC_FILES})
