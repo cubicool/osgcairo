@@ -10,15 +10,15 @@ ADD_DEFINITIONS(
 )
 
 INCLUDE_DIRECTORIES(
-	${EXPAT_SRC}/lib
+	${SRC_EXPAT}/lib
 )
 
 SET(SRC_FILES
-	${EXPAT_SRC}/lib/xmlparse.c
-	${EXPAT_SRC}/lib/xmlrole.c
-	${EXPAT_SRC}/lib/xmltok.c
-	${EXPAT_SRC}/lib/xmltok_impl.c
-	${EXPAT_SRC}/lib/xmltok_ns.c
+	${SRC_EXPAT}/lib/xmlparse.c
+	${SRC_EXPAT}/lib/xmlrole.c
+	${SRC_EXPAT}/lib/xmltok.c
+	${SRC_EXPAT}/lib/xmltok_impl.c
+	${SRC_EXPAT}/lib/xmltok_ns.c
 )
 
 ADD_LIBRARY(osgCairo-deps-expat STATIC ${SRC_FILES})
