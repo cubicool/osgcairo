@@ -12,10 +12,10 @@ Image::Image() {
 }
 
 Image::Image(
-	unsigned int   width,
-	unsigned int   height,
-	cairo_format_t format,
-	unsigned char* data
+	unsigned int               width,
+	unsigned int               height,
+	cairo_format_t             format,
+	unsigned char const *const data
 ) {
 	allocateSurface(width, height, format, data);
 }
@@ -29,10 +29,10 @@ Image::~Image() {
 }
 
 bool Image::allocateSurface(
-	unsigned int   width,
-	unsigned int   height,
-	cairo_format_t format,
-	unsigned char* data
+	unsigned int               width,
+	unsigned int               height,
+	cairo_format_t             format,
+	unsigned char const *const data
 ) {
 	// The default is for CAIRO_FORMAT_ARGB32.
 	GLenum pf1 = GL_RGBA;
