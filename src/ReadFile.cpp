@@ -8,7 +8,7 @@
 namespace osgCairo {
 
 Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* options) {
-	osg::Image* image = osgDB::readImageFile(path, options);
+	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path, options);
 
 	if(!image) return 0;
 
@@ -55,7 +55,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 		<< std::endl
 	;
 
-	delete newData;
+	delete[] newData;
 
 	return cairoImage;
 }
