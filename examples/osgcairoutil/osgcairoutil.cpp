@@ -134,13 +134,13 @@ void drawBevelTextPath(cairo_t* c, int w, int h) {
 }
 
 void drawBevel(cairo_t* c, int w, int h) {
-	static double bevelWidth = 7.0f;
+	static double bevelWidth = 10.0f;
 	static double bevelStep  = 0.1f;
 	static double azimuth    = 0.2f;
-	static double elevation  = 0.0f;
-	static double height     = 10.0f;
-	static double ambient    = 0.5f;
-	static double diffuse    = 0.5f;
+	static double elevation  = 0.2f;
+	static double height     = 75.0f;
+	static double ambient    = 0.2f;
+	static double diffuse    = 0.2f;
 
 	cairo_surface_t* bumpmap = cairo_image_surface_create(CAIRO_FORMAT_A8, w, h);
 	cairo_t*         cr      = cairo_create(bumpmap);
@@ -174,7 +174,7 @@ void drawBevel(cairo_t* c, int w, int h) {
 	cairo_set_source_surface(c, lightmap, 0, 0);
 	cairo_paint(c);
 	cairo_set_operator(c, CAIRO_OPERATOR_SATURATE);
-	cairo_set_source_rgba(c, 0.6f, 0.8f, 1.0f, 0.75f);
+	cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 0.75f);
 	cairo_paint(c);
 	cairo_restore(c);
 	
