@@ -1,5 +1,10 @@
 PROJECT(osgCairo-deps-pixman)
 
+#-DUSE_MMX
+#-DUSE_SSE2
+#-w14710
+#-w14714
+
 ADD_DEFINITIONS(
 	-MD
 	-D_CRT_SECURE_NO_DEPRECATE
@@ -7,10 +12,6 @@ ADD_DEFINITIONS(
 	-DPACKAGE=pixman-1
 	-DPACKAGE_VERSION=""
 	-DPACKAGE_BUGREPORT=""
-	-DUSE_MMX
-	-w14710
-	-w14714
-	-DUSE_SSE2
 )
 
 INCLUDE_DIRECTORIES(${SRC_PIXMAN}/pixman)
@@ -39,9 +40,10 @@ SET(SRC_FILES
 	${SRC_PIXMAN}/pixman/pixman-implementation.c
 	${SRC_PIXMAN}/pixman/pixman-solid-fill.c
 	${SRC_PIXMAN}/pixman/pixman-general.c
-	${SRC_PIXMAN}/pixman/pixman-mmx.c
-	${SRC_PIXMAN}/pixman/pixman-sse2.c
 )
+
+# ${SRC_PIXMAN}/pixman/pixman-sse2.c
+# ${SRC_PIXMAN}/pixman/pixman-mmx.c
 
 ADD_LIBRARY(osgCairo-deps-pixman STATIC ${SRC_FILES})
 

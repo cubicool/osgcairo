@@ -65,6 +65,14 @@ cairo_surface_t* createEmbossedSurface(
 	return cairocks_emboss_create(surface, azimuth, elevation, height, ambient, diffuse);
 }
 
+cairo_surface_t* createDistanceField(
+	cairo_surface_t* surface,
+	int              scan_size,
+	int              block_size
+) {
+	return cairocks_distance_field_create(surface, scan_size, block_size);
+}
+
 std::string cairoFormatAsString(cairo_format_t format) {
 	if(format == CAIRO_FORMAT_ARGB32) return "CAIRO_FORMAT_ARGB32";
 

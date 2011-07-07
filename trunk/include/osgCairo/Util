@@ -56,6 +56,12 @@ OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
 	double
 );
 
+cairo_surface_t* createDistanceField(
+	cairo_surface_t*,
+	int,
+	int
+);
+
 OSGCAIRO_EXPORT std::string cairoFormatAsString (cairo_format_t);
 
 }
