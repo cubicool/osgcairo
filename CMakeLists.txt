@@ -33,6 +33,7 @@ SET(SRC_FILES
 )
 
 SET(CAIROCKS_SRC_FILES
+	ext/cairocks/src/distance-field.c
 	ext/cairocks/src/emboss.c
 	ext/cairocks/src/gaussian-blur.c
 	ext/cairocks/src/invert.c
@@ -112,6 +113,7 @@ FOREACH(INCLUDEFILE ${HEADER_FILES})
 	)
 ENDFOREACH(INCLUDEFILE)
 
+ADD_SUBDIRECTORY(examples/osgcairodistancefield)
 ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
 ADD_SUBDIRECTORY(examples/osgcairoroads)
 ADD_SUBDIRECTORY(examples/osgcairoutil)

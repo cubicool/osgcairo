@@ -36,11 +36,6 @@ SET(SRC_EXPAT
 	CACHE PATH "The extracted expat source"
 )
 
-SET(SRC_FONTCONFIG
-	${OSGCAIRO_DEPS_BASE}/build/fontconfig-2.8.0
-	CACHE PATH "The extracted fontconfig source"
-)
-
 ADD_SUBDIRECTORY(zlib)
 ADD_SUBDIRECTORY(libpng)
 ADD_SUBDIRECTORY(pixman)
