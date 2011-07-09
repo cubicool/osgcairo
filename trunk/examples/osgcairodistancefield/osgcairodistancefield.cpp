@@ -197,8 +197,8 @@ osg::Group* createGUI(osg::Geometry* geometry, osg::Vec3::value_type x, osg::Vec
 	text->setFont(osgText::readFontFile("arial.ttf"));
 	text->setCharacterSize(20.0f);
 	text->setFontResolution(20.0f, 20.0f);
-	text->setPosition(osg::Vec3(-10.0f, 575.0f, 0.0f));
-	text->setAlignment(osgText::Text::LEFT_TOP);
+	text->setPosition(osg::Vec3(x, -y, 0.0f));
+	text->setAlignment(osgText::Text::LEFT_BOTTOM);
 	text->setAxisAlignment(osgText::Text::XY_PLANE);
 	text->setText(
 		"+/-: increase, decrease global scale\n"
