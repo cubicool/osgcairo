@@ -1,0 +1,82 @@
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
+// $Id$
+
+#ifndef OSGCAIRO_IMAGE
+#define OSGCAIRO_IMAGE
+
+#include <cairo.h>
+#include <osg/Image>
+#include <osgCairo/Export>
+
+namespace osgCairo {
+
+//! The Image class is our bread and butter object; this is where most of the magic
+//! takes place. It derives from both Surface (providing the cairo context) and
+//! osg::Image, which is where the actual data is stored (so that we can take
+//! advantage of OSG's image management API).
+class OSGCAIRO_EXPORT Image: public osg::Image {
+public:
+	META_Object(osgCairo, Image);
+
+	//! Default constructor; requires that you call allocateSurface manually later.
+	//! This is useful when you don't know the dimensions of the Image beforehand.
+	Image();
+
+	//! Constructor that makes a single call to allocateSurface for you. These args
+	//! match the arguments to allocateSurface, so please see that documentation for
+	//! further information.
+	Image(
+		unsigned int               width,
+		unsigned int               height,
+		cairo_format_t             format = CAIRO_FORMAT_ARGB32,
+		unsigned char const *const data   = 0
+	);
+	
+	Image(const Image& image, const osg::CopyOp& co);
+
+	virtual ~Image();
+
+	//! The first two arguments are the power-of-two image dimensions; your GPU
+	//! must support this size. The final argument is whether or not you want to use
+	//! a buffer of data initially. By default, the entire surface area is set to all 0's,
+	//! which means different things for different format types; usually black or completely
+	//! transparent black. If you do specify a buffer of image data, you'll need to make
+	//! sure it's formatted properly against the CairoFormat object you used in the constructor.
+	virtual bool allocateSurface(
+		unsigned int               width,
+		unsigned int               height,
+		cairo_format_t             format = CAIRO_FORMAT_ARGB32,
+		unsigned char const *const data   = 0
+	);
+
+	cairo_t* createContext() const;
+
+	//! Returns whether or not the Image is valid internally.
+	virtual bool valid() const;
+
+	cairo_surface_t* getSurface() const;
+	cairo_format_t   getSurfaceFormat() const;
+	int              getSurfaceWidth() const;
+	int              getSurfaceHeight() const;
+	int              getSurfaceStride() const;
+	unsigned char*   getSurfaceData() const;
+
+	//! A helper utility function which will return the image size in memory in bytes.
+	unsigned int getImageSizeInBytes() const;
+
+protected:
+	cairo_surface_t* _surface;
+};
+
+//! This is a special global function that will create a data buffer to be used during an
+//! Images's allocateSurface using an exisiting osg::Image and a desired CairoFormat format.
+//! This doesn't work for all osg::Image formats, so be sure you check the return value
+//! is non-zero.
+OSGCAIRO_EXPORT unsigned char* createNewImageDataAsCairoFormat(
+	osg::Image*    image,
+	cairo_format_t format
+);
+
+}
+
+#endif

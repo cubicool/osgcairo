@@ -1,0 +1,36 @@
+First, get yourself a new Image object:
+
+	osgCairo::Image* image = new osgCairo::Image();
+
+	if(image->allocateImage(128, 128)) {}
+
+	...OR...
+
+	osgCairo::Image* image = new osgCairo::Image(
+		128,
+		128,
+		CAIRO_FORMAT_ARGB32,
+		pointerToRGBAdata
+	);
+
+Secondly, call the various Cairo methods using a cairo_t context created by
+the Image:
+
+	cairo_t* cr = image->createContext();
+
+	if(cairo_status(cr)) return;
+
+	cairo_set_source_rgba(cr, 1.0f, 1.0f, 0.0f, 0.5f);
+	cairo_move_to(cr, 0.0f, 0.0f);
+	cairo_line_to(cr, 10.0f, 10.0f);
+	cairo_stroke(cr);
+
+Thirdly, once you're finished drawing--since an osgCairo::Image is
+also an osg::Image--inform OSG that the Image has been modified and is
+dirty:
+
+	image->dirty();
+
+Have a look at examples/osgcairoviewer to see some of this in action. If you're
+looking for a less C++'ish way of playing around with Cairo and OSG, check out
+osgWidget.

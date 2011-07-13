@@ -1,0 +1,70 @@
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
+// $Id$
+
+#ifndef OSGCAIRO_UTIL
+#define OSGCAIRO_UTIL
+
+#include <cairo.h>
+#include <string>
+#include <osgCairo/Export>
+
+namespace osgCairo {
+namespace util {
+
+OSGCAIRO_EXPORT bool writeToPNG(cairo_surface_t*, const std::string&);
+
+struct Corners {
+	Corners(bool tl = true, bool tr = true, bool br = true, bool bl = true) {
+		corners[0] = tl;
+		corners[1] = tr;
+		corners[2] = br;
+		corners[3] = bl;
+	}
+
+	cairo_bool_t corners[4];
+};
+
+OSGCAIRO_EXPORT bool roundedRectangle(
+	cairo_t*, 
+	double,
+	double,
+	double,
+	double,
+	double,
+	const Corners& = Corners()
+);
+
+OSGCAIRO_EXPORT bool roundedRectangleApply(
+	cairo_t*, 
+	double,
+	double,
+	double,
+	double,
+	double,
+	const Corners& = Corners()
+);
+
+OSGCAIRO_EXPORT bool gaussianBlur (cairo_surface_t*, double, double = 0.0f);
+OSGCAIRO_EXPORT bool mapPathOnto  (cairo_t*, cairo_path_t*);
+
+OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
+	cairo_surface_t*,
+	double,
+	double,
+	double,
+	double,
+	double
+);
+
+cairo_surface_t* createDistanceField(
+	cairo_surface_t*,
+	int,
+	int
+);
+
+OSGCAIRO_EXPORT std::string cairoFormatAsString (cairo_format_t);
+
+}
+}
+
+#endif
