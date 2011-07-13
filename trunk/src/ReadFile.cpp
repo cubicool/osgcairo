@@ -1,4 +1,4 @@
-// -*-c++-*- osgCairo - Copyright (C) 2010 Jeremy Moles
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
 // $Id$
 
 #include <osg/Notify>
