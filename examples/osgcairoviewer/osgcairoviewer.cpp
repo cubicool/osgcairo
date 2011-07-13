@@ -11,6 +11,7 @@
 #include <osgDB/FileUtils>
 #include <osgDB/ReadFile>
 #include <osgDB/WriteFile>
+#include <osgCairo/Version>
 #include <osgCairo/Image>
 #include <osgCairo/ReadFile>
 #include <osgCairo/Util>

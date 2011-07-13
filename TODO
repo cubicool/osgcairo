@@ -1,2 +1,3 @@
-- See if there is a more "Cairo"'ish way to do blurring.
-- Emboss/Bevel?
+- Extend the DistanceField API.
+- Finish the etc/win-static-deps stuff.
+
