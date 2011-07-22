@@ -9,10 +9,14 @@
 #include <osgCairo/Export>
 
 namespace osgCairo {
+
+//! This entire namespace is basically a wrapper around the functions in cairocks.h; in fact,
+//! It would be best to consult that headers documentation instead of looking for it here.
 namespace util {
 
-OSGCAIRO_EXPORT bool writeToPNG(cairo_surface_t*, const std::string&);
+OSGCAIRO_EXPORT bool writeToPNG(cairo_surface_t* surface, const std::string& path);
 
+//! This is a convenient structure for passing the "round corner" booleans to roundedRectangle.
 struct Corners {
 	Corners(bool tl = true, bool tr = true, bool br = true, bool bl = true) {
 		corners[0] = tl;
@@ -25,44 +29,42 @@ struct Corners {
 };
 
 OSGCAIRO_EXPORT bool roundedRectangle(
-	cairo_t*, 
-	double,
-	double,
-	double,
-	double,
-	double,
+	cairo_t*         cr,
+	double           x,
+	double           y,
+	double           width,
+	double           height,
+	double           radius,
 	const Corners& = Corners()
 );
 
 OSGCAIRO_EXPORT bool roundedRectangleApply(
-	cairo_t*, 
-	double,
-	double,
-	double,
-	double,
-	double,
+	cairo_t*         cr,
+	double           x,
+	double           y,
+	double           width,
+	double           height,
+	double           radius,
 	const Corners& = Corners()
 );
 
-OSGCAIRO_EXPORT bool gaussianBlur (cairo_surface_t*, double, double = 0.0f);
-OSGCAIRO_EXPORT bool mapPathOnto  (cairo_t*, cairo_path_t*);
+OSGCAIRO_EXPORT bool gaussianBlur (cairo_surface_t* surface, double radius, double deviation = 0.0f);
+OSGCAIRO_EXPORT bool mapPathOnto  (cairo_t* cr, cairo_path_t* path);
 
 OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
-	cairo_surface_t*,
-	double,
-	double,
-	double,
-	double,
-	double
+	cairo_surface_t* surface,
+	double           azimuth,
+	double           elevation,
+	double           height,
+	double           ambient,
+	double           diffuse
 );
 
 cairo_surface_t* createDistanceField(
-	cairo_surface_t*,
-	int,
-	int
+	cairo_surface_t* surface,
+	int              scanSize,
+	int              blockSize
 );
-
-OSGCAIRO_EXPORT std::string cairoFormatAsString (cairo_format_t);
 
 }
 }

@@ -7,6 +7,16 @@
 
 namespace osgCairo {
 
+std::string cairoFormatAsString(cairo_format_t format) {
+	if(format == CAIRO_FORMAT_ARGB32) return "CAIRO_FORMAT_ARGB32";
+
+	else if(format == CAIRO_FORMAT_RGB24) return "CAIRO_FORMAT_RGB24";
+
+	else if(format == CAIRO_FORMAT_A8) return "CAIRO_FORMAT_A8";
+
+	else return "CAIRO_FORMAT_A1";
+}
+
 Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* options) {
 	osg::ref_ptr<osg::Image> image = osgDB::readImageFile(path, options);
 
@@ -41,7 +51,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 	if(!newData) {
 		osg::notify(osg::WARN)
 			<< "Failed to convert " << path << " to an appropriate Cairo format ("
-			<< util::cairoFormatAsString(cairoFormat) << ")." << std::endl
+			<< cairoFormatAsString(cairoFormat) << ")." << std::endl
 		;
 
 		return 0;
@@ -51,7 +61,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 
 	osg::notify()
 		<< "Loaded osgCairo::Image file " << path
-		<< " using format: " << util::cairoFormatAsString(cairoFormat)
+		<< " using format: " << cairoFormatAsString(cairoFormat)
 		<< std::endl
 	;
 

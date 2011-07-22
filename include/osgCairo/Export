@@ -18,7 +18,7 @@
 //! \section about What Is Cairo
 //!
 //! Cairo is a 2D vector drawing library that enjoys widespread use in the Linux world. It is
-//! a exceptionally well-designed piece of software that will compile and run on many platforms,
+//! an exceptionally well-designed piece of software that will compile and run on many platforms,
 //! and serves as a very competitive (if not superior) free alternative to other kinds of
 //! software that attempt to do the same thing.
 //!

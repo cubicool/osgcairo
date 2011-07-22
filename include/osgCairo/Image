@@ -1,6 +1,9 @@
 // -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
 // $Id$
 
+//! \file
+//! \brief Defines osgCairo::Image, the main object in osgCairo.
+
 #ifndef OSGCAIRO_IMAGE
 #define OSGCAIRO_IMAGE
 
@@ -25,6 +28,9 @@ public:
 	//! Constructor that makes a single call to allocateSurface for you. These args
 	//! match the arguments to allocateSurface, so please see that documentation for
 	//! further information.
+	//! @param width foo
+	//! @param height bar
+	//! @see allocateSurface
 	Image(
 		unsigned int               width,
 		unsigned int               height,
@@ -49,17 +55,32 @@ public:
 		unsigned char const *const data   = 0
 	);
 
+	//! Returns a cairo_t* to be used with the Cairo C API. This must be destroyed with the
+	//! cairo_destroy() function.
 	cairo_t* createContext() const;
 
 	//! Returns whether or not the Image is valid internally.
 	virtual bool valid() const;
 
+	//! Returns the internal Cairo surface; in our case, an "image" surface.
 	cairo_surface_t* getSurface() const;
-	cairo_format_t   getSurfaceFormat() const;
-	int              getSurfaceWidth() const;
-	int              getSurfaceHeight() const;
-	int              getSurfaceStride() const;
-	unsigned char*   getSurfaceData() const;
+
+	//! Returns the cairo_format_t enum; usually ARGB32 or A8.
+	cairo_format_t getSurfaceFormat() const;
+
+	//! Returns the surface width.
+	int getSurfaceWidth() const;
+
+	//! Returns hte surface height.
+	int getSurfaceHeight() const;
+
+	//! Returns the "stride" of a row of pixels; this is calculated by mulitplying the number
+	//! of bytes-per-unit times the number of columns.
+	int getSurfaceStride() const;
+
+	//! Returns a read-write pointer to the internal data. REMEMBER: Cairo stores data with
+	//! pre-multiplied alpha! This is the biggest source of trouble for most new users. :)
+	unsigned char* getSurfaceData() const;
 
 	//! A helper utility function which will return the image size in memory in bytes.
 	unsigned int getImageSizeInBytes() const;

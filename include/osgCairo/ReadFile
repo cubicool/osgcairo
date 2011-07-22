@@ -9,10 +9,16 @@
 
 namespace osgCairo {
 
-OSGCAIRO_EXPORT Image* readImageFile(const std::string&, osgDB::ReaderWriter::Options*);
+//! This function calls osgDB::readImageFile and, if possible, will convert that image data
+//! into an osgCairo::Image object. However, this doesn't work for all formats, in which
+//! a null pointer will be returned. Current GL_RGB, GL_RGBA, and GL_ALPHA are supported.
+//! Intersted parties could easily extend this function for their needs and contribute that
+//! code back into SVN.
+OSGCAIRO_EXPORT Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* options);
 
-inline Image* readImageFile(const std::string& filename) {
-	return readImageFile(filename, osgDB::Registry::instance()->getOptions());
+//! An alternative readImageFile with a default ReaderWriter::Options argument.
+inline Image* readImageFile(const std::string& path) {
+	return readImageFile(path, osgDB::Registry::instance()->getOptions());
 }
 
 }

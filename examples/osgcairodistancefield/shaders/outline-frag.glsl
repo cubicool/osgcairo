@@ -9,11 +9,11 @@ uniform float     OutlineAlphaMax0;
 uniform float     OutlineAlphaMax1;
 
 void main() {
-	float d = texture2D(Texture, sampleCoord).a;
+	float a = texture2D(Texture, sampleCoord).a;
 
 	gl_FragColor =
-		mix(StyleColor, Color, smoothstep(AlphaMin, AlphaMax, d)) *
-		smoothstep(OutlineAlphaMax0, OutlineAlphaMax1, d)
+		mix(StyleColor, Color, smoothstep(AlphaMin, AlphaMax, a)) *
+		smoothstep(OutlineAlphaMax0, OutlineAlphaMax1, a)
 	;
 }
 

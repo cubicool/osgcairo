@@ -73,16 +73,6 @@ cairo_surface_t* createDistanceField(
 	return cairocks_distance_field_create(surface, scan_size, block_size);
 }
 
-std::string cairoFormatAsString(cairo_format_t format) {
-	if(format == CAIRO_FORMAT_ARGB32) return "CAIRO_FORMAT_ARGB32";
-
-	else if(format == CAIRO_FORMAT_RGB24) return "CAIRO_FORMAT_RGB24";
-
-	else if(format == CAIRO_FORMAT_A8) return "CAIRO_FORMAT_A8";
-
-	else return "CAIRO_FORMAT_A1";
-}
-
 }
 }
 
