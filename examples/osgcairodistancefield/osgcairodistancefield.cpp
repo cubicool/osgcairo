@@ -20,8 +20,8 @@
  *
  */
 
-const unsigned int WIDTH      = 1024;
-const unsigned int HEIGHT     = 768;
+const unsigned int WIDTH      = 800;
+const unsigned int HEIGHT     = 600;
 const float        SCALE_STEP = 0.25f;
 
 cairo_surface_t* createDistanceField(unsigned int size, int scanSize, int blockSize) {
@@ -85,93 +85,6 @@ osg::Geode* createDistanceFieldGeode(cairo_surface_t* distanceField) {
 	state->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
 	state->setMode(GL_BLEND, osg::StateAttribute::ON);
 	state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
-
-	geode->addDrawable(geometry);
-
-	return geode;
-}
-
-osg::Geode* createGUIGeode(cairo_surface_t* distanceField, unsigned int guiWidth) {
-	osg::Geode*            geode   = new osg::Geode();
-	osgCairo::Image*       image   = new osgCairo::Image();
-	osg::TextureRectangle* texture = new osg::TextureRectangle();
-	unsigned int           size    = cairo_image_surface_get_width(distanceField);
-
-	if(image->allocateSurface(guiWidth, size + 20, CAIRO_FORMAT_ARGB32)) {
-		cairo_t* c = image->createContext();
-
-		if(!cairo_status(c)) {
-			// Draw the texture and the box around the texture.
-			cairo_save(c);
-			
-			cairo_set_source_rgba(c, 0.2f, 0.2f, 0.2f, 0.8f);
-			cairo_paint(c);
-
-			cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
-			cairo_set_line_width(c, 1.0f);
-			cairo_translate(c, 9.0f, 9.0f);
-			cairo_rectangle(c, 0.5f, 0.5f, size + 2.0f, size + 2.0f);
-			cairo_stroke(c);
-
-			cairo_set_source_surface(c, distanceField, 1, 1);
-			cairo_paint(c);
-
-			cairo_restore(c);
-
-			cairo_font_options_t* fo = cairo_font_options_create();
-
-			cairo_font_options_set_hint_style(fo, CAIRO_HINT_STYLE_FULL);
-
-			float fontSize = 15.0f;
-
-			cairo_set_antialias(c, CAIRO_ANTIALIAS_SUBPIXEL);
-			cairo_set_font_options(c, fo);
-			cairo_select_font_face(c, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-			cairo_set_font_size(c, fontSize);
-			cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
-
-			const char* help[] = {
-				"The generated texture is to the left.",
-				"",
-				"Use the U and I keys to adjust the ViewMatrix scale.",
-				"Use the J and K keys to adjust the Shader scale.",
-				"Use the O and P kess to adjust both scales at once."
-			};
-
-			cairo_translate(c, size + 20.0f, 10.0f);
-
-			for(unsigned int i = 0; i < 5; i++) {
-				cairo_translate(c, 0, fontSize);
-				cairo_text_path(c, help[i]);
-				cairo_fill(c);
-			}
-
-			cairo_font_options_destroy(fo);
-			cairo_destroy(c);
-		}
-
-		image->flipVertical();
-		image->dirty();
-	}
-
-	osg::Geometry*  geometry = osg::createTexturedQuadGeometry(
-		osg::Vec3(0.0f, 0.0f, 0.0f),
-		osg::Vec3(image->s(), 0.0f, 0.0f),
-		osg::Vec3(0.0f, image->t(), 0.0f),
-		0.0f,
-		0.0f, 
-		image->s(),
-		image->t()
-	);
-	
-	texture->setImage(image);
-	texture->setDataVariance(osg::Object::DYNAMIC);
-
-	osg::StateSet* state = geometry->getOrCreateStateSet();
-
-	state->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
-	state->setMode(GL_BLEND, osg::StateAttribute::ON);
-	state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 	state->setAttributeAndModes(
 		new osg::BlendFunc(osg::BlendFunc::ONE, osg::BlendFunc::ONE_MINUS_SRC_ALPHA)
 	);
@@ -183,74 +96,60 @@ osg::Geode* createGUIGeode(cairo_surface_t* distanceField, unsigned int guiWidth
 
 class ScaleSet: public osgGA::GUIEventHandler {
 public:
-	ScaleSet(osg::Camera* camera):
-	_camera(camera) {
+	osg::MatrixTransform* getMatrix(osgGA::GUIActionAdapter& aa) {
+		osgViewer::View* view = dynamic_cast<osgViewer::View*>(&aa);
+
+		if(!view) return 0;
+		
+		osg::Camera* camera = dynamic_cast<osg::Camera*>(view->getSceneData());
+
+		if(!camera) return 0;
+		
+		osg::MatrixTransform* matrix = dynamic_cast<osg::MatrixTransform*>(camera->getChild(0));
+
+		if(!matrix) return 0;
+
+		return matrix;
 	}
 
 	virtual bool handle(const osgGA::GUIEventAdapter& ea, osgGA::GUIActionAdapter& aa) {
 		static float scale = 1.0f;
-
-		if(!_camera.valid()) return false;
-
-		if(ea.getEventType() != osgGA::GUIEventAdapter::KEYDOWN) return false;
 		
-		osg::StateSet* state = _camera->getOrCreateStateSet();
+		if(
+			ea.getEventType() != osgGA::GUIEventAdapter::KEYDOWN ||
+			(
+				ea.getKey() != '=' &&
+				ea.getKey() != '-'
+			)
+		) return false;
+
+		osg::MatrixTransform* matrix = getMatrix(aa);
+		
+		if(!matrix) return false;
+
+		osg::StateSet* state = matrix->getStateSet();
 		osg::Uniform*  aMin  = state->getUniform("AlphaMin");
 		osg::Uniform*  aMax  = state->getUniform("AlphaMax");
-
-		bool adjustViewMatrix = true;
 
 		if(ea.getKey() == '=') scale += SCALE_STEP;
 
 		else if(ea.getKey() == '-') scale -= SCALE_STEP;
 		
-		else if(ea.getKey() == ']') {
-			scale            += SCALE_STEP;
-			adjustViewMatrix  = false;
-		}
-		
-		else if(ea.getKey() == '[') {
-			scale            -= SCALE_STEP;
-			adjustViewMatrix  = false;
-		}
+		// OSG_NOTICE << "New Scale: " << scale << std::endl;
 
-		else if(ea.getKey() == '\\') {
-			const osg::Matrix& vm = _camera->getViewMatrix();
+		aMin->set(std::max(0.0f, 0.5f - 0.07f / (scale / 2.0f)));
+		aMax->set(std::min(0.5f + 0.07f / (scale / 2.0f), 1.0f));
 
-			OSG_NOTICE
-				<< "ViewMatrix Scale: " << vm.getScale().x() << std::endl
-				<< "Scale: " << scale << std::endl
-			;
+		matrix->setMatrix(osg::Matrix::scale(scale, scale, 1.0f));
 
-			return true;
-		}
-
-		else return false;
-
-		if(adjustViewMatrix) {
-			OSG_NOTICE << "New ViewMatrix Scale: " << scale << std::endl;
-			
-			osg::Matrix vm(osg::Matrix::scale(scale, scale, 1.0f));
-		
-			_camera->setViewMatrix(vm);
-		}
-		
-		OSG_NOTICE << "New Scale: " << scale << std::endl;
-
-		aMin->set(std::max(0.0f, 0.5f - 0.07f / scale));
-		aMax->set(std::min(0.5f + 0.07f / scale, 1.0f));
-
-		OSG_NOTICE << "AlphaMin: " << std::max(0.0f, 0.5f - 0.07f / scale) << std::endl;
-		OSG_NOTICE << "AlphaMax: " << std::min(0.5f + 0.07f / scale, 1.0f) << std::endl;
+		// OSG_NOTICE << "AlphaMin: " << std::max(0.0f, 0.5f - 0.07f / scale) << std::endl;
+		// OSG_NOTICE << "AlphaMax: " << std::min(0.5f + 0.07f / scale, 1.0f) << std::endl;
 
 		return true;
 	}
-
-private:
-	osg::observer_ptr<osg::Camera> _camera;
 };
 
-osg::Camera* createOrthoCamera(float width, float height, int orderNum, bool center=false) {
+osg::Camera* createOrthoCamera(float width, float height) {
 	osg::Camera* camera = new osg::Camera();
 
 	camera->getOrCreateStateSet()->setMode(
@@ -258,19 +157,17 @@ osg::Camera* createOrthoCamera(float width, float height, int orderNum, bool cen
 		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
 	);
 
-	if(center) camera->setProjectionMatrixAsOrtho2D(
+	camera->setProjectionMatrixAsOrtho2D(
 		-width / 2.0f,
 		width / 2.0f,
 		-height / 2.0f,
 		height / 2.0f
 	);
 
-	else camera->setProjectionMatrixAsOrtho2D(0.0, width, 0.0, height);
-
 	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	camera->setViewMatrix(osg::Matrix::identity());
 	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
-	camera->setRenderOrder(osg::Camera::POST_RENDER, orderNum);
+	camera->setRenderOrder(osg::Camera::POST_RENDER);
 
 	return camera;
 }
@@ -312,12 +209,11 @@ int main(int argc, char** argv) {
 		std::atoi(args[3])
 	);
 
-	osg::Geode*   geode     = createDistanceFieldGeode(distanceField);
-	osg::Camera*  camera    = createOrthoCamera(WIDTH, HEIGHT, 0, true);
-	osg::Camera*  guiCamera = createOrthoCamera(WIDTH, HEIGHT, 1);
-	osg::Program* program   = new osg::Program();
-	osg::Shader*  vert      = osg::Shader::readShaderFile(osg::Shader::VERTEX, vertPath);
-	osg::Shader*  frag      = osg::Shader::readShaderFile(osg::Shader::FRAGMENT, fragPath);
+	osg::Geode*   geode   = createDistanceFieldGeode(distanceField);
+	osg::Camera*  camera  = createOrthoCamera(WIDTH, HEIGHT);
+	osg::Program* program = new osg::Program();
+	osg::Shader*  vert    = osg::Shader::readShaderFile(osg::Shader::VERTEX, vertPath);
+	osg::Shader*  frag    = osg::Shader::readShaderFile(osg::Shader::FRAGMENT, fragPath);
 
 	float scale  = 1.0f;
 	float aMin   = std::max(0.0f, 0.5f - 0.07f / scale);
@@ -327,7 +223,7 @@ int main(int argc, char** argv) {
 	float oaMax0 = std::max(double(0.0f), ol - 0.07 / scale);
 	float oaMax1 = std::min(ol + 0.07 / scale, double(aMin));
 
-	osg::Uniform* color      = new osg::Uniform("Color", osg::Vec4(1.0f, 0.7f, 0.0f, 1.0f));
+	osg::Uniform* color      = new osg::Uniform("Color", osg::Vec4(1.0f, 0.7f, 0.0f, 0.5f));
 	osg::Uniform* styleColor = new osg::Uniform("StyleColor", osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	osg::Uniform* alphaMin   = new osg::Uniform("AlphaMin", aMin);
 	osg::Uniform* alphaMax   = new osg::Uniform("AlphaMax", aMax);
@@ -340,26 +236,23 @@ int main(int argc, char** argv) {
 	program->addShader(vert);
 	program->addShader(frag);
 
-	camera->getOrCreateStateSet()->setAttributeAndModes(program);
-	camera->getOrCreateStateSet()->addUniform(color);
-	camera->getOrCreateStateSet()->addUniform(styleColor);
-	camera->getOrCreateStateSet()->addUniform(alphaMin);
-	camera->getOrCreateStateSet()->addUniform(alphaMax);
-	camera->getOrCreateStateSet()->addUniform(alphaMax0);
-	camera->getOrCreateStateSet()->addUniform(alphaMax1);
-	camera->getOrCreateStateSet()->addUniform(texture);
-	camera->addChild(geode);
+	osg::MatrixTransform* matrix = new osg::MatrixTransform();
 
-	guiCamera->addChild(createGUIGeode(distanceField, WIDTH));
+	matrix->getOrCreateStateSet()->setAttributeAndModes(program);
+	matrix->getOrCreateStateSet()->addUniform(color);
+	matrix->getOrCreateStateSet()->addUniform(styleColor);
+	matrix->getOrCreateStateSet()->addUniform(alphaMin);
+	matrix->getOrCreateStateSet()->addUniform(alphaMax);
+	matrix->getOrCreateStateSet()->addUniform(alphaMax0);
+	matrix->getOrCreateStateSet()->addUniform(alphaMax1);
+	matrix->getOrCreateStateSet()->addUniform(texture);
+	matrix->addChild(geode);
 
-	osg::Group* group = new osg::Group();
+	camera->addChild(matrix);
 
-	group->addChild(camera);
-	group->addChild(guiCamera);
-
-	viewer.setSceneData(group);
+	viewer.setSceneData(camera);
 	viewer.setUpViewInWindow(50, 50, WIDTH, HEIGHT);
-	viewer.addEventHandler(new ScaleSet(camera));
+	viewer.addEventHandler(new ScaleSet());
 
 	int r = viewer.run();
 
