@@ -22,7 +22,7 @@
 
 const unsigned int WIDTH      = 800;
 const unsigned int HEIGHT     = 600;
-const float        SCALE_STEP = 0.25f;
+const float        SCALE_STEP = 0.05f;
 
 cairo_surface_t* createDistanceField(unsigned int size, int scanSize, int blockSize) {
 	cairo_surface_t*      surface = cairo_image_surface_create(CAIRO_FORMAT_A8, size, size);
@@ -46,6 +46,47 @@ cairo_surface_t* createDistanceField(unsigned int size, int scanSize, int blockS
 	cairo_destroy(c);
 
 	return distanceField;
+}
+
+osg::Geode* createBackgroundGeode(unsigned int width, unsigned int height) {
+	osg::Geode*      geode   = new osg::Geode();
+	osgCairo::Image* image   = new osgCairo::Image();
+	osg::Texture2D*  texture = new osg::Texture2D();
+
+	if(image->allocateSurface(width, height, CAIRO_FORMAT_ARGB32)) {
+		cairo_t* c = image->createContext();
+
+		if(!cairo_status(c)) {
+			cairo_set_source_rgba(c, 1.0f, 0.5f, 0.0f, 1.0f);
+			cairo_paint(c);
+			cairo_destroy(c);
+		}
+
+		image->dirty();
+	}
+
+	osg::Geometry*  geometry = osg::createTexturedQuadGeometry(
+		osg::Vec3(-(image->s() / 2.0f), -(image->t() / 2.0f), -0.1f),
+		osg::Vec3(image->s(), 0.0f, 0.0f),
+		osg::Vec3(0.0f, image->t(), 0.0f),
+		0.0f,
+		0.0f, 
+		1.0f,
+		1.0f
+	);
+	
+	texture->setImage(image);
+	texture->setDataVariance(osg::Object::DYNAMIC);
+
+	osg::StateSet* state = geometry->getOrCreateStateSet();
+
+	state->setTextureAttributeAndModes(0, texture, osg::StateAttribute::ON);
+	state->setMode(GL_BLEND, osg::StateAttribute::ON);
+	state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
+
+	geode->addDrawable(geometry);
+
+	return geode;
 }
 
 osg::Geode* createDistanceFieldGeode(cairo_surface_t* distanceField) {
@@ -210,6 +251,7 @@ int main(int argc, char** argv) {
 	);
 
 	osg::Geode*   geode   = createDistanceFieldGeode(distanceField);
+	osg::Geode*   bg      = createBackgroundGeode(WIDTH, HEIGHT);
 	osg::Camera*  camera  = createOrthoCamera(WIDTH, HEIGHT);
 	osg::Program* program = new osg::Program();
 	osg::Shader*  vert    = osg::Shader::readShaderFile(osg::Shader::VERTEX, vertPath);
@@ -223,7 +265,7 @@ int main(int argc, char** argv) {
 	float oaMax0 = std::max(double(0.0f), ol - 0.07 / scale);
 	float oaMax1 = std::min(ol + 0.07 / scale, double(aMin));
 
-	osg::Uniform* color      = new osg::Uniform("Color", osg::Vec4(1.0f, 0.7f, 0.0f, 0.5f));
+	osg::Uniform* color      = new osg::Uniform("Color", osg::Vec4(1.0f, 1.0f, 1.0f, 1.0f));
 	osg::Uniform* styleColor = new osg::Uniform("StyleColor", osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f));
 	osg::Uniform* alphaMin   = new osg::Uniform("AlphaMin", aMin);
 	osg::Uniform* alphaMax   = new osg::Uniform("AlphaMax", aMax);
@@ -249,6 +291,7 @@ int main(int argc, char** argv) {
 	matrix->addChild(geode);
 
 	camera->addChild(matrix);
+	camera->addChild(bg);
 
 	viewer.setSceneData(camera);
 	viewer.setUpViewInWindow(50, 50, WIDTH, HEIGHT);
