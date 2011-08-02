@@ -84,14 +84,8 @@ TARGET_LINK_LIBRARIES(osgCairo
 	optimized OpenThreads
 	debug     osg${CMAKE_DEBUG_POSTFIX}
 	optimized osg
-	debug     osgUtil${CMAKE_DEBUG_POSTFIX}
-	optimized osgUtil
 	debug     osgDB${CMAKE_DEBUG_POSTFIX}
 	optimized osgDB
-	debug     osgGA${CMAKE_DEBUG_POSTFIX}
-	optimized osgGA
-	debug     osgViewer${CMAKE_DEBUG_POSTFIX}
-	optimized osgViewer
 	debug     cairo
 	optimized cairo
 	cairocks
@@ -141,7 +135,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
 	".*release/"
 )
 
-SET(OSGCAIRO_VERSION "1.0.0")
+SET(OSGCAIRO_VERSION "1.2.0")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "osgCairo-${OSGCAIRO_VERSION}")
 
 INCLUDE(CPack)
