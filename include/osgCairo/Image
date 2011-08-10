@@ -47,10 +47,10 @@ public:
 	//! transparent black. If you do specify a buffer of image data, you'll need to make
 	//! sure it's formatted properly against the CairoFormat object you used in the constructor.
 	virtual bool allocateSurface(
-		unsigned int               width,
-		unsigned int               height,
-		cairo_format_t             format = CAIRO_FORMAT_ARGB32,
-		unsigned char const *const data   = 0
+		unsigned int         width,
+		unsigned int         height,
+		cairo_format_t       format = CAIRO_FORMAT_ARGB32,
+		const unsigned char* data   = 0
 	);
 
 	//! Returns a cairo_t* to be used with the Cairo C API. This must be destroyed with the

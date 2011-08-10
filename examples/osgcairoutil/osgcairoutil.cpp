@@ -4,6 +4,7 @@
 #include <osg/Geode>
 #include <osg/BlendFunc>
 #include <osgDB/ReadFile>
+#include <osgDB/WriteFile>
 #include <osgViewer/Viewer>
 #include <osgViewer/ViewerEventHandlers>
 #include <osgCairo/Image>
@@ -232,6 +233,9 @@ osg::Geode* createExample(unsigned int size) {
 		);
 
 		image->dirty();
+
+		osgDB::writeObjectFile(*image, "image.osgt");
+		osgDB::writeImageFile(*image, "image.png");
 
 		geode->addDrawable(geom);
 	}
