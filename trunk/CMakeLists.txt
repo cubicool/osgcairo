@@ -28,7 +28,6 @@ SET(OPENSCENEGRAPH_LIB_DIR "" CACHE PATH "Location of the the OSG library object
 
 SET(SRC_FILES
 	src/Image.cpp
-	src/LibraryWrapper.cpp
 	src/ReadFile.cpp
 	src/Util.cpp
 )
@@ -40,6 +39,11 @@ SET(CAIROCKS_SRC_FILES
 	ext/cairocks/src/invert.c
 	ext/cairocks/src/map-path-onto.c
 	ext/cairocks/src/rounded.c
+)
+
+SET(SERIALIZER_SRC_FILES
+	src/serializers/LibraryWrapper.cpp
+	src/serializers/Image.cpp
 )
 
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
@@ -57,6 +61,7 @@ SET(CAIROCKS_HEADER_FILES
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
+SOURCE_GROUP("Serilizer Files" FILES ${SERIALIZER_SRC_FILES})
 
 INCLUDE_DIRECTORIES(
 	include
@@ -70,7 +75,7 @@ LINK_DIRECTORIES(
 	${CAIRO_LIBRARY_DIRS}
 )
 
-ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
+ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES} ${SERIALIZER_SRC_FILES})
 
 SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
