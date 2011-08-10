@@ -28,6 +28,7 @@ SET(OPENSCENEGRAPH_LIB_DIR "" CACHE PATH "Location of the the OSG library object
 
 SET(SRC_FILES
 	src/Image.cpp
+	src/LibraryWrapper.cpp
 	src/ReadFile.cpp
 	src/Util.cpp
 )
