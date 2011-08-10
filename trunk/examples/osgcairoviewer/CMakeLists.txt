@@ -1,10 +1,10 @@
 PROJECT(osgcairoviewer)
 
 LINK_LIBRARIES(osgCairo
-	debug     osgGA${CMAKE_DEBUG_POSTFIX}
-	optimized osgGA
 	debug     osgViewer${CMAKE_DEBUG_POSTFIX}
 	optimized osgViewer
+	debug     osgGA${CMAKE_DEBUG_POSTFIX}
+	optimized osgGA
 )
 
 ADD_EXECUTABLE(osgcairoviewer osgcairoviewer.cpp)

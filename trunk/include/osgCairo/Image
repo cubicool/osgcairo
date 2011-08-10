@@ -38,7 +38,7 @@ public:
 		unsigned char const *const data   = 0
 	);
 	
-	Image(const Image& image, const osg::CopyOp& co);
+	Image(const Image& image, const osg::CopyOp& co = osg::CopyOp::SHALLOW_COPY);
 
 	virtual ~Image();
 
