@@ -28,14 +28,12 @@ public:
 	//! Constructor that makes a single call to allocateSurface for you. These args
 	//! match the arguments to allocateSurface, so please see that documentation for
 	//! further information.
-	//! @param width foo
-	//! @param height bar
 	//! @see allocateSurface
 	Image(
-		unsigned int               width,
-		unsigned int               height,
-		cairo_format_t             format = CAIRO_FORMAT_ARGB32,
-		unsigned char const *const data   = 0
+		unsigned int         width,
+		unsigned int         height,
+		cairo_format_t       format = CAIRO_FORMAT_ARGB32,
+		const unsigned char* data   = 0
 	);
 	
 	Image(const Image& image, const osg::CopyOp& co = osg::CopyOp::SHALLOW_COPY);
