@@ -60,7 +60,7 @@ OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
 	double           diffuse
 );
 
-cairo_surface_t* createDistanceField(
+OSGCAIRO_EXPORT cairo_surface_t* createDistanceField(
 	cairo_surface_t* surface,
 	int              scanSize,
 	int              blockSize
