@@ -8,31 +8,35 @@
 
 namespace osgCairo {
 
-Image::Image() {
+Image::Image():
+_surface(0) {
 }
 
 Image::Image(
-	unsigned int               width,
-	unsigned int               height,
-	cairo_format_t             format,
-	unsigned char const *const data
-) {
+	unsigned int         width,
+	unsigned int         height,
+	cairo_format_t       format,
+	const unsigned char* data
+):
+_surface(0) {
 	allocateSurface(width, height, format, data);
 }
 
 Image::Image(const Image& si, const osg::CopyOp& co):
-osg::Image(si, co) {
+osg::Image(si, co),
+_surface(si._surface) {
+	// TODO: surface_reference if copyOp...
 }
 
 Image::~Image() {
-	cairo_surface_destroy(_surface);
+	if(_surface) cairo_surface_destroy(_surface);
 }
 
 bool Image::allocateSurface(
-	unsigned int               width,
-	unsigned int               height,
-	cairo_format_t             format,
-	unsigned char const *const data
+	unsigned int         width,
+	unsigned int         height,
+	cairo_format_t       format,
+	const unsigned char* data
 ) {
 	// The default is for CAIRO_FORMAT_ARGB32.
 	GLenum pf1 = GL_RGBA;

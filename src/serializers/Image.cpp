@@ -6,6 +6,7 @@
 #include <osgDB/InputStream>
 #include <osgDB/OutputStream>
 #include <osgCairo/Image>
+#include <osgCairo/Util>
 
 // ---------------------------------------------------------------------------------------- Surface
 static bool checkSurface(const osgCairo::Image& image) {
@@ -17,8 +18,11 @@ static bool readSurface(osgDB::InputStream& is, osgCairo::Image& image) {
 }
 
 static bool writeSurface(osgDB::OutputStream& os, const osgCairo::Image& image) {
-	// const std::string format = osgCairo::util::
-	// os << image.getWidth() << image.getHeight();
+	const std::string format = osgCairo::util::cairoFormatAsString(image.getSurfaceFormat());
+
+	os << format << image.getSurfaceWidth() << image.getSurfaceHeight() << std::endl;
+	
+	os.setWriteImageHint(osgDB::OutputStream::WRITE_EXTERNAL_FILE);
 
 	return true;
 }
