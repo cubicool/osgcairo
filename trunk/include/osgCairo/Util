@@ -14,6 +14,12 @@ namespace osgCairo {
 //! It would be best to consult that headers documentation instead of looking for it here.
 namespace util {
 
+//! Converts a cairo_format_t into its string representation.
+OSGCAIRO_EXPORT std::string cairoFormatAsString(cairo_format_t format);
+
+//! Converts a cairo_format_t string representation into its actual enum value.
+OSGCAIRO_EXPORT cairo_format_t stringAsCairoFormat(const std::string& format);
+
 OSGCAIRO_EXPORT bool writeToPNG(cairo_surface_t* surface, const std::string& path);
 
 //! This is a convenient structure for passing the "round corner" booleans to roundedRectangle.
