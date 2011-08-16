@@ -59,20 +59,27 @@ bool Image::allocateSurface(
 		pf2 = GL_UNSIGNED_BYTE;
 	}
 
-	else if(format == CAIRO_FORMAT_RGB24) pf1 = GL_RGB;
+	else if(format != CAIRO_FORMAT_ARGB32) {
+		OSGCAIRO_WARN 
+			<< "The format you've chosen is not supported in osgCairo; there is no "
+			"compelling reason (speed or otherwise) to use a format other than "
+			"ARGB32 or A8 in an OpenGL setting."
+			<< std::endl
+		;
+
+		return false;
+	}
 
 	// Call the osg::Image allocation method.
 	allocateImage(width, height, 1, pf1, pf2);
 
 	if(!osg::Image::valid()) return false;
 
-	unsigned int i = 0;
+	unsigned int i = 4;
 
 	// This will have to do for now. :)
 	if(format == CAIRO_FORMAT_A8) i = 1;
 
-	else i = 4;
-	
 	if(data) std::memcpy(_data, data, (width * height) * i);
 
 	else std::memset(_data, 0, (width * height) * i);
@@ -87,6 +94,94 @@ bool Image::allocateSurface(
 		width,
 		height,
 		cairo_format_stride_for_width(format, width)
+	);
+
+	if(!valid()) return false;
+
+	dirty();
+
+	return true;
+}
+
+bool Image::allocateSurface(const osg::Image* image) {
+	if(!image) return false;
+
+	const osgCairo::Image* test = dynamic_cast<const osgCairo::Image*>(image);
+
+	if(test) {
+		OSGCAIRO_WARN
+			<< "Cannot allocate from an existing osgCairo::Image; "
+			"use copy construction instead; this method is only intended "
+			"for allocating from a traditional osg::Image."
+			<< std::endl
+		;
+
+		return false;
+	}
+
+	GLenum format = image->getPixelFormat();
+
+	if(format == GL_ALPHA || format == GL_LUMINANCE) return allocateSurface(
+		image->s(),
+		image->t(),
+		CAIRO_FORMAT_A8,
+		static_cast<const unsigned char*>(image->getDataPointer())
+	);
+
+	else if(format != GL_RGB && format != GL_RGBA) {
+		OSGCAIRO_WARN
+			<< "Can only allocate ARGB32 surfaces from GL_RGB/GL_RGBA Image sources."
+			<< std::endl
+		;
+
+		return false;
+	}
+
+	allocateImage(image->s(), image->t(), 1, GL_RGBA, GL_UNSIGNED_INT_8_8_8_8_REV);
+
+	if(!osg::Image::valid()) return false;
+
+	_pixelFormat = GL_BGRA;
+
+	const unsigned char* data      = image->data();
+	unsigned int         numPixels = image->s() * image->t();
+	unsigned int         offset    = 4;
+
+	if(format == GL_RGB) offset = 3;
+
+	for(unsigned int i = 0; i < numPixels; i++) {
+		unsigned char a = data[i * offset + 3];
+		unsigned char r = data[i * offset + 2];
+		unsigned char g = data[i * offset + 1];
+		unsigned char b = data[i * offset];
+
+		// We want ARGB32 from a _SOURCE_ that _DOES_ have an alpha
+		// channel; therefore, we need to premultiply.
+		if(format == GL_RGBA) {			
+			_data[i * 4]     = (r * a) / 255;
+			_data[i * 4 + 1] = (g * a) / 255;
+			_data[i * 4 + 2] = (b * a) / 255;
+			_data[i * 4 + 3] = a;
+		}
+
+		// Otherwise, we're loading from a source with no alpha
+		// channel. This doesn't make a lot of sense to do, unless
+		// the user is planning on using CAIRO_OPERATOR_CLEAR at
+		// some point during their drawing.
+		else {
+			_data[i * 4]     = r;
+			_data[i * 4 + 1] = g;
+			_data[i * 4 + 2] = b;
+			_data[i * 4 + 3] = 255;
+		}
+	}
+
+	_surface = cairo_image_surface_create_for_data(
+		_data,
+		CAIRO_FORMAT_ARGB32,
+		image->s(),
+		image->t(),
+		cairo_format_stride_for_width(CAIRO_FORMAT_ARGB32, image->s())
 	);
 
 	if(!valid()) return false;
@@ -172,82 +267,5 @@ unsigned int Image::getImageSizeInBytes() const {
 	return computeRowWidthInBytes(_s, _pixelFormat, _dataType, _packing) * _t * _r;
 }
 
-// Thank you to Riccardo Corsi <riccardo.corsi@vrmmp.it> for pointing out the necessity
-// of this routine. :)
-// TODO: If this routine gets called a lot, it may make sense to change the data
-// IN PLACE instead of doing a new allocation every time.
-unsigned char* createNewImageDataAsCairoFormat(osg::Image* image, cairo_format_t cairoFormat) {
-	unsigned char* data     = image->data();
-	unsigned char* newData  = 0;
-	GLenum         format   = image->getPixelFormat();
-	unsigned int   numPixel = image->s() * image->t();
-
-	if(cairoFormat == CAIRO_FORMAT_ARGB32 || cairoFormat == CAIRO_FORMAT_RGB24) {
-		if(format != GL_RGB && format != GL_RGBA) return 0;
-
-		unsigned int offset = 4;
-
-		newData = new unsigned char[numPixel * 4];
-
-		if(format == GL_RGB) offset = 3;
-
-		for(unsigned int i = 0; i < numPixel; i++) {
-			unsigned char a = data[i * offset + 3];
-			unsigned char r = data[i * offset + 2];
-			unsigned char g = data[i * offset + 1];
-			unsigned char b = data[i * offset];
-
-			// Requested format is RGB24, which doesn't use the alpha byte.
-			if(cairoFormat == CAIRO_FORMAT_RGB24) {
-				newData[i * 4]     = r;
-				newData[i * 4 + 1] = g;
-				newData[i * 4 + 2] = b;
-				newData[i * 4 + 3] = 0;
-			}
-
-			else {
-				// We want ARGB32 from a _SOURCE_ that _DOES_ have an alpha
-				// channel; therefore, we need to premultiply.
-				if(format == GL_RGBA) {			
-					newData[i * 4]     = (r * a) / 255;
-					newData[i * 4 + 1] = (g * a) / 255;
-					newData[i * 4 + 2] = (b * a) / 255;
-					newData[i * 4 + 3] = a;
-				}
-
-				// Otherwise, we're loading from a source with no alpha
-				// channel. This doesn't make a lot of sense to do, unless
-				// the user is planning on using CAIRO_OPERATOR_CLEAR at
-				// some point during their drawing.
-				else {
-					newData[i * 4]     = r;
-					newData[i * 4 + 1] = g;
-					newData[i * 4 + 2] = b;
-					newData[i * 4 + 3] = 255;
-				}
-			}
-		}
-
-	}
-
-	// The user wants CAIRO_FORMAT_A8...
-	else {
-		if(format != GL_ALPHA && format != GL_LUMINANCE) {
-			OSGCAIRO_WARN("createNewImageDataAsCairoFormat")
-				<< "Couldn't understand GL format enum '" << format
-				<< "' for CAIRO_FORMAT_A8."
-				<< std::endl
-			;
-
-			return 0;
-		}
-
-		newData = new unsigned char[numPixel];
-		
-		std::memcpy(newData, data, numPixel);
-	}
-
-	return newData;
 }
 
-}

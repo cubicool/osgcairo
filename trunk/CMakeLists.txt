@@ -28,6 +28,7 @@ SET(OPENSCENEGRAPH_LIB_DIR "" CACHE PATH "Location of the the OSG library object
 
 SET(SRC_FILES
 	src/Image.cpp
+	src/LibraryWrapper.cpp
 	src/ReadFile.cpp
 	src/Util.cpp
 )
@@ -136,7 +137,7 @@ SET(CPACK_SOURCE_IGNORE_FILES
 	".*release/"
 )
 
-SET(OSGCAIRO_VERSION "1.2.0")
+SET(OSGCAIRO_VERSION "1.4.0")
 SET(CPACK_SOURCE_PACKAGE_FILE_NAME "osgCairo-${OSGCAIRO_VERSION}")
 
 INCLUDE(CPack)

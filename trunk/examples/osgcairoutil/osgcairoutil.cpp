@@ -90,7 +90,7 @@ void drawPie(cairo_t* c, int w, int h) {
 		cairo_new_path(c);
 		cairo_text_path(c, atts[i]);
 
-		osgCairo::util::mapPathOnto(c, path);
+		osgCairo::mapPathOnto(c, path);
 	
 		cairo_path_destroy(path);
 
@@ -158,7 +158,7 @@ void drawBevel(cairo_t* c, int w, int h) {
 
 	cairo_destroy(cr);
 
-	cairo_surface_t* lightmap = osgCairo::util::createEmbossedSurface(
+	cairo_surface_t* lightmap = osgCairo::createEmbossedSurface(
 		bumpmap,
 		azimuth,
 		elevation,

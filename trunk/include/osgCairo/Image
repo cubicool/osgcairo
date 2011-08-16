@@ -35,7 +35,7 @@ public:
 		cairo_format_t       format,
 		const unsigned char* data = 0
 	);
-	
+
 	Image(const Image& image, const osg::CopyOp& co = osg::CopyOp::SHALLOW_COPY);
 
 	virtual ~Image();
@@ -52,6 +52,11 @@ public:
 		cairo_format_t       format,
 		const unsigned char* data = 0
 	);
+
+	//! This is an alternative form of allocation that will intialize the Image data from an
+	//! existing osg::Image image, but NOT an osgCairo::Image; use the copy constructor for
+	//! that.
+	virtual bool allocateSurface(const osg::Image* image);
 
 	//! Returns a cairo_t* to be used with the Cairo C API. This must be destroyed with the
 	//! cairo_destroy() function.
@@ -98,15 +103,6 @@ public:
 protected:
 	cairo_surface_t* _surface;
 };
-
-//! This is a special global function that will create a data buffer to be used during an
-//! Images's allocateSurface using an exisiting osg::Image and a desired CairoFormat format.
-//! This doesn't work for all osg::Image formats, so be sure you check the return value
-//! is non-zero.
-OSGCAIRO_EXPORT unsigned char* createNewImageDataAsCairoFormat(
-	osg::Image*    image,
-	cairo_format_t format
-);
 
 }
 
