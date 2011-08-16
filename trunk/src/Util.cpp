@@ -2,7 +2,9 @@
 // $Id$
 
 #include <osg/Math>
-#include <osg/Notify>
+#include <osgDB/FileUtils>
+#include <osgCairo/Notify>
+#include <osgCairo/Image>
 #include <osgCairo/Util>
 
 #include "cairocks.h"
@@ -36,10 +38,49 @@ bool writeToPNG(cairo_surface_t* surface, const std::string& path) {
 
 	return true;
 #else
-	osg::notify(osg::WARN) << "Your version of Cairo does not support PNG writing!" << std::endl;
+	OSGCAIRO_WARN("util::writeToPNG")
+		<< "Your version of Cairo does not support PNG writing!"
+		<< std::endl
+	;
 
 	return false;
 #endif
+}
+
+Image* readFromPNG(const std::string& path) {
+	osgCairo::Image* image = 0;
+
+#ifdef CAIRO_HAS_PNG_FUNCTIONS
+	if(!osgDB::fileExists(path)) return image;
+
+	cairo_surface_t* surface = cairo_image_surface_create_from_png(path.c_str());
+
+	if(!surface) return image;
+
+	image = new osgCairo::Image();
+
+	if(!image->allocateSurface(
+		cairo_image_surface_get_width(surface),
+		cairo_image_surface_get_height(surface),
+		cairo_image_surface_get_format(surface),
+		cairo_image_surface_get_data(surface)
+	)) {
+		OSGCAIRO_WARN("util::readFromPNG")
+			<< "Couldn't allocate new Image."
+			<< std::endl
+		;
+	}
+
+	cairo_surface_destroy(surface);
+
+#else
+	OSGCAIRO_WARN("util::readFromPNG")
+		<< "Your version of Cairo does not support PNG reading!"
+		<< std::endl
+	;
+#endif
+
+	return image;
 }
 
 bool roundedRectangle(

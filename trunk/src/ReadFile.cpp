@@ -1,7 +1,7 @@
 // -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
 // $Id$
 
-#include <osg/Notify>
+#include <osgCairo/Notify>
 #include <osgCairo/ReadFile>
 #include <osgCairo/Util>
 
@@ -15,9 +15,14 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 	GLenum         format      = image->getPixelFormat();
 	cairo_format_t cairoFormat = CAIRO_FORMAT_ARGB32;
 
-	if(format != GL_RGB && format != GL_RGBA && format != GL_ALPHA) return 0;
+	if(
+		format != GL_RGB &&
+		format != GL_RGBA &&
+		format != GL_ALPHA &&
+		format != GL_LUMINANCE
+	) return 0;
 
-	if(format == GL_ALPHA) cairoFormat = CAIRO_FORMAT_A8;
+	if(format == GL_ALPHA || format == GL_LUMINANCE) cairoFormat = CAIRO_FORMAT_A8;
 
 	else if(format == GL_RGB) {
 		// Check the options string to see if the want to add an alpha channel
@@ -25,7 +30,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 		std::string ops = options ? options->getOptionString() : std::string();
 
 		if(ops.find("addAlphaToRGB") != std::string::npos) {
-			osg::notify()
+			OSGCAIRO_INFO("readImageFile")
 				<< "Adding alpha channel to GL_RGB image at the "
 				<< "request of the user." << std::endl
 			;
@@ -39,7 +44,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 	unsigned char* newData = createNewImageDataAsCairoFormat(image, cairoFormat);
 
 	if(!newData) {
-		osg::notify(osg::WARN)
+		OSGCAIRO_WARN("readImageFile")
 			<< "Failed to convert " << path << " to an appropriate Cairo format ("
 			<< util::cairoFormatAsString(cairoFormat) << ")." << std::endl
 		;
@@ -49,7 +54,7 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 
 	Image* cairoImage = new Image(image->s(), image->t(), cairoFormat, newData);
 
-	osg::notify()
+	OSG_INFO
 		<< "Loaded osgCairo::Image file " << path
 		<< " using format: " << util::cairoFormatAsString(cairoFormat)
 		<< std::endl
@@ -61,3 +66,4 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 }
 
 }
+

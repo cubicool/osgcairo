@@ -3,7 +3,7 @@
 
 #include <cstring>
 #include <cmath>
-#include <osg/Notify>
+#include <osgCairo/Notify>
 #include <osgCairo/Image>
 
 namespace osgCairo {
@@ -25,7 +25,19 @@ _surface(0) {
 Image::Image(const Image& si, const osg::CopyOp& co):
 osg::Image(si, co),
 _surface(si._surface) {
-	// TODO: surface_reference if copyOp...
+	// If the user wants to do a full copy...
+	if(co.getCopyFlags() & osg::CopyOp::DEEP_COPY_IMAGES) {
+		_surface = cairo_image_surface_create_for_data(
+			_data,
+			si.getSurfaceFormat(),
+			si.getSurfaceWidth(),
+			si.getSurfaceHeight(),
+			si.getSurfaceStride()
+		);
+	}
+
+	// Otherwise, bump the reference count.
+	else cairo_surface_reference(_surface);
 }
 
 Image::~Image() {
@@ -92,6 +104,42 @@ bool Image::valid() const {
 	return !cairo_surface_status(_surface) && osg::Image::valid();
 }
 
+bool Image::preMultiply() {
+	if(getSurfaceFormat() != CAIRO_FORMAT_ARGB32) return false;
+
+	for(int p = 0; p < _s * _t; p++) {
+		unsigned int  offset = p * 4;
+		unsigned char alpha  = _data[offset + 3];
+
+		_data[offset]     = (_data[offset] * alpha) / 255;
+		_data[offset + 1] = (_data[offset + 1] * alpha) / 255;
+		_data[offset + 2] = (_data[offset + 2] * alpha) / 255;
+	}
+
+	dirty();
+
+	return true;
+}
+
+bool Image::unPreMultiply() {
+	if(getSurfaceFormat() != CAIRO_FORMAT_ARGB32) return false;
+
+	for(int p = 0; p < _s * _t; p++) {
+		unsigned int  offset = p * 4;
+		unsigned char alpha  = _data[offset + 3];
+
+		if(!alpha) continue;
+
+		_data[offset]     = (_data[offset] * 255) / alpha;
+		_data[offset + 1] = (_data[offset + 1] * 255) / alpha;
+		_data[offset + 2] = (_data[offset + 2] * 255) / alpha;
+	}
+
+	dirty();
+
+	return true;
+}
+
 cairo_surface_t* Image::getSurface() const {
 	return _surface;
 }
@@ -116,6 +164,10 @@ unsigned char* Image::getSurfaceData() const {
 	return cairo_image_surface_get_data(_surface);
 }
 
+cairo_status_t Image::getSurfaceStatus() const {
+	return cairo_surface_status(_surface);
+}
+
 unsigned int Image::getImageSizeInBytes() const {
 	return computeRowWidthInBytes(_s, _pixelFormat, _dataType, _packing) * _t * _r;
 }
@@ -125,36 +177,77 @@ unsigned int Image::getImageSizeInBytes() const {
 // TODO: If this routine gets called a lot, it may make sense to change the data
 // IN PLACE instead of doing a new allocation every time.
 unsigned char* createNewImageDataAsCairoFormat(osg::Image* image, cairo_format_t cairoFormat) {
-	unsigned char* data   = image->data();
-	GLenum         format = image->getPixelFormat();
+	unsigned char* data     = image->data();
+	unsigned char* newData  = 0;
+	GLenum         format   = image->getPixelFormat();
+	unsigned int   numPixel = image->s() * image->t();
 
 	if(cairoFormat == CAIRO_FORMAT_ARGB32 || cairoFormat == CAIRO_FORMAT_RGB24) {
 		if(format != GL_RGB && format != GL_RGBA) return 0;
 
-		unsigned int   numPixel = image->s() * image->t();
-		unsigned char* newData  = new unsigned char[numPixel * 4];
-		unsigned int   offset   = 4;
+		unsigned int offset = 4;
+
+		newData = new unsigned char[numPixel * 4];
 
 		if(format == GL_RGB) offset = 3;
 
-		for(unsigned int i = 0; i < numPixel; ++i) {
-			newData[i * 4]     = data[i * offset + 2];
-			newData[i * 4 + 1] = data[i * offset + 1];
-			newData[i * 4 + 2] = data[i * offset];
+		for(unsigned int i = 0; i < numPixel; i++) {
+			unsigned char a = data[i * offset + 3];
+			unsigned char r = data[i * offset + 2];
+			unsigned char g = data[i * offset + 1];
+			unsigned char b = data[i * offset];
 
-			if(cairoFormat == CAIRO_FORMAT_ARGB32) {
-				if(format == GL_RGBA) newData[i * 4 + 3] = data[i * offset + 3];
-
-				else newData[i * 4 + 3] = 255;
+			// Requested format is RGB24, which doesn't use the alpha byte.
+			if(cairoFormat == CAIRO_FORMAT_RGB24) {
+				newData[i * 4]     = r;
+				newData[i * 4 + 1] = g;
+				newData[i * 4 + 2] = b;
+				newData[i * 4 + 3] = 0;
 			}
 
-			else newData[i * 4 + 3] = 0;
+			else {
+				// We want ARGB32 from a _SOURCE_ that _DOES_ have an alpha
+				// channel; therefore, we need to premultiply.
+				if(format == GL_RGBA) {			
+					newData[i * 4]     = (r * a) / 255;
+					newData[i * 4 + 1] = (g * a) / 255;
+					newData[i * 4 + 2] = (b * a) / 255;
+					newData[i * 4 + 3] = a;
+				}
+
+				// Otherwise, we're loading from a source with no alpha
+				// channel. This doesn't make a lot of sense to do, unless
+				// the user is planning on using CAIRO_OPERATOR_CLEAR at
+				// some point during their drawing.
+				else {
+					newData[i * 4]     = r;
+					newData[i * 4 + 1] = g;
+					newData[i * 4 + 2] = b;
+					newData[i * 4 + 3] = 255;
+				}
+			}
 		}
 
-		return newData;
 	}
 
-	return 0;
+	// The user wants CAIRO_FORMAT_A8...
+	else {
+		if(format != GL_ALPHA && format != GL_LUMINANCE) {
+			OSGCAIRO_WARN("createNewImageDataAsCairoFormat")
+				<< "Couldn't understand GL format enum '" << format
+				<< "' for CAIRO_FORMAT_A8."
+				<< std::endl
+			;
+
+			return 0;
+		}
+
+		newData = new unsigned char[numPixel];
+		
+		std::memcpy(newData, data, numPixel);
+	}
+
+	return newData;
 }
 
 }

@@ -32,8 +32,8 @@ public:
 	Image(
 		unsigned int         width,
 		unsigned int         height,
-		cairo_format_t       format = CAIRO_FORMAT_ARGB32,
-		const unsigned char* data   = 0
+		cairo_format_t       format,
+		const unsigned char* data = 0
 	);
 	
 	Image(const Image& image, const osg::CopyOp& co = osg::CopyOp::SHALLOW_COPY);
@@ -49,8 +49,8 @@ public:
 	virtual bool allocateSurface(
 		unsigned int         width,
 		unsigned int         height,
-		cairo_format_t       format = CAIRO_FORMAT_ARGB32,
-		const unsigned char* data   = 0
+		cairo_format_t       format,
+		const unsigned char* data = 0
 	);
 
 	//! Returns a cairo_t* to be used with the Cairo C API. This must be destroyed with the
@@ -59,6 +59,15 @@ public:
 
 	//! Returns whether or not the Image is valid internally.
 	virtual bool valid() const;
+
+	//! If the internal format is ARGB32, this function will pre-multiply the alpha for 
+	//! proper internal Cairo usage. This will return false if the format is incompatible.
+	bool preMultiply();
+
+	//! The the internal format is ARGB32, this function will un-pre-multiply the alpha
+	//! for proper usage with the osgDB (or perhaps other) components. This will return
+	//! false if the format is incompatible.
+	bool unPreMultiply();
 
 	//! Returns the internal Cairo surface; in our case, an "image" surface.
 	cairo_surface_t* getSurface() const;
@@ -79,6 +88,9 @@ public:
 	//! Returns a read-write pointer to the internal data. REMEMBER: Cairo stores data with
 	//! pre-multiplied alpha! This is the biggest source of trouble for most new users. :)
 	unsigned char* getSurfaceData() const;
+
+	//! Returns the raw status of the surface.
+	cairo_status_t getSurfaceStatus() const;
 
 	//! A helper utility function which will return the image size in memory in bytes.
 	unsigned int getImageSizeInBytes() const;
