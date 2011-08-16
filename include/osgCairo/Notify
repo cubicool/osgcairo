@@ -6,9 +6,9 @@
 
 #include <osg/Notify>
 
-#define OSGCAIRO_INFO(func) OSG_INFO << "osgCairo::" << func << ": "
-#define OSGCAIRO_NOTICE(func) OSG_NOTICE << "osgCairo::" << func << ": "
-#define OSGCAIRO_WARN(func) OSG_WARN << "osgCairo::" << func << ": "
+#define OSGCAIRO_INFO   OSG_INFO   << "osgCairo/INFO [" << __FUNCTION__ << "]: "
+#define OSGCAIRO_NOTICE OSG_NOTICE << "osgCairo/NOTICE [" << __FUNCTION__ << "]: "
+#define OSGCAIRO_WARN   OSG_WARN   << "osgCairo/WARN [" << __FUNCTION__ << "]: "
 
 #endif
 

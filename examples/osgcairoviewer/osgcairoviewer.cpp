@@ -76,7 +76,7 @@ osg::Geode* createExample_loadImages() {
 	cairo_t* c = image->createContext();
 
 	if(!cairo_status(c)) {
-		osgCairo::util::roundedRectangleApply(
+		osgCairo::roundedRectangleApply(
 			c,
 			10.0f,
 			10.0f,
@@ -133,9 +133,9 @@ osg::Geode* createExample_simpleDrawing() {
 			}
 
 			// If we wanted to create a PNG image of our surface, we could do so here.
-			// osgCairo::util::writeToPNG(image->getSurface(), "output.png");
+			// osgCairo::writeToPNG(image->getSurface(), "output.png");
 	
-			// osgCairo::util::gaussianBlur(image->getSurface(), 10.0f);
+			// osgCairo::gaussianBlur(image->getSurface(), 10.0f);
 
 			cairo_destroy(c);
 

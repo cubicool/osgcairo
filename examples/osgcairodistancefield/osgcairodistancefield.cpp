@@ -35,12 +35,12 @@ cairo_surface_t* createDistanceField(unsigned int size, int scanSize, int blockS
 
 	osg::ElapsedTime t;
 
-	cairo_surface_t* distanceField = osgCairo::util::createDistanceField(surface, scanSize, blockSize);
+	cairo_surface_t* distanceField = osgCairo::createDistanceField(surface, scanSize, blockSize);
 
 	OSG_NOTICE << "Took " << t.elapsedTime() << " seconds." << std::endl;
 
-	osgCairo::util::writeToPNG(surface, "surface.png");
-	osgCairo::util::writeToPNG(distanceField, "distanceField.png");
+	// cairo_surface_write_to_png(surface, "surface.png");
+	// cairo_surface_write_to_png(distanceField, "distanceField.png");
 
 	cairo_surface_destroy(surface);
 	cairo_destroy(c);

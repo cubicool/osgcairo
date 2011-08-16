@@ -3,11 +3,13 @@
 #include <osgCairo/Image>
 #include <osgCairo/ReadFile>
 #include <osgCairo/Util>
+#include <osgCairo/Notify>
 
 const unsigned int IMG_WIDTH  = 512;
 const unsigned int IMG_HEIGHT = 256;
+const char*        FILE_EXT   = ".png";
 
-void textOnImage(osgCairo::Image* image, cairo_format_t format, const std::string& name) {
+void textOnImage(osgCairo::Image* image, const std::string& name) {
 	cairo_t* c = image->createContext();
 
 	if(!cairo_status(c)) {
@@ -36,7 +38,9 @@ void textOnImage(osgCairo::Image* image, cairo_format_t format, const std::strin
 
 		cairo_text_path(c, name.c_str());
 
-		if(format != CAIRO_FORMAT_A8) cairo_set_source_rgb(c, 1.0f, 0.0f, 0.0f);
+		if(image->getSurfaceFormat() != CAIRO_FORMAT_A8) {
+			cairo_set_source_rgb(c, 1.0f, 0.0f, 0.0f);
+		}
 
 		cairo_fill(c);
 		cairo_destroy(c);
@@ -47,9 +51,9 @@ osgCairo::Image* createImage(cairo_format_t format, const std::string& name) {
 	osgCairo::Image* image = new osgCairo::Image();
 	
 	if(image->allocateSurface(IMG_WIDTH, IMG_HEIGHT, format)) {
-		textOnImage(image, format, name);
+		textOnImage(image, name);
 
-		// image->flipVertical();
+		image->flipVertical();
 		image->dirty();
 	}
 
@@ -58,27 +62,25 @@ osgCairo::Image* createImage(cairo_format_t format, const std::string& name) {
 
 void writeImage(osgCairo::Image* image, const std::string& path) {
 	if(!image) {
-		OSG_NOTICE << "Warning: " << path << ".png couldn't be written." << std::endl;
+		OSG_NOTICE << "Warning: " << path << " couldn't be written." << std::endl;
 
 		return;
 	}
 
-	OSG_NOTICE << "Writing: " << path << ".png" << std::endl;
-	
-	// This could be use on ARGB32 surfaces. However, osgDB cannot CURRENTLY be used to
-	// dump images, so we stick with osgCairo::util.
-	// image->unPreMultiply();
-	// osgDB::writeImageFile(*image, path + ".png");
+	OSG_NOTICE << "Writing: " << path << FILE_EXT << std::endl;
 
-	osgCairo::util::writeToPNG(image->getSurface(), path + ".png");
+	// Calling this function will convert the alpha levels internally so that they 
+	// are not premultiplied, resulting in a "proper" PNG. However, cairo uses
+	// premultiplied alpha internally.
+	// if(image->getSurfaceFormat() == CAIRO_FORMAT_ARGB32) image->unPreMultiply();
+	
+	osgDB::writeImageFile(*image, path + FILE_EXT);
 }
 
 osgCairo::Image* readImage(const std::string& path) {
-	OSG_NOTICE << "Reading: " << path << ".png" << std::endl;
+	OSG_NOTICE << "Reading: " << path << FILE_EXT << std::endl;
 
-	// return osgCairo::readImageFile(path + ".png");
-
-	return osgCairo::util::readFromPNG(path + ".png");
+	return osgCairo::readImageFile(path + FILE_EXT);
 }
 
 void imageStats(osgCairo::Image* image) {
@@ -92,22 +94,17 @@ void imageStats(osgCairo::Image* image) {
 
 int main(int argc, char** argv) {
 	osg::ref_ptr<osgCairo::Image> imageA8     = createImage(CAIRO_FORMAT_A8, "imageA8");
-	osg::ref_ptr<osgCairo::Image> imageRGB24  = createImage(CAIRO_FORMAT_RGB24, "imageRGB24");
 	osg::ref_ptr<osgCairo::Image> imageARGB32 = createImage(CAIRO_FORMAT_ARGB32, "imageARGB32");
 
 	writeImage(imageA8, "imageA8");
-	writeImage(imageRGB24, "imageRGB24");
 	writeImage(imageARGB32, "imageARGB32");
 
 	imageA8     = readImage("imageA8");
-	imageRGB24  = readImage("imageRGB24");
 	imageARGB32 = readImage("imageARGB32");
 
 	writeImage(imageA8, "read-imageA8");
-	writeImage(imageRGB24, "read-imageRGB24");
 	writeImage(imageARGB32, "read-imageARGB32");
 
-	/*
 	osg::ref_ptr<osgCairo::Image> orig = createImage(CAIRO_FORMAT_A8, "orig");
 
 	// Test SHALLOW copying...
@@ -128,9 +125,12 @@ int main(int argc, char** argv) {
 	
 	imageStats(copy);
 
+	textOnImage(copy, "copy-from-orig");
+
+	copy->dirty();
+
 	writeImage(orig, "orig");
 	writeImage(copy, "copy");
-	*/
 
 	return 0;
 }

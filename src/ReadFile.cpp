@@ -3,7 +3,6 @@
 
 #include <osgCairo/Notify>
 #include <osgCairo/ReadFile>
-#include <osgCairo/Util>
 
 namespace osgCairo {
 
@@ -12,57 +11,11 @@ Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* opti
 
 	if(!image) return 0;
 
-	GLenum         format      = image->getPixelFormat();
-	cairo_format_t cairoFormat = CAIRO_FORMAT_ARGB32;
+	Image* cairoImage = new Image();
 
-	if(
-		format != GL_RGB &&
-		format != GL_RGBA &&
-		format != GL_ALPHA &&
-		format != GL_LUMINANCE
-	) return 0;
+	if(cairoImage->allocateSurface(image)) return cairoImage;
 
-	if(format == GL_ALPHA || format == GL_LUMINANCE) cairoFormat = CAIRO_FORMAT_A8;
-
-	else if(format == GL_RGB) {
-		// Check the options string to see if the want to add an alpha channel
-		// to RGB images; this can be really useful sometimes.
-		std::string ops = options ? options->getOptionString() : std::string();
-
-		if(ops.find("addAlphaToRGB") != std::string::npos) {
-			OSGCAIRO_INFO("readImageFile")
-				<< "Adding alpha channel to GL_RGB image at the "
-				<< "request of the user." << std::endl
-			;
-
-			cairoFormat = CAIRO_FORMAT_ARGB32;
-		}
-
-		else cairoFormat = CAIRO_FORMAT_RGB24;
-	}
-
-	unsigned char* newData = createNewImageDataAsCairoFormat(image, cairoFormat);
-
-	if(!newData) {
-		OSGCAIRO_WARN("readImageFile")
-			<< "Failed to convert " << path << " to an appropriate Cairo format ("
-			<< util::cairoFormatAsString(cairoFormat) << ")." << std::endl
-		;
-
-		return 0;
-	}
-
-	Image* cairoImage = new Image(image->s(), image->t(), cairoFormat, newData);
-
-	OSG_INFO
-		<< "Loaded osgCairo::Image file " << path
-		<< " using format: " << util::cairoFormatAsString(cairoFormat)
-		<< std::endl
-	;
-
-	delete[] newData;
-
-	return cairoImage;
+	return 0;
 }
 
 }
