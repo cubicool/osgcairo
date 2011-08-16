@@ -1,0 +1,14 @@
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
+// $Id$
+
+#ifndef OSGCAIRO_NOTIFY
+#define OSGCAIOR_NOTIFY
+
+#include <osg/Notify>
+
+#define OSGCAIRO_INFO   OSG_INFO   << "osgCairo/INFO [" << __FUNCTION__ << "]: "
+#define OSGCAIRO_NOTICE OSG_NOTICE << "osgCairo/NOTICE [" << __FUNCTION__ << "]: "
+#define OSGCAIRO_WARN   OSG_WARN   << "osgCairo/WARN [" << __FUNCTION__ << "]: "
+
+#endif
+
