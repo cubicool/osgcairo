@@ -12,8 +12,8 @@ SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a postfix, usually d on windows")
 
 # On GCC, we need to set these compiler flags.
 IF(NOT WIN32)
-	SET(CMAKE_C_FLAGS "-W -Wall -Wno-unused -fPIC")
-	SET(CMAKE_CXX_FLAGS "-W -Wall -Wno-unused -fPIC")
+	SET(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused -fPIC")
+	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -fPIC")
 ENDIF(NOT WIN32)
 
 IF(NOT WIN32)
@@ -41,11 +41,6 @@ SET(CAIROCKS_SRC_FILES
 	ext/cairocks/src/rounded.c
 )
 
-SET(SERIALIZER_SRC_FILES
-	src/serializers/LibraryWrapper.cpp
-	src/serializers/Image.cpp
-)
-
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
 SET(HEADER_FILES
 	${HEADER_PATH}/Export
@@ -61,7 +56,6 @@ SET(CAIROCKS_HEADER_FILES
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${SRC_FILES})
-SOURCE_GROUP("Serilizer Files" FILES ${SERIALIZER_SRC_FILES})
 
 INCLUDE_DIRECTORIES(
 	include
@@ -75,7 +69,7 @@ LINK_DIRECTORIES(
 	${CAIRO_LIBRARY_DIRS}
 )
 
-ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES} ${SERIALIZER_SRC_FILES})
+ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
 
 SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
@@ -117,6 +111,7 @@ ENDFOREACH(INCLUDEFILE)
 ADD_SUBDIRECTORY(examples/osgcairodistancefield)
 ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
 ADD_SUBDIRECTORY(examples/osgcairoroads)
+ADD_SUBDIRECTORY(examples/osgcairotests)
 ADD_SUBDIRECTORY(examples/osgcairoutil)
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
 

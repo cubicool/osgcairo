@@ -17,7 +17,7 @@ namespace osgCairo {
 OSGCAIRO_EXPORT Image* readImageFile(const std::string& path, osgDB::ReaderWriter::Options* options);
 
 //! An alternative readImageFile with a default ReaderWriter::Options argument.
-inline Image* readImageFile(const std::string& path) {
+Image* readImageFile(const std::string& path) {
 	return readImageFile(path, osgDB::Registry::instance()->getOptions());
 }
 
