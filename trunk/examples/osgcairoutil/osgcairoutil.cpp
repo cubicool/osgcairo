@@ -116,8 +116,8 @@ void drawPie(cairo_t* c, int w, int h) {
 }
 
 void drawBevelTextPath(cairo_t* c, int w, int h) {
-	static const char* text     = "COW!";
-	static double      fontsize = 150.0f;
+	static const char* text     = "Mooo!!!";
+	static double      fontsize = 110.0f;
 
 	cairo_text_extents_t extents;
 
@@ -207,7 +207,7 @@ osg::Geode* createExample(unsigned int size) {
 			1.0f
 		);
 		
-		cairo_t* c = image->createContext();
+		cairo_t* c = image->createContext(false);
 
 		if(!cairo_status(c)) {
 			drawBevel(c, image->s(), image->t());

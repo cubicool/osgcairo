@@ -191,8 +191,15 @@ bool Image::allocateSurface(const osg::Image* image) {
 	return true;
 }
 
-cairo_t* Image::createContext() const {
-	return cairo_create(_surface);
+cairo_t* Image::createContext(bool adjustOrigin) const {
+	cairo_t* c = cairo_create(_surface);
+
+	if(adjustOrigin && c) {
+		cairo_translate(c, 0.0f, getSurfaceHeight());
+		cairo_scale(c, 1.0f, -1.0f);
+	}
+
+	return c;
 }
 
 bool Image::valid() const {
