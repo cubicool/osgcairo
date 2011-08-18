@@ -252,7 +252,7 @@ int Image::getSurfaceHeight() const {
 }
 
 int Image::getSurfaceStride() const {
-	return cairo_image_surface_get_height(_surface);
+	return cairo_image_surface_get_stride(_surface);
 }
 
 unsigned char* Image::getSurfaceData() const {
