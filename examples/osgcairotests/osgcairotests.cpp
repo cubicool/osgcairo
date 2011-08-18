@@ -18,9 +18,6 @@ void textOnImage(osgCairo::Image* image, const std::string& name) {
 		cairo_paint(c);
 		cairo_restore(c);
 
-		// cairo_translate(c, 0.0f, image->t());
-		// cairo_scale(c, 1.0f, -1.0f);
-
 		cairo_text_extents_t extents;
 
 		cairo_set_font_size(c, 50.0f);
@@ -56,7 +53,6 @@ osgCairo::Image* createImage(cairo_format_t format, const std::string& name) {
 	if(image->allocateSurface(IMG_WIDTH, IMG_HEIGHT, format)) {
 		textOnImage(image, name);
 
-		// image->flipVertical();
 		image->dirty();
 	}
 

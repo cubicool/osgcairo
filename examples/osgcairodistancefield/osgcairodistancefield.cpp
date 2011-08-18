@@ -104,7 +104,6 @@ osg::Geode* createDistanceFieldGeode(cairo_surface_t* distanceField) {
 			cairo_destroy(c);
 		}
 
-		image->flipVertical();
 		image->dirty();
 	}
 
