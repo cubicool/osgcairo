@@ -56,7 +56,7 @@ OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
 	double
 );
 
-cairo_surface_t* createDistanceField(
+OSGCAIRO_EXPORT cairo_surface_t* createDistanceField(
 	cairo_surface_t*,
 	int,
 	int
