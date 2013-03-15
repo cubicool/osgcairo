@@ -88,6 +88,9 @@ bool Image::allocateSurface(
 
 	else _pixelFormat = GL_BGRA;
 
+	// Remove any previous surface allocation.
+	if(_surface) cairo_surface_destroy(_surface);
+
 	_surface = cairo_image_surface_create_for_data(
 		_data,
 		format,
@@ -105,6 +108,8 @@ bool Image::allocateSurface(
 
 bool Image::allocateSurface(const osg::Image* image) {
 	if(!image) return false;
+
+	if(_surface) return false;
 
 	const osgCairo::Image* test = dynamic_cast<const osgCairo::Image*>(image);
 
@@ -175,6 +180,9 @@ bool Image::allocateSurface(const osg::Image* image) {
 			_data[i * 4 + 3] = 255;
 		}
 	}
+
+	// Remove any previous surface allocation.
+	if(_surface) cairo_surface_destroy(_surface);
 
 	_surface = cairo_image_surface_create_for_data(
 		_data,
