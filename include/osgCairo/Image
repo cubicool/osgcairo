@@ -85,7 +85,7 @@ public:
 	//! Returns the surface width.
 	int getSurfaceWidth() const;
 
-	//! Returns hte surface height.
+	//! Returns the surface height.
 	int getSurfaceHeight() const;
 
 	//! Returns the "stride" of a row of pixels; this is calculated by mulitplying the number

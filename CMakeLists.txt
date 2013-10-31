@@ -12,8 +12,8 @@ SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a postfix, usually d on windows")
 
 # On GCC, we need to set these compiler flags.
 IF(NOT WIN32)
-	SET(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused -fPIC")
-	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused -fPIC")
+	SET(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused-parameter -fPIC")
+	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -fPIC")
 ENDIF(NOT WIN32)
 
 IF(NOT WIN32)
@@ -111,7 +111,7 @@ ENDFOREACH(INCLUDEFILE)
 
 ADD_SUBDIRECTORY(examples/osgcairodistancefield)
 ADD_SUBDIRECTORY(examples/osgcairodrawspeed)
-ADD_SUBDIRECTORY(examples/osgcairoroads)
+# ADD_SUBDIRECTORY(examples/osgcairoroads)
 ADD_SUBDIRECTORY(examples/osgcairotests)
 ADD_SUBDIRECTORY(examples/osgcairoutil)
 ADD_SUBDIRECTORY(examples/osgcairoviewer)
