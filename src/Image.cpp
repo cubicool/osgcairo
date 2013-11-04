@@ -57,6 +57,10 @@ bool Image::allocateSurface(
 	if(format == CAIRO_FORMAT_A8) {
 		pf1 = GL_ALPHA;
 		pf2 = GL_UNSIGNED_BYTE;
+
+		// In A8 surfaces, the width must be evenly divisible by 4; if not,
+		// this will catch that failure and resize the image appropriately.
+		width = cairo_format_stride_for_width(format, width);
 	}
 
 	else if(format != CAIRO_FORMAT_ARGB32) {
