@@ -12,8 +12,8 @@ SET(CMAKE_DEBUG_POSTFIX "d" CACHE STRING "Add a postfix, usually d on windows")
 
 # On GCC, we need to set these compiler flags.
 IF(NOT WIN32)
-	SET(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused-parameter -fPIC")
-	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter -fPIC")
+	SET(CMAKE_C_FLAGS "-Wall -Wextra -Wno-unused-parameter ${CMAKE_C_FLAGS}")
+	SET(CMAKE_CXX_FLAGS "-Wall -Wextra -Wno-unused-parameter ${CMAKE_CXX_FLAGS}")
 ENDIF(NOT WIN32)
 
 IF(NOT WIN32)
