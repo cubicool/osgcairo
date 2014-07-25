@@ -1,0 +1,67 @@
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
+// $Id$
+
+#ifndef OSGCAIRO_UTIL
+#define OSGCAIRO_UTIL
+
+#include <cairo.h>
+#include <string>
+#include <osgCairo/Export>
+
+namespace osgCairo {
+
+class Image;
+
+//! This is a convenient structure for passing the "round corner" booleans to roundedRectangle.
+struct Corners {
+	Corners(bool tl = true, bool tr = true, bool br = true, bool bl = true) {
+		corners[0] = tl;
+		corners[1] = tr;
+		corners[2] = br;
+		corners[3] = bl;
+	}
+
+	cairo_bool_t corners[4];
+};
+
+OSGCAIRO_EXPORT bool roundedRectangle(
+	cairo_t*         cr,
+	double           x,
+	double           y,
+	double           width,
+	double           height,
+	double           radius,
+	const Corners& = Corners()
+);
+
+OSGCAIRO_EXPORT bool roundedRectangleApply(
+	cairo_t*         cr,
+	double           x,
+	double           y,
+	double           width,
+	double           height,
+	double           radius,
+	const Corners& = Corners()
+);
+
+OSGCAIRO_EXPORT bool gaussianBlur (cairo_surface_t* surface, double radius, double deviation = 0.0f);
+OSGCAIRO_EXPORT bool mapPathOnto  (cairo_t* cr, cairo_path_t* path);
+
+OSGCAIRO_EXPORT cairo_surface_t* createEmbossedSurface(
+	cairo_surface_t* surface,
+	double           azimuth,
+	double           elevation,
+	double           height,
+	double           ambient,
+	double           diffuse
+);
+
+OSGCAIRO_EXPORT cairo_surface_t* createDistanceField(
+	cairo_surface_t* surface,
+	int              scanSize,
+	int              blockSize
+);
+
+}
+
+#endif
