@@ -9,5 +9,5 @@ LINK_LIBRARIES(osgCairo
 
 ADD_EXECUTABLE(osgcairodrawspeed osgcairodrawspeed.cpp)
 
-INSTALL(TARGETS osgcairodrawspeed DESTINATION ${CMAKE_INSTALL_PREFIX}/share/OpenSceneGraph/bin)
+INSTALL(TARGETS osgcairodrawspeed DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 SET_TARGET_PROPERTIES(osgcairodrawspeed PROPERTIES DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")

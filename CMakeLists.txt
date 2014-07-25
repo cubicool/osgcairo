@@ -46,8 +46,9 @@ SET(HEADER_FILES
 	"${HEADER_PATH}/ReadFile"
 	"${HEADER_PATH}/Util"
 	"${HEADER_PATH}/Version"
-	"${PROJECT_SOURCE_DIR}/ext/cairocks/src/cairocks.h"
 )
+
+# "${PROJECT_SOURCE_DIR}/ext/cairocks/src/cairocks.h"
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
 SOURCE_GROUP("Source Files" FILES ${SRC_FILES})

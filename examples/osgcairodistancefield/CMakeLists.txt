@@ -9,5 +9,5 @@ LINK_LIBRARIES(osgCairo
 
 ADD_EXECUTABLE(osgcairodistancefield osgcairodistancefield.cpp)
 
-INSTALL(TARGETS osgcairodistancefield DESTINATION ${CMAKE_INSTALL_PREFIX}/share/OpenSceneGraph/bin)
+INSTALL(TARGETS osgcairodistancefield DESTINATION ${CMAKE_INSTALL_PREFIX}/bin)
 SET_TARGET_PROPERTIES(osgcairodistancefield PROPERTIES DEBUG_POSTFIX "${CMAKE_DEBUG_POSTFIX}")
