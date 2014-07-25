@@ -27,32 +27,26 @@ SET(OPENSCENEGRAPH_INCLUDE_DIR "" CACHE PATH "Location of the OSG include header
 SET(OPENSCENEGRAPH_LIB_DIR "" CACHE PATH "Location of the the OSG library objects.")
 
 SET(SRC_FILES
-	src/Image.cpp
-	src/LibraryWrapper.cpp
-	src/ReadFile.cpp
-	src/Util.cpp
-)
-
-SET(CAIROCKS_SRC_FILES
-	ext/cairocks/src/distance-field.c
-	ext/cairocks/src/emboss.c
-	ext/cairocks/src/gaussian-blur.c
-	ext/cairocks/src/invert.c
-	ext/cairocks/src/map-path-onto.c
-	ext/cairocks/src/rounded.c
+	"src/Image.cpp"
+	"src/LibraryWrapper.cpp"
+	"src/ReadFile.cpp"
+	"src/Util.cpp"
+	"ext/cairocks/src/distance-field.c"
+	"ext/cairocks/src/emboss.c"
+	"ext/cairocks/src/gaussian-blur.c"
+	"ext/cairocks/src/invert.c"
+	"ext/cairocks/src/map-path-onto.c"
+	"ext/cairocks/src/rounded.c"
 )
 
 SET(HEADER_PATH ${osgCairo_SOURCE_DIR}/include/osgCairo)
 SET(HEADER_FILES
-	${HEADER_PATH}/Export
-	${HEADER_PATH}/Image
-	${HEADER_PATH}/ReadFile
-	${HEADER_PATH}/Util
-	${HEADER_PATH}/Version
-)
-
-SET(CAIROCKS_HEADER_FILES
-	ext/cairocks/src/cairocks.h
+	"${HEADER_PATH}/Export"
+	"${HEADER_PATH}/Image"
+	"${HEADER_PATH}/ReadFile"
+	"${HEADER_PATH}/Util"
+	"${HEADER_PATH}/Version"
+	"${PROJECT_SOURCE_DIR}/ext/cairocks/src/cairocks.h"
 )
 
 SOURCE_GROUP("Header Files" FILES ${HEADER_FILES})
@@ -72,11 +66,6 @@ LINK_DIRECTORIES(
 
 ADD_LIBRARY(osgCairo SHARED ${HEADER_FILES} ${SRC_FILES})
 
-SOURCE_GROUP("Header Files" FILES ${CAIROCKS_HEADER_FILES})
-SOURCE_GROUP("Source Files" FILES ${CAIROCKS_SRC_FILES})
-
-ADD_LIBRARY(cairocks STATIC ${CAIROCKS_HEADER_FILES} ${CAIROCKS_SRC_FILES})
-
 # Add debug postfix to OSG libraries so we link to the right ones in debug.
 # Cairo is a C-only library so the same one (release) can be linked to both
 # debug and release without problems.
@@ -89,7 +78,6 @@ TARGET_LINK_LIBRARIES(osgCairo
 	optimized osgDB
 	debug     cairo
 	optimized cairo
-	cairocks
 )
 
 # The archive/runtime part is so that the lib/dll pair goes into lib and bin
