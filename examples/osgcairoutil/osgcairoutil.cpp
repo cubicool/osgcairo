@@ -16,7 +16,7 @@ void drawPie(cairo_t* c, int w, int h) {
 	double r   = h2 * 0.8f;
 	double seg = (2.0f * osg::PI) / 8.0f;
 	double top = osg::PI + (osg::PI / 2.0f);
-	
+
 	// each "tier" or level or an arc
 	double lvl[] = { 0.0f, 0.25f, 0.50f, 0.75f, 1.0f };
 
@@ -30,7 +30,7 @@ void drawPie(cairo_t* c, int w, int h) {
 		"Cowpower!",
 		"s p o t s"
 	};
-	
+
 	double attl[] = {
 		0.25f,
 		0.0f,
@@ -45,7 +45,7 @@ void drawPie(cairo_t* c, int w, int h) {
 	cairo_set_line_width(c, ((w + h) / 2.0f) * 0.003f);
 	cairo_select_font_face(c, "SegoeUI", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
 	cairo_set_font_size(c, ((w + h) / 2.0f) * 0.05f);
-        
+
 	cairo_translate(c, w2, h2);
 	cairo_rotate(c, -seg / 2.0f);
 	cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -59,26 +59,26 @@ void drawPie(cairo_t* c, int w, int h) {
 		cairo_set_source_rgba(c, 0.2f, 0.8f, 0.2f, 0.5f);
 		cairo_fill(c);
 		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
-	
+
         	// Do the various levels...
 		cairo_move_to(c, 0.0f, 0.0f);
 		cairo_line_to(c, 0.0f, -r);
 		cairo_stroke(c);
-		
+
 		for(unsigned int l = 0; l < 5; l++) {
 			cairo_arc(c, 0.0f, 0.0f, lvl[l] * r, top, top + seg);
 			cairo_stroke(c);
 		}
 
 		cairo_text_extents_t extents;
-		
+
 		cairo_text_extents(c, atts[i], &extents);
-		
+
 		double arcsize = r * seg;
-	
+
 		// ------------------------------------
 		cairo_save(c);
-	
+
 		double tr = extents.width / r;
 		double aa = ((arcsize - extents.width) / 2.0f) / r;
 
@@ -91,7 +91,7 @@ void drawPie(cairo_t* c, int w, int h) {
 		cairo_text_path(c, atts[i]);
 
 		osgCairo::mapPathOnto(c, path);
-	
+
 		cairo_path_destroy(path);
 
 		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 1.0f);
@@ -99,10 +99,10 @@ void drawPie(cairo_t* c, int w, int h) {
         	cairo_stroke_preserve(c);
 		cairo_set_source_rgba(c, 0.8f, 0.5f, 0.1f, 0.7f);
 		cairo_fill(c);
-	
+
 		cairo_restore(c);
 		// ------------------------------------
-	
+
         	// Pick a random level...
 		cairo_move_to(c, 0.0f, 0.0f);
 		cairo_line_to(c, 0.0f, -r);
@@ -124,13 +124,13 @@ void drawBevelTextPath(cairo_t* c, int w, int h) {
 	cairo_select_font_face(c, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_BOLD);
 	cairo_set_font_size(c, fontsize);
 	cairo_text_extents(c, text, &extents);
-	
+
 	cairo_move_to(
 		c,
 		((w - extents.width) / 2.0) - extents.x_bearing,
 		(h - extents.y_bearing) / 2.0
 	);
-	
+
 	cairo_text_path(c, text);
 }
 
@@ -147,7 +147,7 @@ void drawBevel(cairo_t* c, int w, int h) {
 	cairo_t*         cr      = cairo_create(bumpmap);
 
 	drawBevelTextPath(cr, w, h);
-	
+
 	cairo_set_operator(cr, CAIRO_OPERATOR_SOURCE);
 
 	for(double l = bevelWidth; l > 0.0f; l -= bevelStep) {
@@ -168,7 +168,7 @@ void drawBevel(cairo_t* c, int w, int h) {
 	);
 
 	drawBevelTextPath(c, w, h);
-	
+
 	cairo_save(c);
 	cairo_clip_preserve(c);
 	cairo_set_operator(c, CAIRO_OPERATOR_SOURCE);
@@ -178,7 +178,7 @@ void drawBevel(cairo_t* c, int w, int h) {
 	cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 0.75f);
 	cairo_paint(c);
 	cairo_restore(c);
-	
+
 	// TODO: This is a hack! Figure out why the border is poor quality...
 	cairo_set_line_width(c, 4.0);
 	cairo_set_operator(c, CAIRO_OPERATOR_CLEAR);
@@ -194,7 +194,7 @@ void drawBevel(cairo_t* c, int w, int h) {
 osg::Geode* createExample(unsigned int size) {
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = new osgCairo::Image();
-	
+
 	if(image->allocateSurface(size, size, CAIRO_FORMAT_ARGB32)) {
 		osg::Texture2D* texture = new osg::Texture2D();
 		osg::Geometry*  geom    = osg::createTexturedQuadGeometry(
@@ -202,11 +202,11 @@ osg::Geode* createExample(unsigned int size) {
 			osg::Vec3(image->s(), 0.0f, 0.0f),
 			osg::Vec3(0.0f, image->t(), 0.0f),
 			0.0f,
-			0.0f, 
+			0.0f,
 			1.0f,
 			1.0f
 		);
-		
+
 		cairo_t* c = image->createContext(false);
 
 		if(!cairo_status(c)) {
@@ -217,15 +217,15 @@ osg::Geode* createExample(unsigned int size) {
 
 		texture->setImage(image);
 		texture->setDataVariance(osg::Object::DYNAMIC);
-        
+
 		osg::StateSet* state = geom->getOrCreateStateSet();
-        
+
 		state->setTextureAttributeAndModes(
 			0,
 			texture,
 			osg::StateAttribute::ON
 		);
-        
+
 		state->setMode(GL_BLEND, osg::StateAttribute::ON);
 		state->setRenderingHint(osg::StateSet::TRANSPARENT_BIN);
 		state->setAttributeAndModes(

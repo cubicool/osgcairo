@@ -25,7 +25,7 @@ osg::Geometry* createGeometry(osg::Image* image, bool setBlendMode=true) {
 		osg::Vec3(image->s(), 0.0f, 0.0f),
 		osg::Vec3(0.0f, image->t(), 0.0f),
 		0.0f,
-		0.0f, 
+		0.0f,
 		1.0f,
 		1.0f
 	);
@@ -61,7 +61,7 @@ osg::Geode* createExample_loadImages() {
 	// to you could simply save an alpha channel in your PNG, in which case
 	// something like this isn't necessary. FUTHERMORE, if you dont' want (or
 	// need) an alpha channel, just leave the image as-is.
-	osg::ref_ptr<osgDB::ReaderWriter::Options> opts = 
+	osg::ref_ptr<osgDB::ReaderWriter::Options> opts =
 		new osgDB::ReaderWriter::Options("addAlphaToRGB")
 	;
 
@@ -84,7 +84,7 @@ osg::Geode* createExample_loadImages() {
 			image->t() - 20.0f,
 			20.0f
 		);
-	
+
 		cairo_set_source_rgba(c, 1.0f, 1.0f, 1.0f, 0.5f);
 		cairo_set_line_width(c, 40.0f);
 		cairo_arc(
@@ -108,13 +108,13 @@ osg::Geode* createExample_loadImages() {
 osg::Geode* createExample_simpleDrawing() {
 	osg::Geode*      geode = new osg::Geode();
 	osgCairo::Image* image = new osgCairo::Image();
-	
+
 	if(image->allocateSurface(256, 256, CAIRO_FORMAT_ARGB32)) {
 		cairo_t* c = image->createContext();
 
 		if(!cairo_status(c)) {
 			cairo_scale(c, 256.0f, 256.0f);
-	
+
 			const osg::Vec4 colors[] = {
 				osg::Vec4(0.0f, 0.0f, 0.0f, 1.0f),
 				osg::Vec4(1.0f, 0.0f, 0.0f, 0.8f),
@@ -134,7 +134,7 @@ osg::Geode* createExample_simpleDrawing() {
 
 			// If we wanted to create a PNG image of our surface, we could do so here.
 			// osgCairo::writeToPNG(image->getSurface(), "output.png");
-	
+
 			// osgCairo::gaussianBlur(image->getSurface(), 10.0f);
 
 			cairo_destroy(c);
@@ -155,7 +155,7 @@ osg::Camera* createCamera() {
 		GL_LIGHTING,
 		osg::StateAttribute::PROTECTED | osg::StateAttribute::OFF
 	);
-	
+
 	camera->setReferenceFrame(osg::Transform::ABSOLUTE_RF);
 	camera->setClearMask(GL_DEPTH_BUFFER_BIT);
 	camera->setRenderOrder(osg::Camera::POST_RENDER);
@@ -165,29 +165,29 @@ osg::Camera* createCamera() {
 
 int main(int, char**) {
 	osgDB::FilePathList& paths = osgDB::getDataFilePathList();
-	
+
 	paths.push_back("../examples/osgcairoviewer/");
 	paths.push_back("examples/osgcairoviewer/");
 	paths.push_back("./");
 
 	// Setup a single graphics context; I got this code from the osgcompositeviewer
 	// example.
-	osg::GraphicsContext::WindowingSystemInterface* wsi = 
+	osg::GraphicsContext::WindowingSystemInterface* wsi =
 		osg::GraphicsContext::getWindowingSystemInterface()
 	;
-	
+
 	if(!wsi) {
 		osg::notify(osg::NOTICE)
 			<< "No WindowSystemInterface available, cannot create windows."
 			<< std::endl
 		;
-		
+
 		return 1;
 	}
-	
+
 	unsigned int width  = 256 * 3 + 40;
 	unsigned int height = 276;
-	
+
 	osg::ref_ptr<osg::GraphicsContext::Traits> traits = new osg::GraphicsContext::Traits();
 
 	traits->x                = 100;
@@ -202,7 +202,7 @@ int main(int, char**) {
 	osg::ref_ptr<osg::GraphicsContext> gc =
 		osg::GraphicsContext::createGraphicsContext(traits.get())
 	;
-	
+
 	if(gc.valid()) {
 		gc->setClearColor(osg::Vec4f(0.2f, 0.2f, 0.6f, 1.0f));
 		gc->setClearMask(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -287,6 +287,6 @@ int main(int, char**) {
 
 		viewer.addView(view);
 	}
-	
+
 	return viewer.run();
 }
