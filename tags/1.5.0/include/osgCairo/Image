@@ -1,0 +1,111 @@
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
+// $Id$
+
+//! \file
+//! \brief Defines osgCairo::Image, the main object in osgCairo.
+
+#ifndef OSGCAIRO_IMAGE
+#define OSGCAIRO_IMAGE
+
+#include <cairo.h>
+#include <osg/Image>
+#include <osgCairo/Export>
+
+namespace osgCairo {
+
+// The Image class is our bread and butter object; this is where most of the
+// magic takes place. It derives from osg::Image, which is where the actual
+// data is stored (so that we can take advantage of OSG's image management
+// API).
+class OSGCAIRO_EXPORT Image: public osg::Image {
+public:
+	META_Object(osgCairo, Image);
+
+	//! Default constructor; requires that you call allocateSurface manually later.
+	//! This is useful when you don't know the dimensions of the Image beforehand.
+	Image();
+
+	//! Constructor that makes a single call to allocateSurface for you. These args
+	//! match the arguments to allocateSurface, so please see that documentation for
+	//! further information.
+	//! @see allocateSurface
+	Image(
+		unsigned int         width,
+		unsigned int         height,
+		cairo_format_t       format,
+		const unsigned char* data = 0
+	);
+
+	Image(const Image& image, const osg::CopyOp& co = osg::CopyOp::SHALLOW_COPY);
+
+	virtual ~Image();
+
+	//! The first two arguments are the power-of-two image dimensions; your GPU
+	//! must support this size. The final argument is whether or not you want to use
+	//! a buffer of data initially. By default, the entire surface area is set to all 0's,
+	//! which means different things for different format types; usually black or completely
+	//! transparent black. If you do specify a buffer of image data, you'll need to make
+	//! sure it's formatted properly against the CairoFormat object you used in the constructor.
+	virtual bool allocateSurface(
+		unsigned int         width,
+		unsigned int         height,
+		cairo_format_t       format,
+		const unsigned char* data = 0
+	);
+
+	//! This is an alternative form of allocation that will intialize the Image data from an
+	//! existing osg::Image image, but NOT an osgCairo::Image; use the copy constructor for
+	//! that.
+	virtual bool allocateSurface(const osg::Image* image);
+
+	//! Returns a cairo_t* to be used with the Cairo C API. This must be destroyed with the
+	//! cairo_destroy() function. The @adjustOrigin parameter determines whether or not the
+	//! context should have it's origin modified so that it is consistent with OpenGL 
+	//! coordinates.
+	cairo_t* createContext(bool adjustOrigin = true) const;
+
+	//! Returns whether or not the Image is valid internally.
+	virtual bool valid() const;
+
+	//! If the internal format is ARGB32, this function will pre-multiply the alpha for 
+	//! proper internal Cairo usage. This will return false if the format is incompatible.
+	bool preMultiply();
+
+	//! The the internal format is ARGB32, this function will un-pre-multiply the alpha
+	//! for proper usage with the osgDB (or perhaps other) components. This will return
+	//! false if the format is incompatible.
+	bool unPreMultiply();
+
+	//! Returns the internal Cairo surface; in our case, an "image" surface.
+	cairo_surface_t* getSurface() const;
+
+	//! Returns the cairo_format_t enum; usually ARGB32 or A8.
+	cairo_format_t getSurfaceFormat() const;
+
+	//! Returns the surface width.
+	int getSurfaceWidth() const;
+
+	//! Returns the surface height.
+	int getSurfaceHeight() const;
+
+	//! Returns the "stride" of a row of pixels; this is calculated by mulitplying the number
+	//! of bytes-per-unit times the number of columns.
+	int getSurfaceStride() const;
+
+	//! Returns a read-write pointer to the internal data. REMEMBER: Cairo stores data with
+	//! pre-multiplied alpha! This is the biggest source of trouble for most new users. :)
+	unsigned char* getSurfaceData() const;
+
+	//! Returns the raw status of the surface.
+	cairo_status_t getSurfaceStatus() const;
+
+	//! A helper utility function which will return the image size in memory in bytes.
+	unsigned int getImageSizeInBytes() const;
+
+protected:
+	cairo_surface_t* _surface;
+};
+
+}
+
+#endif
