@@ -1,0 +1,48 @@
+// -*-c++-*- osgCairo - Copyright (C) 2011 osgCairo Development Team
+// $Id$
+
+//! \file
+//! \brief Main doxygen docs; also defines compiler signature exports.
+
+#ifndef OSGCAIRO_EXPORT_
+#define OSGCAIRO_EXPORT_
+
+//! \mainpage osgCairo NodeKit Documentation
+//!
+//! \section intro Introduction
+//!
+//! osgCairo is C++ glueware between the excellent <a href='http://cairographics.org'>Cairo C library</a>
+//! and the <a href='http://openscenegraph.org'>OpenSceneGraph</a>. If you are viewing this documentation
+//! then you are likely quite familar with OSG, but are new to Cairo.
+//! 
+//! \section about What Is Cairo
+//!
+//! Cairo is a 2D vector drawing library that enjoys widespread use in the Linux world. It is
+//! an exceptionally well-designed piece of software that will compile and run on many platforms,
+//! and serves as a very competitive (if not superior) free alternative to other kinds of
+//! software that attempt to do the same thing.
+//!
+//! The author of this software originally intended to use Cairo simply for interactively
+//! generating user interface elements at runtime, but it soon became evident that Cairo was
+//! capable of helping with much more. For example, using a routine found in the ReadFile
+//! header, osgCairo can load any image that OSG itself supports and use the contents of that
+//! image as a background for future drawing operations. Furthermore, Cairo provides a
+//! glyph object that when used properly (with software like Pango/osgPango) can paint very
+//! high-quality font faces.
+//!
+//! \section usage A Quick Example
+//! 
+//! \include docs/demo.cpp
+
+#if defined(_MSC_VER) || defined(__CYGWIN__) || defined(__MINGW32__) || defined( __BCPLUSPLUS__)  || defined( __MWERKS__)
+    #if defined( osgCairo_EXPORTS )
+    #	define OSGCAIRO_EXPORT __declspec(dllexport)
+    #else
+    #	define OSGCAIRO_EXPORT __declspec(dllimport)
+    #endif
+#else
+    #define OSGCAIRO_EXPORT
+#endif  
+
+#endif
+
